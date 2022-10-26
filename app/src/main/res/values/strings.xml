@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">FinancialManagement</string>
+    <string name="imgBtnAssetsGraphWidth">50dp</string>
+    <string name="btnDayString">Day</string>
+    <string name="btnWeekString">Week</string>
+    <string name="btnMonthString">Month</string>
+    <string name="btnPeriodString">Period</string>
 </resources>

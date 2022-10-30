@@ -12,7 +12,7 @@
         android:layout_height="wrap_content">
 
         <Space
-            android:layout_width="@string/imgBtnAssetsGraphWidth"
+            android:layout_width="@string/image_button_assets_graph_width"
             android:layout_height="wrap_content" />
 
         <TextView
@@ -26,8 +26,8 @@
 
         <ImageButton
             android:id="@+id/imgBtnAssetsGraph"
-            android:layout_width="@string/imgBtnAssetsGraphWidth"
-            android:layout_height="@string/imgBtnAssetsGraphWidth"
+            android:layout_width="@string/image_button_assets_graph_width"
+            android:layout_height="@string/image_button_assets_graph_width"
             tools:srcCompat="@tools:sample/avatars" />
 
     </LinearLayout>
@@ -40,7 +40,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/btnDayString"
+            android:text="@string/button_day_string"
             app:layout_constraintEnd_toStartOf="@+id/btnWeek"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +50,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/btnWeekString"
+            android:text="@string/button_week_string"
             app:layout_constraintEnd_toStartOf="@+id/btnMonth"
             app:layout_constraintStart_toEndOf="@+id/btnDay"
             app:layout_constraintTop_toTopOf="parent" />
@@ -60,7 +60,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/btnMonthString"
+            android:text="@string/button_month_string"
             app:layout_constraintEnd_toStartOf="@+id/btnPeriod"
             app:layout_constraintStart_toEndOf="@+id/btnWeek"
             app:layout_constraintTop_toTopOf="parent" />
@@ -70,20 +70,99 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/btnPeriodString"
+            android:text="@string/button_period_string"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnMonth"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txtAssets"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/assets_label" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtCurrent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/current_assets_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtExpected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="@string/expected_assets_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtCurrentValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="1234,56€"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtCurrent" />
+
+        <TextView
+            android:id="@+id/txtExpectedValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="2000,00€"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtExpected" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.utils.widget.MockView
+        android:id="@+id/mockView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/categoryColorLabel"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:background="#FF0000"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtCategoryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Food"
+                app:layout_constraintStart_toEndOf="@+id/categoryColorLabel"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
 </LinearLayout>

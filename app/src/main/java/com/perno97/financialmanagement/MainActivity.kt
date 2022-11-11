@@ -1,5 +1,6 @@
 package com.perno97.financialmanagement
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +10,8 @@ import com.perno97.financialmanagement.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var dialog: AlertDialog
+    private lateinit var editAssetsDialog: AlertDialog
+    private lateinit var addFinMovDialog: AlertDialog
     private val logTag = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,14 +21,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         // Creating builder for edit current assets dialog
-        val builder = AlertDialog.Builder(this)
-        builder.setView(R.layout.activity_edit_current_assets_dialog)
-        dialog = builder.create()
+        val editAssetsDialogBuilder = AlertDialog.Builder(this)
+        val addFinMovDialogBuilder = AlertDialog.Builder(this)
+        editAssetsDialogBuilder.setView(R.layout.activity_edit_current_assets_dialog)
+        addFinMovDialogBuilder.setView(R.layout.activity_add_financial_movement)
+        editAssetsDialog = editAssetsDialogBuilder.create()
+        addFinMovDialog = addFinMovDialogBuilder.create()
 
         binding.txtCurrentValue.setOnClickListener {
             // TODO non si capisce che il testo è cliccabile
             Log.i(logTag, "Clicked edit current assets value")
-            dialog.show()
+            editAssetsDialog.show()
+        }
+        binding.fabAddMovement.setOnClickListener {
+            Log.i(logTag, "Clicked add financial movement")
+            startActivity(Intent(this, AddFinancialMovementActivity::class.java))
         }
 
     }

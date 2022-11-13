@@ -11,7 +11,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var editAssetsDialog: AlertDialog
-    private lateinit var addFinMovDialog: AlertDialog
     private val logTag = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,11 +21,8 @@ class MainActivity : AppCompatActivity() {
 
         // Creating builder for edit current assets dialog
         val editAssetsDialogBuilder = AlertDialog.Builder(this)
-        val addFinMovDialogBuilder = AlertDialog.Builder(this)
         editAssetsDialogBuilder.setView(R.layout.activity_edit_current_assets_dialog)
-        addFinMovDialogBuilder.setView(R.layout.activity_add_financial_movement)
         editAssetsDialog = editAssetsDialogBuilder.create()
-        addFinMovDialog = addFinMovDialogBuilder.create()
 
         binding.txtCurrentValue.setOnClickListener {
             // TODO non si capisce che il testo è cliccabile

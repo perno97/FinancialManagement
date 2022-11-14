@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.FinancialManagement" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- enable window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -12,5 +14,10 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.FinancialManagement.SlideBottom">
+        <item name="android:windowEnterTransition">@transition/slide_add_fin_mov</item>
+        <item name="android:windowExitTransition">@transition/slide_add_fin_mov</item>
     </style>
 </resources>

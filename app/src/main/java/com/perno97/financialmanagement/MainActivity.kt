@@ -1,5 +1,6 @@
 package com.perno97.financialmanagement
 
+import android.app.ActivityOptions
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -31,7 +32,10 @@ class MainActivity : AppCompatActivity() {
         }
         binding.fabAddMovement.setOnClickListener {
             Log.i(logTag, "Clicked add financial movement")
-            startActivity(Intent(this, AddFinancialMovementActivity::class.java))
+            startActivity(
+                Intent(this, AddFinancialMovementActivity::class.java),
+                ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+            )
         }
 
     }

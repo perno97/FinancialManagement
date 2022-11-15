@@ -1,13 +1,27 @@
 package com.perno97.financialmanagement
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
-// TODO rimuovere file
-class EditCurrentAssetsDialog : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.e("EditCurrentAssetsDialog", "OnCreate")
-        //setContentView(R.layout.activity_edit_current_assets_dialog)
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+
+class EditCurrentAssetsDialog : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        AlertDialog.Builder(requireContext())
+            .create()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_edit_current_assets_dialog, container, false)
+    }
+
+    companion object {
+        const val TAG = "EditCurrentAssetsDialog"
     }
 }

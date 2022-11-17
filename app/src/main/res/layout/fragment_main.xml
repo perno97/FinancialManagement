@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -20,14 +20,29 @@
                 android:layout_width="@string/image_button_assets_graph_width"
                 android:layout_height="match_parent" />-->
 
+            <Space
+                android:id="@+id/space1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="50dp"
+                android:layout_height="20dp"/>
+
             <TextView
                 android:id="@+id/txtTitle"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
                 android:text="August 2022"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_constraintEnd_toStartOf="@id/space2"
+                app:layout_constraintStart_toEndOf="@id/space1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+            <Space
+                android:id="@+id/space2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="50dp"
+                android:layout_height="20dp"/>
 
             <!--<ImageButton
                 android:id="@+id/imgBtnAssetsGraph"
@@ -36,7 +51,7 @@
                 tools:srcCompat="@tools:sample/avatars"
                 android:contentDescription="TODO" />--> <!-- TODO -->
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

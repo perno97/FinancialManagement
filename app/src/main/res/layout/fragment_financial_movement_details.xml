@@ -6,14 +6,13 @@
     android:layout_height="match_parent"
     android:layout_gravity="bottom"
     android:background="@color/white"
-    android:id="@+id/addFinMovLayout"
     tools:context=".AddFinancialMovementFragment">
 
     <TextView
-        android:id="@+id/txtNew"
+        android:id="@+id/txtDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New"
+        android:text="Details"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,10 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="0"
+        android:text="30"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtNew" />
+        app:layout_constraintTop_toBottomOf="@id/txtDetails" />
 
     <TextView
         android:id="@+id/txtCurrency"
@@ -35,7 +34,7 @@
         android:layout_marginTop="30dp"
         android:text="€"
         app:layout_constraintStart_toEndOf="@id/txtMovementAmount"
-        app:layout_constraintTop_toBottomOf="@id/txtNew" />
+        app:layout_constraintTop_toBottomOf="@id/txtDetails" />
 
     <LinearLayout
         android:id="@+id/linLayIncomeOutcome"
@@ -88,6 +87,7 @@
             android:layout_marginEnd="30dp"
             android:ems="10"
             android:inputType="date"
+            android:text="01/01/2022"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -223,7 +223,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabConfirmNew"
+        android:id="@+id/fabEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -235,7 +235,7 @@
         app:srcCompat="?android:attr/textCheckMark" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAbortNew"
+        android:id="@+id/fabBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -244,7 +244,7 @@
         android:layout_marginBottom="15dp"
         app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/fabConfirmNew"
+        app:layout_constraintEnd_toStartOf="@id/fabEdit"
         app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

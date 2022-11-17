@@ -49,7 +49,13 @@ class MainFragment : Fragment() {
         binding.fabRegisteredMovements.setOnClickListener {
             Log.i(LOG_TAG, "Clicked registered movements")
             parentFragmentManager.commit {
-                add<RegisteredMovementsFragment>(R.id.fragment_container_view)
+                setCustomAnimations(
+                    R.anim.slide_in_bottom,
+                    R.anim.slide_out_top,
+                    R.anim.slide_in_top,
+                    R.anim.slide_out_bottom
+                )
+                replace(R.id.fragment_container_view, RegisteredMovementsFragment())
                 addToBackStack(null)
             }
         }

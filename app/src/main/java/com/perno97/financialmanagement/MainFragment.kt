@@ -13,7 +13,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
-import org.w3c.dom.Text
 
 private const val LOG_TAG = "MainFragment"
 
@@ -50,6 +49,13 @@ class MainFragment : Fragment() {
                 childFragmentManager, EditCurrentAssetsDialog.TAG
             )
         }
+        binding.imgBtnGraphs.setOnClickListener{
+            Log.i(LOG_TAG, "Clicked on graphs button")
+            parentFragmentManager.commit {
+                replace(R.id.fragment_container_view, AssetsGraphsFragment())
+                addToBackStack(null)
+            }
+        }
         binding.fabRegisteredMovements.setOnClickListener {
             Log.i(LOG_TAG, "Clicked registered movements")
             parentFragmentManager.commit {
@@ -76,6 +82,7 @@ class MainFragment : Fragment() {
             catProg.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text = "160€"
             catProg.setOnClickListener {
                 parentFragmentManager.commit {
+                    binding.categoryList.removeView(catProg)
                     replace(R.id.fragment_container_view, CategoryDetailsFragment(catProg))
                     addToBackStack(null)
                 }

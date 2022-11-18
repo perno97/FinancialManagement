@@ -1,12 +1,10 @@
 package com.perno97.financialmanagement
 
 import android.os.Bundle
-import android.transition.Visibility
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 
 class FinancialMovementDetailsFragment : Fragment() {
@@ -43,6 +41,13 @@ class FinancialMovementDetailsFragment : Fragment() {
         binding.fabAbortEdit.hide()
     }
 
+    private fun enableEditing() {
+        binding.imgBtnBack.visibility = View.INVISIBLE
+        binding.fabEdit.hide()
+        binding.fabAbortEdit.show()
+        binding.fabConfirmEdit.show()
+    }
+
     private fun confirmEdit() {
         disableEditing()
         //TODO
@@ -51,13 +56,6 @@ class FinancialMovementDetailsFragment : Fragment() {
     private fun cancelEdit() {
         disableEditing()
         //TODO
-    }
-
-    private fun enableEditing() {
-        binding.imgBtnBack.visibility = View.INVISIBLE
-        binding.fabEdit.hide()
-        binding.fabAbortEdit.show()
-        binding.fabConfirmEdit.show()
     }
 
     override fun onDestroyView() {

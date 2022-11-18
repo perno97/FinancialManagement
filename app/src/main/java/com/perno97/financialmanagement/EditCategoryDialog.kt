@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
+import com.perno97.financialmanagement.databinding.FragmentEditCategoryDialogBinding
 
-class EditCurrentAssetsDialog : DialogFragment() {
+class EditCategoryDialog : DialogFragment() {
 
-    private var _binding: FragmentEditCurrentAssetsDialogBinding? = null
+    private var _binding: FragmentEditCategoryDialogBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -19,11 +19,11 @@ class EditCurrentAssetsDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentEditCurrentAssetsDialogBinding.inflate(inflater, container, false)
-        binding.btnConfirmEditAssets.setOnClickListener {
+        _binding = FragmentEditCategoryDialogBinding.inflate(inflater, container, false)
+        binding.btnConfirmEditCategory.setOnClickListener {
             confirmAction()
         }
-        binding.btnCancelEditAssets.setOnClickListener {
+        binding.btnCancelEditCategory.setOnClickListener {
             cancelAction()
         }
         return binding.root
@@ -45,6 +45,6 @@ class EditCurrentAssetsDialog : DialogFragment() {
     }
 
     companion object {
-        const val TAG = "EditCurrentAssetsDialog"
+        const val TAG = "EditCategoryDialog"
     }
 }

@@ -28,16 +28,18 @@
                 android:layout_height="match_parent"
                 android:text="August 2022"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                app:layout_constraintEnd_toStartOf="@id/space2"
+                app:layout_constraintEnd_toStartOf="@id/imgBtnGraphs"
                 app:layout_constraintStart_toEndOf="@id/space1"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
-            <Space
-                android:id="@+id/space2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+
+            <ImageButton
+                android:id="@+id/imgBtnGraphs"
                 android:layout_width="50dp"
-                android:layout_height="20dp"/>
+                android:layout_height="wrap_content"
+                android:src="?attr/actionModeShareDrawable"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

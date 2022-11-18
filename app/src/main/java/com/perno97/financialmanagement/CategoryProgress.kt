@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 
+// TODO delete this file
+
 private const val CATEGORY_COLOR_DIMENSIONS = 15
 private const val DEFAULT_COLOR = Color.RED
 private const val DEFAULT_CURRENT_PROGRESS = 50

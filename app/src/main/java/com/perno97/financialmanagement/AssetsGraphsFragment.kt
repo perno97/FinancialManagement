@@ -5,13 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
+import com.perno97.financialmanagement.databinding.FragmentAssetsGraphsBinding
 
-private const val LOG_TAG = "CategoryDetailsFragment"
+class AssetsGraphsFragment : Fragment() {
 
-class CategoryDetailsFragment(private val catProg: View) : Fragment() {
-
-    private var _binding: FragmentCategoryDetailsBinding? = null
+    private var _binding: FragmentAssetsGraphsBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -20,16 +18,10 @@ class CategoryDetailsFragment(private val catProg: View) : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
+        _binding = FragmentAssetsGraphsBinding.inflate(inflater, container, false)
         binding.imgBtnBack.setOnClickListener{
             parentFragmentManager.popBackStack()
         }
-        binding.imgBtnEdit.setOnClickListener {
-            EditCategoryDialog().show(
-                childFragmentManager, EditCategoryDialog.TAG
-            )
-        }
-        binding.catProgContainer.addView(catProg)
         return binding.root
     }
 

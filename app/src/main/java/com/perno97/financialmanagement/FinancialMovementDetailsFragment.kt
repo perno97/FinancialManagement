@@ -1,6 +1,7 @@
 package com.perno97.financialmanagement
 
 import android.os.Bundle
+import android.transition.Visibility
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -23,14 +24,40 @@ class FinancialMovementDetailsFragment : Fragment() {
         binding.fabEdit.setOnClickListener {
             enableEditing()
         }
-        binding.fabBack.setOnClickListener {
+        binding.imgBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
+        }
+        binding.fabConfirmEdit.setOnClickListener {
+            confirmEdit()
+        }
+        binding.fabAbortEdit.setOnClickListener {
+            cancelEdit()
         }
         return binding.root
     }
 
+    private fun disableEditing() {
+        binding.imgBtnBack.visibility = View.VISIBLE
+        binding.fabEdit.show()
+        binding.fabConfirmEdit.hide()
+        binding.fabAbortEdit.hide()
+    }
+
+    private fun confirmEdit() {
+        disableEditing()
+        //TODO
+    }
+
+    private fun cancelEdit() {
+        disableEditing()
+        //TODO
+    }
+
     private fun enableEditing() {
-        //TODO da implementare
+        binding.imgBtnBack.visibility = View.INVISIBLE
+        binding.fabEdit.hide()
+        binding.fabAbortEdit.show()
+        binding.fabConfirmEdit.show()
     }
 
     override fun onDestroyView() {

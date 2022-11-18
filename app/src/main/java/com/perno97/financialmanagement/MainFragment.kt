@@ -1,15 +1,19 @@
 package com.perno97.financialmanagement
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
+import org.w3c.dom.Text
 
 private const val LOG_TAG = "MainFragment"
 
@@ -57,6 +61,24 @@ class MainFragment : Fragment() {
                 )
                 replace(R.id.fragment_container_view, RegisteredMovementsFragment())
                 addToBackStack(null)
+            }
+        }
+
+        for (i in 1..10) {
+            val catProg = inflater.inflate(R.layout.category_progress, null)
+            binding.categoryList.addView(catProg)
+            catProg.findViewById<TextView>(R.id.categoryColorLabel).setBackgroundColor(Color.BLUE)
+            catProg.findViewById<TextView>(R.id.txtCategoryName).text = "Food"
+            val progressBar = catProg.findViewById<ProgressBar>(R.id.progressBarCategoryBudget)
+            progressBar.max = 200
+            progressBar.progress = 160
+            catProg.findViewById<TextView>(R.id.txtMaxCategoryBudget).text = "200€"
+            catProg.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text = "160€"
+            catProg.setOnClickListener {
+                parentFragmentManager.commit {
+                    replace(R.id.fragment_container_view, CategoryDetailsFragment(catProg))
+                    addToBackStack(null)
+                }
             }
         }
         return binding.root

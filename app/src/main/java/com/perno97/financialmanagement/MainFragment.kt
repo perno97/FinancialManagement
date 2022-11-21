@@ -12,6 +12,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
 
 private const val LOG_TAG = "MainFragment"
@@ -69,6 +72,15 @@ class MainFragment : Fragment() {
                 addToBackStack(null)
             }
         }
+        val chart = binding.pieChartMain
+        val entries = ArrayList<PieEntry>()
+        entries.add(PieEntry(0.5f,"Parte1"))
+        entries.add(PieEntry(0.5f,"Parte2"))
+        val dataSet = PieDataSet(entries, "Budgets")
+        val pieData = PieData(dataSet)
+        chart.data = pieData
+        chart.invalidate()
+
 
         for (i in 1..10) {
             val catProg = inflater.inflate(R.layout.category_progress, null)

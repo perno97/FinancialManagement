@@ -16,43 +16,24 @@
             android:layout_width="@string/image_button_assets_graph_width"
             android:layout_height="match_parent" />-->
 
-        <ImageButton
-            android:id="@+id/imgBtnBack"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:src="?attr/actionModeCloseDrawable"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginTop="25dp"
             android:text="August 2022"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintEnd_toStartOf="@id/space"
-            app:layout_constraintStart_toEndOf="@id/imgBtnBack"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
-        <Space
-            android:id="@+id/space"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="50dp"
-            android:layout_height="20dp"/>
-
-        <!--<ImageButton
-            android:id="@+id/imgBtnAssetsGraph"
-            android:layout_width="@string/image_button_assets_graph_width"
-            android:layout_height="@string/image_button_assets_graph_width"
-            tools:srcCompat="@tools:sample/avatars"
-            android:contentDescription="TODO" />--> <!-- TODO -->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp">
 
         <Button
             android:id="@+id/btnDay"
@@ -95,24 +76,12 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/btnIncoming"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Incoming"/>
-    </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp">
+        android:layout_marginTop="17dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp">
 
 
         <androidx.cardview.widget.CardView
@@ -127,7 +96,10 @@
                     android:layout_height="wrap_content"
                     android:background="@color/cardview_dark_background"
                     android:gravity="center"
-                    android:padding="10dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:paddingStart="35dp"
+                    android:paddingEnd="35dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

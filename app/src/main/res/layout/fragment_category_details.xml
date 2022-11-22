@@ -22,6 +22,7 @@
             <ImageButton
                 android:id="@+id/imgBtnBack"
                 android:layout_width="50dp"
+                android:layout_marginTop="25dp"
                 android:layout_height="wrap_content"
                 android:src="?attr/actionModeCloseDrawable"
                 app:layout_constraintStart_toStartOf="parent"
@@ -31,31 +32,20 @@
                 android:id="@+id/txtTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="25dp"
                 android:text="August 2022"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                app:layout_constraintEnd_toStartOf="@id/space"
-                app:layout_constraintStart_toEndOf="@id/imgBtnBack"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
-            <Space
-                android:id="@+id/space"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_width="50dp"
-                android:layout_height="20dp"/>
-
-            <!--<ImageButton
-                android:id="@+id/imgBtnAssetsGraph"
-                android:layout_width="@string/image_button_assets_graph_width"
-                android:layout_height="@string/image_button_assets_graph_width"
-                tools:srcCompat="@tools:sample/avatars"
-                android:contentDescription="TODO" />--> <!-- TODO -->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp">
 
             <Button
                 android:id="@+id/btnWeek"
@@ -87,18 +77,55 @@
                 app:layout_constraintStart_toEndOf="@+id/btnMonth"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/catProgContainer"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toStartOf="@+id/imgBtnEdit"
+                android:layout_marginStart="65dp"
+                android:layout_marginEnd="65dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
-
+                <TextView
+                    android:id="@+id/txtCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fuel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <ProgressBar
+                    android:id="@+id/progressBarCategoryBudget"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="35dp"
+                    android:max="150"
+                    android:progress="120"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtCategoryName" />
+                <TextView
+                    android:id="@+id/txtMaxCategoryBudget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:text="150€"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />
+                <TextView
+                    android:id="@+id/txtCurrentCategoryProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:text="120€"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -108,18 +135,28 @@
                 android:layout_height="wrap_content"
                 android:src="?attr/actionModeCloseDrawable"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toEndOf="@id/catProgContainer"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="Statistics" />
 
         <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:padding="15dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -138,6 +175,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Food"
+                        android:layout_marginStart="15dp"
                         app:layout_constraintBottom_toTopOf="@+id/txtMaxCategoryBudget"
                         app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -153,15 +191,17 @@
                 android:id="@+id/fabAddFilterCat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginTop="10dp"
                 android:clickable="true"
                 android:src="@android:drawable/ic_menu_add"
-                app:fabSize="mini" />
+                app:fabCustomSize="25dp"
+                android:focusable="true" />
         </LinearLayout>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:layout_marginBottom="17dp"
             android:gravity="center"
             android:text="Expenses" />
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/primary"
     android:id="@+id/addFinMovLayout"
     tools:context=".AddFinancialMovementFragment">
 
@@ -77,6 +77,7 @@
                 android:paddingEnd="25dp"
                 app:layout_constraintTop_toBottomOf="@id/linLayIncomeOutcome"
                 app:layout_constraintStart_toStartOf="parent"
+                android:background="@color/white"
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -161,7 +162,6 @@
                         android:ems="10"
                         android:inputType="textShortMessage"
                         android:text="Name"
-                        android:textAlignment="textEnd"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/txtTitleInput" />
 
@@ -192,7 +192,6 @@
                         android:ems="10"
                         android:inputType="textLongMessage|textMultiLine|textNoSuggestions"
                         android:text="Name"
-                        android:textAlignment="textEnd"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/txtNotesInput" />
 

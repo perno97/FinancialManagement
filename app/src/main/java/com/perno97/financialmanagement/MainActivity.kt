@@ -2,6 +2,8 @@ package com.perno97.financialmanagement
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.room.Room
+import com.perno97.financialmanagement.database.AppDatabase
 import com.perno97.financialmanagement.databinding.ActivityMainBinding
 
 private const val LOG_TAG = "MainActivity"

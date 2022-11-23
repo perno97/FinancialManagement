@@ -21,9 +21,6 @@ class RegisteredMovementsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisteredMovementsBinding.inflate(inflater, container, false)
-        binding.imgBtnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
         binding.singleRegisteredMov.setOnClickListener {
             parentFragmentManager.commit {
                 add<FinancialMovementDetailsFragment>(R.id.fragment_container_view)

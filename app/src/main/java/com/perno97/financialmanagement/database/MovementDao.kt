@@ -10,12 +10,12 @@ interface MovementDao {
     @Query("SELECT * FROM movement")
     fun getAll(): List<Movement>
 
-    @Query("SELECT * FROM movement WHERE movementId IN (:userIds)")
-    fun loadAllByIds(userIds: IntArray): List<Movement>
+    @Query("SELECT * FROM movement WHERE movementId IN (:movementIds)")
+    fun loadAllByIds(movementIds: IntArray): List<Movement>
 
     @Insert
-    fun insertAll(vararg users: Movement)
+    fun insertAll(vararg movements: Movement)
 
     @Delete
-    fun delete(user: Movement)
+    fun delete(movement: Movement)
 }

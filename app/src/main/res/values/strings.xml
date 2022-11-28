@@ -8,4 +8,7 @@
     <string name="assets_label">Assets</string>
     <string name="current_assets_label">Current</string>
     <string name="expected_assets_label">Expected</string>
+    <string name="euro_value">%.2f€</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

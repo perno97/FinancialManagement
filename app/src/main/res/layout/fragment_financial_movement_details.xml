@@ -3,16 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_gravity="bottom"
-    android:id="@+id/addFinMovLayout"
-    tools:context=".AddFinancialMovementActivity">
+    android:background="@color/white"
+    tools:context=".AddFinancialMovementFragment">
+
+    <ImageButton
+        android:id="@+id/imgBtnBack"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:src="?attr/actionModeCloseDrawable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txtNew"
+        android:id="@+id/txtDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New"
+        android:text="Details"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,10 +30,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="0"
+        android:text="30"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtNew" />
+        app:layout_constraintTop_toBottomOf="@id/txtDetails" />
 
     <TextView
         android:id="@+id/txtCurrency"
@@ -33,8 +41,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="€"
-        app:layout_constraintStart_toEndOf="@+id/txtMovementAmount"
-        app:layout_constraintTop_toBottomOf="@+id/txtNew" />
+        app:layout_constraintStart_toEndOf="@id/txtMovementAmount"
+        app:layout_constraintTop_toBottomOf="@id/txtDetails" />
 
     <LinearLayout
         android:id="@+id/linLayIncomeOutcome"
@@ -63,10 +71,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputDateRow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/linLayIncomeOutcome">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linLayIncomeOutcome">
 
         <TextView
             android:id="@+id/txtDate"
@@ -85,6 +95,7 @@
             android:layout_marginEnd="30dp"
             android:ems="10"
             android:inputType="date"
+            android:text="01/01/2022"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -93,10 +104,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputCategoryRow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/inputDateRow">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputDateRow">
 
         <TextView
             android:id="@+id/txtCategory"
@@ -122,10 +134,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputTitleRow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/inputCategoryRow">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputCategoryRow">
 
         <TextView
             android:id="@+id/txtTitle"
@@ -155,10 +169,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputNotesRow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/inputTitleRow">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputTitleRow">
 
         <TextView
             android:id="@+id/txtNotes"
@@ -188,10 +203,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputNotifyRow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/inputNotesRow">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputNotesRow">
 
         <TextView
             android:id="@+id/txtNotify"
@@ -214,37 +230,43 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
-        android:orientation="horizontal"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_margin="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputNotifyRow">
+        app:srcCompat="?android:attr/textCheckMark" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabConfirmNew"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="?android:attr/textCheckMark" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabConfirmEdit"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_margin="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="?android:attr/textCheckMark" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAbortNew"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            app:fabSize="mini"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/fabConfirmNew"
-            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAbortEdit"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="15dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fabConfirmEdit"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

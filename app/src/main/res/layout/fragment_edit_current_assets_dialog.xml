@@ -2,16 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="30dp"
+    android:paddingStart="45dp"
+    android:paddingEnd="45dp"
+    android:paddingTop="35dp"
+    android:paddingBottom="40dp"
+    android:background="@color/white"
     tools:context=".EditCurrentAssetsDialog">
 
     <TextView
         android:id="@+id/txtEditCurrentAssets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
         android:text="Edit current assets"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +24,7 @@
         android:id="@+id/editTextCurrentAssets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="65dp"
         android:ems="10"
         android:inputType="numberDecimal"
         android:minHeight="48dp"
@@ -30,22 +33,22 @@
         app:layout_constraintTop_toBottomOf="@+id/txtEditCurrentAssets" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnCancelEditAssets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Button"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
+        android:layout_marginTop="72dp"
+        android:text="Cancel"
+        app:layout_constraintEnd_toStartOf="@+id/btnConfirmEditAssets"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextCurrentAssets" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btnConfirmEditAssets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Button"
+        android:layout_marginTop="72dp"
+        android:text="Confirm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button"
+        app:layout_constraintStart_toEndOf="@+id/btnCancelEditAssets"
         app:layout_constraintTop_toBottomOf="@+id/editTextCurrentAssets" />
 </androidx.constraintlayout.widget.ConstraintLayout>

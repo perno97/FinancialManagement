@@ -1,18 +1,25 @@
 package com.perno97.financialmanagement.database
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import android.graphics.Color
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-@Database(entities = [Movement::class], version = 1)
+@Database(entities = [Movement::class, Category::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun movementDao(): MovementDao
+
+    abstract fun applicationDao(): ApplicationDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
-        fun getInstance(context: Context): AppDatabase {
+        fun getInstance(
+            context: Context,
+            scope: CoroutineScope
+        ): AppDatabase {
             synchronized(this) {
                 var instance = INSTANCE
 

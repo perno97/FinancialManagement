@@ -25,24 +25,33 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/txtMovementAmount"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="55dp"
-                android:text="0"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/movAmountRow"
+                app:layout_constraintTop_toBottomOf="@id/txtNew"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtNew" />
+                app:layout_constraintEnd_toEndOf="parent">
+                <EditText
+                    android:id="@+id/editTextMovAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="55dp"
+                    android:text="0"
+                    android:inputType="numberDecimal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/txtCurrency"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="55dp"
-                android:text="€"
-                app:layout_constraintStart_toEndOf="@id/txtMovementAmount"
-                app:layout_constraintTop_toBottomOf="@id/txtNew" />
+                <TextView
+                    android:id="@+id/txtCurrency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="55dp"
+                    android:text="€"
+                    app:layout_constraintStart_toEndOf="@id/editTextMovAmount"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
                 android:id="@+id/linLayIncomeOutcome"
@@ -52,7 +61,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtMovementAmount">
+                app:layout_constraintTop_toBottomOf="@id/movAmountRow">
 
                 <Button
                     android:id="@+id/btnIncome"
@@ -119,12 +128,20 @@
                     app:layout_constraintTop_toBottomOf="@id/inputDateRow">
 
                     <TextView
+                        android:id="@+id/txtCategoryAddFin"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Category"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
+                    <Button
+                        android:id="@+id/btnAddNewCategory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+"
+                        app:layout_constraintStart_toEndOf="@id/txtCategoryAddFin"
+                        app:layout_constraintEnd_toStartOf="@id/spinnerCategory" />
 
                     <Spinner
                         android:id="@+id/spinnerCategory"

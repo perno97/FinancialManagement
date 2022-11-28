@@ -16,4 +16,8 @@
     <color name="dark">#405059</color>
     <color name="dark_30">#EFF0F1</color>
     <color name="dark_10">#FAFAFA</color>
+    <integer-array name="category_colors_array">
+        <item>@color/primary</item>
+        <item>@color/success</item>
+    </integer-array>
 </resources>

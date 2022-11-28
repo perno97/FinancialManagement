@@ -28,7 +28,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:max="150"
+        android:max="100"
         android:progress="120"
         app:layout_constraintBottom_toTopOf="@+id/txtCurrentCategoryProgress"
         app:layout_constraintEnd_toEndOf="parent"

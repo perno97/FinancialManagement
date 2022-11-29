@@ -9,6 +9,10 @@ import java.util.*
 
 class AppViewModel(private val repository: AppRepository) : ViewModel(){
 
+    val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
+
+    val allMovements: LiveData<List<Movement>> = repository.allMovements.asLiveData()
+
     fun insert(category: Category) = viewModelScope.launch {
         repository.insert(category)
     }
@@ -21,8 +25,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel(){
         repository.deleteAllCategories()
     }
 
-    fun getCategoryBudgetsList(dateFrom: LocalDate, dateTo: LocalDate, mainFragment: MainFragment) : Flow<List<CategoryWithExpensesSum>> {
-        return repository.getCategoryBudgetsList(dateFrom, dateTo)
+    fun getCategoryBudgetsList(dateFrom: LocalDate, dateTo: LocalDate) : LiveData<List<CategoryWithExpensesSum>> {
+        return repository.getCategoryBudgetsList(dateFrom, dateTo).asLiveData()
     }
 }
 

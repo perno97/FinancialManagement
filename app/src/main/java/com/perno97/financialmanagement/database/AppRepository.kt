@@ -5,6 +5,11 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 class AppRepository(private val applicationDao: ApplicationDao) {
+
+    val allCategories: Flow<List<Category>> = applicationDao.getAllCategories()
+
+    val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
+
     @WorkerThread
     suspend fun insert(category: Category) {
         applicationDao.insertAllCategories(category)

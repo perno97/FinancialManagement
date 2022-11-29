@@ -1,14 +1,12 @@
 <resources>
     <string name="app_name">FinancialManagement</string>
     <string name="image_button_assets_graph_width">50dp</string>
-    <string name="button_day_string">Day</string>
-    <string name="button_week_string">Week</string>
-    <string name="button_month_string">Month</string>
-    <string name="button_period_string">Period</string>
-    <string name="assets_label">Assets</string>
-    <string name="current_assets_label">Current</string>
-    <string name="expected_assets_label">Expected</string>
+    <string name="button_day_string">DAY</string>
+    <string name="button_week_string">WEEK</string>
+    <string name="button_month_string">MONTH</string>
+    <string name="button_period_string">PERIOD</string>
+    <string name="assets_label">ASSETS</string>
+    <string name="current_assets_label">CURRENT</string>
+    <string name="expected_assets_label">EXPECTED</string>
     <string name="euro_value">%.2f€</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

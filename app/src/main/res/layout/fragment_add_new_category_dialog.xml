@@ -4,121 +4,130 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    tools:context=".EditCurrentAssetsDialog">
+    android:paddingStart="45dp"
+    android:paddingEnd="45dp"
+    android:paddingTop="35dp"
+    android:paddingBottom="40dp"
+    android:background="@drawable/all_rounded_20_style"
+    android:backgroundTint="@color/white"
+    tools:context=".AddNewCategoryDialog">
 
     <TextView
         android:id="@+id/txtAddNewCat"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center"
         android:layout_height="wrap_content"
-        android:text="Add new category"
+        android:text="ADD NEW CATEGORY"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/inputNewCatNameRow"
+    <LinearLayout
+        android:id="@+id/inputNameNewCatRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+        app:layout_constraintTop_toBottomOf="@id/txtAddNewCat">
         <TextView
             android:id="@+id/txtCatName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="NAME"
+            android:gravity="center_vertical"
+            android:layout_weight=".5" />
 
         <EditText
             android:id="@+id/editTextNewCatName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textShortMessage"
-            android:minHeight="48dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:gravity="center_vertical"
+            android:layout_weight=".5"
+            android:maxLength="15" />
+    </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/inputNewCatColorRow"
+    <TextView
+        android:id="@+id/txtColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="COLOR"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"/>
+
+    <Spinner
+        android:id="@+id/spinnerColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/inputBudgetNewCatRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputNewCatNameRow">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Color"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Spinner
-            android:id="@+id/spinnerColor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/inputNewCatBudgetRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputNewCatColorRow">
-
+        app:layout_constraintTop_toBottomOf="@id/txtColor">
         <TextView
             android:id="@+id/txtNewCatBudget"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Budget"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight=".5"
+            android:gravity="center_vertical"
+            android:text="MONTH BUDGET" />
 
         <EditText
             android:id="@+id/editTextNewCatBudget"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight=".4"
             android:ems="10"
-            android:inputType="number"
-            android:minHeight="48dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:inputType="number"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".1"
+            android:text="€" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/btnCancelNewCategory"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
-        android:text="Cancel"
-        app:layout_constraintEnd_toStartOf="@+id/btnConfirmNewCategory"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputNewCatColorRow" />
-
-    <Button
-        android:id="@+id/btnConfirmNewCategory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:text="Confirm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnCancelNewCategory"
-        app:layout_constraintTop_toBottomOf="@+id/inputNewCatColorRow" />
+        app:layout_constraintTop_toBottomOf="@id/inputBudgetNewCatRow">
+        <Button
+            android:id="@+id/btnCancelNewCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:layout_marginEnd="3dp"
+            android:background="@drawable/all_rounded_10_style"
+            app:backgroundTint="@color/dark"
+            android:text="CANCEL"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmNewCategory"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnConfirmNewCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:layout_marginStart="3dp"
+            android:textColor="@color/white"
+            android:background="@drawable/all_rounded_10_style"
+            app:backgroundTint="@color/primary"
+            android:text="CONFIRM"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnCancelNewCategory"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

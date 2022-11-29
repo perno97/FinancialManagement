@@ -16,8 +16,26 @@
     <color name="dark">#405059</color>
     <color name="dark_30">#EFF0F1</color>
     <color name="dark_10">#FAFAFA</color>
-    <integer-array name="category_colors_array">
-        <item>@color/primary</item>
-        <item>@color/success</item>
-    </integer-array>
+    <string-array name="category_colors_array">
+        <item>#800000</item>
+        <item>#9A6324</item>
+        <item>#808000</item>
+        <item>#469990</item>
+        <item>#000075</item>
+        <item>#000000</item>
+        <item>#e6194B</item>
+        <item>#f58231</item>
+        <item>#ffe119</item>
+        <item>#3cb44b</item>
+        <item>#42d4f4</item>
+        <item>#4363d8</item>
+        <item>#911eb4</item>
+        <item>#f032e6</item>
+        <item>#a9a9a9</item>
+        <item>#fabed4</item>
+        <item>#ffd8b1</item>
+        <item>#fffac8</item>
+        <item>#aaffc3</item>
+        <item>#dcbeff</item>
+    </string-array>
 </resources>

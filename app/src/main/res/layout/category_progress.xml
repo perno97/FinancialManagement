@@ -6,10 +6,9 @@
 
     <TextView
         android:id="@+id/categoryColorLabel"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_margin="20dp"
-        android:background="#FF0000"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/all_rounded_10_style"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -19,6 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Food"
+        android:layout_marginStart="15dp"
         app:layout_constraintBottom_toTopOf="@+id/txtMaxCategoryBudget"
         app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +26,7 @@
     <ProgressBar
         android:id="@+id/progressBarCategoryBudget"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:max="100"
         android:progress="120"
@@ -38,6 +38,7 @@
         android:id="@+id/txtMaxCategoryBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
         android:text="150€"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/categoryColorLabel"

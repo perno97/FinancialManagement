@@ -1,12 +1,9 @@
 package com.perno97.financialmanagement
 
-import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.database.AppViewModel
@@ -14,7 +11,7 @@ import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentAddNewCategoryDialogBinding
 import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
-import com.perno97.financialmanagement.utils.SpinnerAdapter
+import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter
 
 class AddNewCategoryDialog : DialogFragment() {
 
@@ -31,8 +28,8 @@ class AddNewCategoryDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddNewCategoryDialogBinding.inflate(inflater, container, false)
-        val spinnerAdapter = SpinnerAdapter(requireContext())
-        binding.spinnerColor.adapter = spinnerAdapter
+        val colorsSpinnerAdapter = ColorsSpinnerAdapter(requireContext())
+        binding.spinnerColor.adapter = colorsSpinnerAdapter
         binding.btnConfirmNewCategory.setOnClickListener {
             confirmAction()
         }
@@ -44,12 +41,12 @@ class AddNewCategoryDialog : DialogFragment() {
 
     private fun confirmAction() {
         val name = binding.editTextNewCatName.text.toString()
-        val color = binding.spinnerColor.selectedItem
+        val color = binding.spinnerColor.selectedItem.toString()
         val budget = binding.editTextNewCatBudget.text.toString().toFloat()
         appViewModel.insert(
             Category(
                 name = name,
-                color = color.toString(),
+                color = color,
                 budget = budget
             )
         )

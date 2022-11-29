@@ -8,14 +8,16 @@
     android:paddingEnd="45dp"
     android:paddingTop="35dp"
     android:paddingBottom="40dp"
-    android:background="@color/white"
+    android:background="@drawable/all_rounded_20_style"
+    android:backgroundTint="@color/white"
     tools:context=".EditCurrentAssetsDialog">
 
     <TextView
         android:id="@+id/txtEditCurrentAssets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit current assets"
+        android:text="EDIT CURRENT ASSETS"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,29 +28,52 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="65dp"
         android:ems="10"
+        android:textSize="28sp"
+        android:textAlignment="center"
+        android:background="@drawable/all_rounded_30_style"
+        android:backgroundTint="@color/dark_10"
         android:inputType="numberDecimal"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtEditCurrentAssets" />
 
-    <Button
-        android:id="@+id/btnCancelEditAssets"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
-        android:text="Cancel"
-        app:layout_constraintEnd_toStartOf="@+id/btnConfirmEditAssets"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCurrentAssets" />
-
-    <Button
-        android:id="@+id/btnConfirmEditAssets"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:text="Confirm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnCancelEditAssets"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCurrentAssets" />
+        app:layout_constraintTop_toBottomOf="@id/editTextCurrentAssets">
+        <Button
+            android:id="@+id/btnCancelEditAssets"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:layout_marginEnd="3dp"
+            android:background="@drawable/all_rounded_10_style"
+            app:backgroundTint="@color/dark"
+            android:text="CANCEL"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmEditAssets"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnConfirmEditAssets"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:layout_marginStart="3dp"
+            android:textColor="@color/white"
+            android:background="@drawable/all_rounded_10_style"
+            app:backgroundTint="@color/primary"
+            android:text="CONFIRM"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnCancelEditAssets"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

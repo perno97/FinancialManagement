@@ -13,5 +13,8 @@ data class IncumbentMovement(
     override val movementId: Int,
     override val date: LocalDate,
     override val amount: Float,
-    override val category: Int
-) :Movement(movementId, date, amount, category)
+    override val category: String,
+    override val title: String,
+    override val notes: String,
+    override val notify: Boolean
+) :Movement(movementId, date, amount, category, title, notes, notify)

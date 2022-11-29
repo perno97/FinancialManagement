@@ -8,12 +8,12 @@ import java.util.*
 class Converters {
 
     @TypeConverter
-    fun fromString(value: String): LocalDate? {
-        return value.let { LocalDate.parse(value) }
+    fun fromTimestamp(value: Long): LocalDate? {
+        return value.let { LocalDate.ofEpochDay(value) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: LocalDate): String? {
-        return date.toString()
+    fun dateToTimestamp(date: LocalDate): Long {
+        return date.toEpochDay()
     }
 }

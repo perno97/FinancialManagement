@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.database.CategoryWithExpensesSum
@@ -212,11 +213,12 @@ class MainFragment : Fragment(), ICustomPeriod{
                     .backgroundTintList = ColorStateList.valueOf(Color.parseColor(c.color))
                 colors.add(Color.parseColor(c.color))
                 catProg.findViewById<TextView>(R.id.txtCategoryName).text = c.name
-                val progressBar = catProg.findViewById<ProgressBar>(R.id.progressBarCategoryBudget)
+                val progressBar = catProg.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 progressBar.progress = (c.current * 100 / c.budget).roundToInt()
-                val progressDrawable = progressBar.progressDrawable.mutate()
+                /*val progressDrawable = progressBar.progressDrawable.mutate()
                 progressDrawable.setColorFilter(Color.parseColor(c.color), PorterDuff.Mode.SRC_IN)
-                progressBar.progressDrawable = progressDrawable
+                progressBar.progressDrawable = progressDrawable*/
+                progressBar.indicatorColor[0] = Color.parseColor(c.color)
 
                 catProg.findViewById<TextView>(R.id.txtMaxCategoryBudget).text = getString(R.string.euro_value, c.budget)
                 catProg.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =

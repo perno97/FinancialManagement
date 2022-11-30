@@ -24,6 +24,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
+import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.CategoryWithExpensesSum
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
 import java.time.Instant
@@ -37,7 +38,7 @@ import kotlin.math.roundToInt
 
 private const val LOG_TAG = "MainFragment"
 
-class MainFragment : Fragment(), ICustomPeriod{
+class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null
     // This property is only valid between onCreateView and
@@ -56,11 +57,9 @@ class MainFragment : Fragment(), ICustomPeriod{
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         initListeners()
-
         setPeriodMonth()
         binding.btnMonth.isEnabled = false
         loadData()
-
         return binding.root
     }
 
@@ -106,13 +105,11 @@ class MainFragment : Fragment(), ICustomPeriod{
             setPeriodWeek()
             loadData()
         }
-        binding.btnPeriod.setOnClickListener { //TODO disattivare appena premuto sennò se ne aprono molti
+        binding.btnPeriod.setOnClickListener {
+            binding.btnPeriod.isEnabled = false
             binding.btnDay.isEnabled = true
             binding.btnWeek.isEnabled = true
             binding.btnMonth.isEnabled = true
-            /*DatePickerFragment(null, this).show(
-                parentFragmentManager, DatePickerFragment.TAG
-            )*/
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select period")
@@ -131,8 +128,9 @@ class MainFragment : Fragment(), ICustomPeriod{
                     .atZone(ZoneId.systemDefault()).toLocalDate()
 
                 setCustomPeriod(from,to)
+                binding.btnPeriod.isEnabled = true
             }
-            dateRangePicker.show(parentFragmentManager, DatePickerFragment.TAG)
+            dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
         }
         binding.txtCurrentValue.setOnClickListener {
             // TODO non si capisce che il testo è cliccabile
@@ -161,6 +159,8 @@ class MainFragment : Fragment(), ICustomPeriod{
                 addToBackStack(null)
             }
         }
+        val d = LocalDate.parse("2022-11-30")
+        Log.e(LOG_TAG, "DATA --> " + d.atStartOfDay(ZoneId.systemDefault()).toEpochSecond())
     }
 
     /**
@@ -178,11 +178,11 @@ class MainFragment : Fragment(), ICustomPeriod{
     }
     private fun setPeriodWeek() {
         dateTo = LocalDate.now()
-        dateFrom = LocalDate.now().with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+        dateFrom = LocalDate.now().with(TemporalAdjusters.previousOrSame(firstDayOfWeek)) //TODO controllare
         setTitle("${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
                 "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}")
     }
-    override fun setCustomPeriod(from: LocalDate, to: LocalDate) {
+    fun setCustomPeriod(from: LocalDate, to: LocalDate) {
         dateTo = to
         dateFrom = from
         setTitle("${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
@@ -226,7 +226,7 @@ class MainFragment : Fragment(), ICustomPeriod{
                 catProg.setOnClickListener {
                     parentFragmentManager.commit {
                         binding.categoryList.removeView(catProg)
-                        replace(R.id.fragment_container_view, CategoryDetailsFragment(catProg))
+                        replace(R.id.fragment_container_view, CategoryDetailsFragment(Category(c.name,c.color,c.budget)))
                         addToBackStack(null)
                     }
                 }

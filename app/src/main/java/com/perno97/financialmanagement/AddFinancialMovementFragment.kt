@@ -62,7 +62,7 @@ class AddFinancialMovementFragment : Fragment() {
                             .atZone(ZoneId.systemDefault()).toLocalDate()
                         binding.editTextMovementDate.setText(date.toString())
                     }
-                    datePicker.show(parentFragmentManager, DatePickerFragment.TAG)
+                    datePicker.show(parentFragmentManager, "rangeDatePickerDialog")
                 }
                 return false
             }

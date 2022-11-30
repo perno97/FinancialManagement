@@ -7,8 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
 class FinancialManagementApplication :Application() {
-    val applicationScope = CoroutineScope(SupervisorJob())
-
-    val database by lazy { AppDatabase.getInstance(this, applicationScope) }
+    val database by lazy { AppDatabase.getInstance(this) }
     val repository by lazy { AppRepository(database.applicationDao())}
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="25dp"
+    android:layout_marginEnd="25dp"
+    android:layout_marginBottom="20dp"
+    app:cardCornerRadius="15dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/dark"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="35dp"
+            android:paddingEnd="35dp">
+            <TextView
+                android:id="@+id/txtHeaderDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="03/01/2022"
+                android:textColor="@color/white"
+                android:layout_weight=".4" />
+            <TextView
+                android:id="@+id/txtHeaderPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+80€"
+                android:textColor="@color/info"
+                android:layout_weight=".3"
+                android:gravity="end"/>
+            <TextView
+                android:id="@+id/txtHeaderNegative"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-20€"
+                android:textColor="@color/warning"
+                android:layout_weight=".3"
+                android:gravity="end"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/movementLinesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

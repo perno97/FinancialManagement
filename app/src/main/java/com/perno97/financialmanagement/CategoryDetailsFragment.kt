@@ -7,11 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
 
 private const val LOG_TAG = "CategoryDetailsFragment"
 
-class CategoryDetailsFragment(private val catProg: View) : Fragment() {
+class CategoryDetailsFragment(private val category: Category) : Fragment() {
 
     private var _binding: FragmentCategoryDetailsBinding? = null
     // This property is only valid between onCreateView and
@@ -23,7 +24,7 @@ class CategoryDetailsFragment(private val catProg: View) : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
-        binding.imgBtnBack.setOnClickListener{
+        binding.fabBtnBack.setOnClickListener{
             parentFragmentManager.popBackStack()
         }
         binding.imgBtnEdit.setOnClickListener {
@@ -43,20 +44,11 @@ class CategoryDetailsFragment(private val catProg: View) : Fragment() {
                 addToBackStack(null)
             }
         }
-        binding.catProgContainer.addView(catProg)
         return binding.root
-    }
-
-    public fun enableButtons() {
-        binding.fabAddFilterCat.isEnabled = true
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        const val CATEGORY_DETAILS_POP_NAME = "CategoryDetailsFragmentPop"
     }
 }

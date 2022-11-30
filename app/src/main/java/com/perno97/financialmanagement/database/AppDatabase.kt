@@ -17,8 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
         fun getInstance(
-            context: Context,
-            scope: CoroutineScope
+            context: Context
         ): AppDatabase {
             synchronized(this) {
                 var instance = INSTANCE

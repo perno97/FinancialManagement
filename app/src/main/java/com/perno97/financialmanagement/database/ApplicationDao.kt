@@ -30,4 +30,9 @@ interface ApplicationDao {
             " movement WHERE date >= :dateFrom AND date <= :dateTo AND amount > 0 GROUP BY catName)" +
             " ON category.name = catName")
     fun getCategoryBudgetsList(dateFrom: LocalDate, dateTo: LocalDate): Flow<List<CategoryWithExpensesSum>>
+
+    @Query("SELECT STRFTIME('%Y-%m', date) as newDate," +
+            " SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
+            " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative FROM movement")
+    fun getMovementsGroupByMonth(): Flow<List<GroupedMovements>>
 }

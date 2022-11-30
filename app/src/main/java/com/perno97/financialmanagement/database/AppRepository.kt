@@ -10,6 +10,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
 
+    val movementsGroupByMonth: Flow<List<GroupedMovements>> = applicationDao.getMovementsGroupByMonth()
+
     @WorkerThread
     suspend fun insert(category: Category) {
         applicationDao.insertAllCategories(category)

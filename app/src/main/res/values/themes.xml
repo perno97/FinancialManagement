@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:colorAccent">@color/dark</item>
         <!-- Customize your theme here. -->
         <item name="android:textSize">12sp</item>
         <item name="android:textColorPrimary">@color/dark</item>

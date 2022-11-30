@@ -13,6 +13,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel(){
 
     val allMovements: LiveData<List<Movement>> = repository.allMovements.asLiveData()
 
+    val movementsGroupByMonth: LiveData<List<GroupedMovements>> = repository.movementsGroupByMonth.asLiveData()
+
     fun insert(category: Category) = viewModelScope.launch {
         repository.insert(category)
     }

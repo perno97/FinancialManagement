@@ -19,7 +19,7 @@ class AssetsGraphsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAssetsGraphsBinding.inflate(inflater, container, false)
-        binding.imgBtnBack.setOnClickListener{
+        binding.fabBtnBack.setOnClickListener{
             parentFragmentManager.popBackStack()
         }
         return binding.root

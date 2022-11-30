@@ -19,10 +19,10 @@ class FinancialMovementDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFinancialMovementDetailsBinding.inflate(inflater, container, false)
-        binding.fabEdit.setOnClickListener {
+        binding.fabEditMovement.setOnClickListener {
             enableEditing()
         }
-        binding.imgBtnBack.setOnClickListener {
+        binding.fabBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
         binding.fabConfirmEdit.setOnClickListener {
@@ -35,15 +35,15 @@ class FinancialMovementDetailsFragment : Fragment() {
     }
 
     private fun disableEditing() {
-        binding.imgBtnBack.visibility = View.VISIBLE
-        binding.fabEdit.show()
+        binding.fabBtnBack.show()
+        binding.fabEditMovement.show()
         binding.fabConfirmEdit.hide()
         binding.fabAbortEdit.hide()
     }
 
     private fun enableEditing() {
-        binding.imgBtnBack.visibility = View.INVISIBLE
-        binding.fabEdit.hide()
+        binding.fabBtnBack.hide()
+        binding.fabEditMovement.hide()
         binding.fabAbortEdit.show()
         binding.fabConfirmEdit.show()
     }

@@ -10,6 +10,7 @@ import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDial
 class EditCurrentAssetsDialog : DialogFragment() {
 
     private var _binding: FragmentEditCurrentAssetsDialogBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!

@@ -10,6 +10,7 @@ import com.perno97.financialmanagement.databinding.FragmentAssetsGraphsBinding
 class AssetsGraphsFragment : Fragment() {
 
     private var _binding: FragmentAssetsGraphsBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -19,7 +20,7 @@ class AssetsGraphsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAssetsGraphsBinding.inflate(inflater, container, false)
-        binding.fabBtnBack.setOnClickListener{
+        binding.fabBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
         return binding.root

@@ -15,6 +15,7 @@ private const val LOG_TAG = "CategoryDetailsFragment"
 class CategoryDetailsFragment(private val category: Category) : Fragment() {
 
     private var _binding: FragmentCategoryDetailsBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -24,7 +25,7 @@ class CategoryDetailsFragment(private val category: Category) : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
-        binding.fabBtnBack.setOnClickListener{
+        binding.fabBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
         binding.imgBtnEdit.setOnClickListener {

@@ -1,19 +1,21 @@
 package com.perno97.financialmanagement.database
 
 import androidx.lifecycle.*
-import com.perno97.financialmanagement.MainFragment
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.*
 
-class AppViewModel(private val repository: AppRepository) : ViewModel(){
+class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
 
     val allMovements: LiveData<List<Movement>> = repository.allMovements.asLiveData()
 
-    val movementsGroupByMonth: LiveData<List<GroupedMovements>> = repository.movementsGroupByMonth.asLiveData()
+    val movementsGroupByMonth: LiveData<Map<GroupInfo, List<MovementAndCategory>>> =
+        repository.movementsGroupByMonth.asLiveData()
+
+    val allMovementsAndCategories: LiveData<List<MovementAndCategory>> =
+        repository.movementAndCategory.asLiveData()
 
     fun insert(category: Category) = viewModelScope.launch {
         repository.insert(category)
@@ -27,7 +29,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel(){
         repository.deleteAllCategories()
     }
 
-    fun getCategoryBudgetsList(dateFrom: LocalDate, dateTo: LocalDate) : LiveData<List<CategoryWithExpensesSum>> {
+    fun getCategoryBudgetsList(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): LiveData<List<CategoryWithExpensesSum>> {
         return repository.getCategoryBudgetsList(dateFrom, dateTo).asLiveData()
     }
 }

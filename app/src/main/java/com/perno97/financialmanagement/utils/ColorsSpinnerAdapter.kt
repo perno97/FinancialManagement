@@ -15,7 +15,7 @@ class ColorsSpinnerAdapter(private val context: Context) : BaseAdapter() {
 
     init {
         val array = context.resources.getStringArray(R.array.category_colors_array)
-        for(c in array){
+        for (c in array) {
             colors.add(c)
         }
     }
@@ -32,12 +32,12 @@ class ColorsSpinnerAdapter(private val context: Context) : BaseAdapter() {
         return p0.toLong()
     }
 
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        val view = LayoutInflater.from(context).inflate(R.layout.color_spinner_row, p2, false)
+    override fun getView(index: Int, view: View?, viewGroup: ViewGroup?): View {
+        val v = LayoutInflater.from(context).inflate(R.layout.color_spinner_row, viewGroup, false)
 
-        view.findViewById<TextView>(R.id.spinnerText)
-            .setBackgroundColor(Color.parseColor(colors.get(p0)))
-        return view
+        v.findViewById<TextView>(R.id.spinnerText)
+            .setBackgroundColor(Color.parseColor(colors[index]))
+        return v
     }
 
 }

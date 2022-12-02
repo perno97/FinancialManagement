@@ -1,20 +1,21 @@
 package com.perno97.financialmanagement
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.util.Pair
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.perno97.financialmanagement.database.AppViewModel
-import com.perno97.financialmanagement.database.AppViewModelFactory
-import com.perno97.financialmanagement.database.GroupedMovements
+import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
 import java.time.Instant
 import java.time.LocalDate
@@ -22,6 +23,8 @@ import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 private const val LOG_TAG = "RegMovementsFragment"
 
@@ -56,16 +59,26 @@ class RegisteredMovementsFragment : Fragment() {
         }
     }
 
-    private fun movementsLoaded(movements: List<GroupedMovements>) {
+    private fun movementsLoaded(movements: Map<GroupInfo, List<MovementAndCategory>>) {
         if(movements.isEmpty()){
             return
         }
         else {
-            for(m in movements){
+            for(group in movements.keys){
                 val card = LayoutInflater.from(requireContext()).inflate(R.layout.movement_card, binding.movementCardsContainer, false)
-                card.findViewById<TextView>(R.id.txtHeaderDate).text = m.newDate
-                card.findViewById<TextView>(R.id.txtHeaderNegative).text = m.negative.toString()
-                card.findViewById<TextView>(R.id.txtHeaderPositive).text = m.positive.toString()
+                card.findViewById<TextView>(R.id.txtHeaderDate).text = group.newDate
+                card.findViewById<TextView>(R.id.txtHeaderNegative).text = String.format("%.2f€", group.negative)
+                card.findViewById<TextView>(R.id.txtHeaderPositive).text = String.format("%.2f€", group.positive)
+                for(mov in movements[group]!!){
+                    val lineContainer = card.findViewById<LinearLayout>(R.id.movementLinesContainer)
+                    val cardLine = LayoutInflater.from(requireContext()).inflate(R.layout.movement_line, lineContainer, false)
+                    cardLine.findViewById<TextView>(R.id.txtCatLineColor)
+                        .backgroundTintList = ColorStateList.valueOf(Color.parseColor(mov.category.color))
+                    cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
+                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
+                    cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text = String.format("%.2f€", mov.movement.amount)
+                    lineContainer.addView(cardLine)
+                }
                 binding.movementCardsContainer.addView(card)
             }
         }

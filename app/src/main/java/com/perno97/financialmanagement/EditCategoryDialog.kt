@@ -10,6 +10,7 @@ import com.perno97.financialmanagement.databinding.FragmentEditCategoryDialogBin
 class EditCategoryDialog : DialogFragment() {
 
     private var _binding: FragmentEditCategoryDialogBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!

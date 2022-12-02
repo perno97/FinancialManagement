@@ -10,12 +10,12 @@ import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentAddNewCategoryDialogBinding
-import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
 import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter
 
 class AddNewCategoryDialog : DialogFragment() {
 
     private var _binding: FragmentAddNewCategoryDialogBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!

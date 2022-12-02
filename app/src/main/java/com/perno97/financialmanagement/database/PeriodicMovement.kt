@@ -9,7 +9,7 @@ import java.util.*
 @Entity(tableName = "periodic_movement")
 data class PeriodicMovement(
     @PrimaryKey(autoGenerate = true) val periodicMovementId: Int,
-    @ColumnInfo(name = "days") val days: Int, //TODO ripetizione ogni giovedì? Ogni 15 del mese?
+    val days: Int, //TODO ripetizione ogni giovedì? Ogni 15 del mese?
     override val movementId: Int,
     override val date: LocalDate,
     override val amount: Float,

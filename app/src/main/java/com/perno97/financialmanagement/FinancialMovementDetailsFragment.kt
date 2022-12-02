@@ -10,6 +10,7 @@ import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDeta
 class FinancialMovementDetailsFragment : Fragment() {
 
     private var _binding: FragmentFinancialMovementDetailsBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!

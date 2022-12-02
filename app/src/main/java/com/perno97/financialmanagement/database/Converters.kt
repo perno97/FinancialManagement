@@ -1,17 +1,18 @@
 package com.perno97.financialmanagement.database
 
 import androidx.room.TypeConverter
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.*
+
 
 class Converters {
 
     @TypeConverter
     fun fromTimestamp(value: Long): LocalDate? {
-        return value.let { LocalDateTime.ofEpochSecond(value,0,ZoneId.systemDefault()).toLocalDate() }
+        return value.let {
+            Instant.ofEpochSecond(value).atZone(ZoneId.systemDefault()).toLocalDate()
+        }
     }
 
     @TypeConverter

@@ -32,10 +32,10 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategoryBudgetsList(
+    fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<List<CategoryWithExpensesSum>> {
-        return applicationDao.getCategoryBudgetsList(dateFrom, dateTo)
+        return applicationDao.getCategoryExpensesProgresses(dateFrom, dateTo)
     }
 }

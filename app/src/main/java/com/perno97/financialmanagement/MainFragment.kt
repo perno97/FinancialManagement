@@ -15,20 +15,23 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.CategoryWithExpensesSum
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
+import com.perno97.financialmanagement.utils.PeriodState
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
@@ -36,6 +39,8 @@ import kotlin.math.roundToInt
 
 
 private const val LOG_TAG = "MainFragment"
+private const val DATE_FROM_KEY = "dateFrom"
+private const val DATE_TO_KEY = "dateTo"
 
 class MainFragment : Fragment() {
     /**
@@ -56,15 +61,30 @@ class MainFragment : Fragment() {
 
     private lateinit var dateFrom: LocalDate
     private lateinit var dateTo: LocalDate
-    private lateinit var dateRangePicker: MaterialDatePicker<Pair<Long, Long>>
+    private var datePickerSelection: Pair<Long, Long>? = null
     private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+    private var state = PeriodState.MONTH
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        setMonth()
+        // Load UI data
+        lifecycleScope.launch {
+            appViewModel.uiState.collect {
+                dateFrom = it.dateFrom ?: LocalDate.now().minusDays(1)
+                dateTo = it.dateTo ?: LocalDate.now()
+                state = it.state ?: PeriodState.MONTH
+                datePickerSelection = it.datePickerSelection
+                when (state) {
+                    PeriodState.DAY -> setDay()
+                    PeriodState.WEEK -> setWeek()
+                    PeriodState.MONTH -> setMonth()
+                    PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
+                }
+            }
+        }
         return binding.root
     }
 
@@ -74,16 +94,16 @@ class MainFragment : Fragment() {
         //TODO disattivare bottoni in onPause()?
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        //TODO salvare configurazione UI
+    override fun onStop() {
+        super.onStop()
+        appViewModel.setPeriod(dateFrom, dateTo, state, datePickerSelection) // Saving UI state
     }
 
     private fun updateData() {
         binding.categoryList.removeAllViews()
-        appViewModel.getCategoryBudgetsList(dateFrom, dateTo)
-            .observe(viewLifecycleOwner, Observer {
-                categoriesLoaded(it)
+        appViewModel.getCategoryExpensesProgresses(dateFrom, dateTo)
+            .observe(viewLifecycleOwner, Observer { list ->
+                categoriesLoaded(list)
             })
     }
 
@@ -93,6 +113,7 @@ class MainFragment : Fragment() {
         binding.btnMonth.isEnabled = true
         dateTo = LocalDate.now()
         dateFrom = dateTo
+        state = PeriodState.DAY
         setTitle("${dateTo.dayOfMonth} ${dateTo.month} ${dateTo.year}")
         updateData()
     }
@@ -104,6 +125,7 @@ class MainFragment : Fragment() {
         dateTo = LocalDate.now()
         dateFrom = LocalDate.now()
             .with(TemporalAdjusters.previousOrSame(firstDayOfWeek)) //TODO controllare
+        state = PeriodState.WEEK
         setTitle(
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
@@ -117,47 +139,23 @@ class MainFragment : Fragment() {
         binding.btnMonth.isEnabled = false
         dateTo = LocalDate.now()
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
+        state = PeriodState.MONTH
         setTitle("${dateTo.month} ${dateTo.year}")
         updateData()
     }
 
-    private fun setPeriod() {
-        binding.btnPeriod.isEnabled = false
+    private fun setPeriod(from: LocalDate, to: LocalDate) {
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
-        /**
-         * Update of [dateTo], [dateFrom], layout title and visualized data
-         * is done inside [initDateRangePicker]
-         */
-        dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
-    }
-
-    private fun initDateRangePicker() {
-        dateRangePicker =
-            MaterialDatePicker.Builder.dateRangePicker()
-                .setTitleText("Select period")
-                .setSelection(
-                    Pair(
-                        MaterialDatePicker.thisMonthInUtcMilliseconds(),
-                        MaterialDatePicker.todayInUtcMilliseconds()
-                    )
-                )
-                .build()
-        dateRangePicker.addOnPositiveButtonClickListener { pair ->
-            val from = Instant.ofEpochMilli(pair.first)
-                .atZone(ZoneId.systemDefault()).toLocalDate()
-            val to = Instant.ofEpochMilli(pair.second)
-                .atZone(ZoneId.systemDefault()).toLocalDate()
-            dateTo = to
-            dateFrom = from
-            setTitle(
-                "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                        "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
-            )
-            updateData()
-            binding.btnPeriod.isEnabled = true
-        }
+        dateTo = to
+        dateFrom = from
+        state = PeriodState.PERIOD
+        setTitle(
+            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
+                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+        )
+        updateData()
     }
 
     private fun initListeners() {
@@ -184,7 +182,32 @@ class MainFragment : Fragment() {
             setMonth()
         }
         binding.btnPeriod.setOnClickListener {
-            setPeriod()
+            binding.btnPeriod.isEnabled = false
+
+            // Build
+            val dateRangePicker =
+                MaterialDatePicker.Builder.dateRangePicker()
+                    .setTitleText("Select period")
+                    .setSelection(
+                        datePickerSelection ?: Pair(
+                            MaterialDatePicker.thisMonthInUtcMilliseconds(),
+                            MaterialDatePicker.todayInUtcMilliseconds()
+                        )
+                    )
+                    .build()
+            // Add confirm listener
+            dateRangePicker.addOnPositiveButtonClickListener { pair ->
+                val from = Instant.ofEpochMilli(pair.first)
+                    .atZone(ZoneId.systemDefault()).toLocalDate()
+                val to = Instant.ofEpochMilli(pair.second)
+                    .atZone(ZoneId.systemDefault()).toLocalDate()
+                datePickerSelection = dateRangePicker.selection
+                binding.btnPeriod.isEnabled = true
+                setPeriod(from, to)
+            }
+
+            // Show
+            dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
         }
         binding.txtCurrentValue.setOnClickListener {
             // TODO non si capisce che il testo è cliccabile
@@ -219,38 +242,58 @@ class MainFragment : Fragment() {
         binding.txtTitle.text = title
     }
 
-    fun categoriesLoaded(categories: List<CategoryWithExpensesSum>) {
-        val entries = ArrayList<PieEntry>()
+    private fun categoriesLoaded(categories: List<CategoryWithExpensesSum>) {
+        val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
         if (categories.isEmpty()) {
-            entries.add(PieEntry(1f, "No data"))
+            pieChartEntries.add(PieEntry(1f, "No data"))
             colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
         } else {
             var budgetsSum = 0f
             var currentSum = 0f
-            for (c in categories) {
-                budgetsSum += c.budget
-                currentSum += c.current
-                val catProg =
-                    layoutInflater.inflate(R.layout.category_progress, binding.categoryList, false)
-                entries.add(PieEntry(c.current, c.name))
-                binding.categoryList.addView(catProg)
-                catProg.findViewById<TextView>(R.id.categoryColorLabel)
-                    .backgroundTintList = ColorStateList.valueOf(Color.parseColor(c.color))
-                colors.add(Color.parseColor(c.color))
-                catProg.findViewById<TextView>(R.id.txtCategoryName).text = c.name
-                val progressBar =
-                    catProg.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
-                progressBar.progress = (c.current * 100 / c.budget).roundToInt()
-                progressBar.indicatorColor[0] = Color.parseColor(c.color)
+            val budgetMultiplier: Int = when (state) {
+                PeriodState.DAY -> 1
+                PeriodState.WEEK -> 7
+                PeriodState.MONTH -> 30
+                PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo).toInt()
+            } // Budget is defined as daily budget
 
-                catProg.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
-                    getString(R.string.euro_value, c.budget)
-                catProg.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
+            for (c in categories) {
+                val multipliedBudget = c.budget * budgetMultiplier
+                budgetsSum += multipliedBudget
+                currentSum += c.current
+
+                // Add category name and value to chart
+                pieChartEntries.add(PieEntry(c.current, c.name))
+                // Add category color to chart
+                colors.add(Color.parseColor(c.color))
+
+                // Load layout
+                val viewCatProgressLayout =
+                    layoutInflater.inflate(R.layout.category_progress, binding.categoryList, false)
+                // Add progress layout to container
+                binding.categoryList.addView(viewCatProgressLayout)
+                // Set category color of category line
+                viewCatProgressLayout.findViewById<TextView>(R.id.categoryColorLabel)
+                    .backgroundTintList = ColorStateList.valueOf(Color.parseColor(c.color))
+                // Set category name of category line
+                viewCatProgressLayout.findViewById<TextView>(R.id.txtCategoryName).text = c.name
+                // Load progress bar
+                val progressBar =
+                    viewCatProgressLayout.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+                // Set progress bar progress and color
+                progressBar.progress = (c.current * 100 / multipliedBudget).roundToInt()
+                progressBar.indicatorColor[0] = Color.parseColor(c.color)
+                // Set category budget of category line
+                viewCatProgressLayout.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
+                    getString(R.string.euro_value, multipliedBudget)
+                // Set category current expenses of category line
+                viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
                     String.format("%.2f€", c.current)
-                catProg.setOnClickListener {
+                // Set click listener for category line
+                viewCatProgressLayout.setOnClickListener {
                     parentFragmentManager.commit {
-                        binding.categoryList.removeView(catProg)
+                        binding.categoryList.removeView(viewCatProgressLayout)
                         replace(
                             R.id.fragment_container_view,
                             CategoryDetailsFragment(Category(c.name, c.color, c.budget))
@@ -259,13 +302,15 @@ class MainFragment : Fragment() {
                     }
                 }
             }
+            // If current total expenses are lower than budget then there's a slice showing
+            // the remaining available budget
             val diff = budgetsSum - currentSum
             if (diff > 0) {
-                entries.add(PieEntry(diff, "Available"))
+                pieChartEntries.add(PieEntry(diff, "Available"))
                 colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
             }
         }
-        val dataSet = PieDataSet(entries, "Budgets")
+        val dataSet = PieDataSet(pieChartEntries, "Budgets")
         dataSet.colors = colors
         val pieData = PieData(dataSet)
         val chart = binding.pieChartMain

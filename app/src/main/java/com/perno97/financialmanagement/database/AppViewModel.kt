@@ -1,11 +1,37 @@
 package com.perno97.financialmanagement.database
 
 import androidx.lifecycle.*
+import com.perno97.financialmanagement.FinancialManagementUiState
+import com.perno97.financialmanagement.utils.PeriodState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import androidx.core.util.Pair
 import java.util.*
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(FinancialManagementUiState())
+    val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
+
+    fun setPeriod(
+        from: LocalDate,
+        to: LocalDate,
+        state: PeriodState,
+        datePickerSelection: Pair<Long, Long>?
+    ) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                dateFrom = from,
+                dateTo = to,
+                state = state,
+                datePickerSelection = datePickerSelection
+            )
+        }
+    }
 
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
 
@@ -29,11 +55,11 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.deleteAllCategories()
     }
 
-    fun getCategoryBudgetsList(
+    fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): LiveData<List<CategoryWithExpensesSum>> {
-        return repository.getCategoryBudgetsList(dateFrom, dateTo).asLiveData()
+        return repository.getCategoryExpensesProgresses(dateFrom, dateTo).asLiveData()
     }
 }
 

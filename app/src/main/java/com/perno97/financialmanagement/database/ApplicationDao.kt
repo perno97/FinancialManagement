@@ -29,10 +29,10 @@ interface ApplicationDao {
     @Query(
         "SELECT name, color, daily_budget AS budget, current FROM category" +
                 " INNER JOIN (SELECT movement.category AS catName, SUM(amount) AS current FROM" +
-                " movement WHERE date >= :dateFrom AND date <= :dateTo AND amount > 0 GROUP BY catName)" +
+                " movement WHERE date >= :dateFrom AND date <= :dateTo AND amount < 0 GROUP BY catName)" +
                 " ON category.name = catName"
     )
-    fun getCategoryBudgetsList(
+    fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<List<CategoryWithExpensesSum>>

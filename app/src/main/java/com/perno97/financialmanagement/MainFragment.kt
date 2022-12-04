@@ -3,6 +3,10 @@ package com.perno97.financialmanagement
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextUtils
+import android.text.style.AbsoluteSizeSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +39,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 
@@ -245,26 +250,28 @@ class MainFragment : Fragment() {
     private fun categoriesLoaded(categories: List<CategoryWithExpensesSum>) {
         val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
+        var budgetsSum = 0f
         if (categories.isEmpty()) {
             pieChartEntries.add(PieEntry(1f, "No data"))
             colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
         } else {
-            var budgetsSum = 0f
             var currentSum = 0f
             val budgetMultiplier: Int = when (state) {
                 PeriodState.DAY -> 1
                 PeriodState.WEEK -> 7
                 PeriodState.MONTH -> 30
-                PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo).toInt()
+                PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
+                    .toInt() + 1 // Add 1 because between is exclusive
             } // Budget is defined as daily budget
 
             for (c in categories) {
                 val multipliedBudget = c.budget * budgetMultiplier
+                val currentModule = -c.current
                 budgetsSum += multipliedBudget
-                currentSum += c.current
+                currentSum += currentModule
 
                 // Add category name and value to chart
-                pieChartEntries.add(PieEntry(c.current, c.name))
+                pieChartEntries.add(PieEntry(currentModule, c.name))
                 // Add category color to chart
                 colors.add(Color.parseColor(c.color))
 
@@ -282,14 +289,14 @@ class MainFragment : Fragment() {
                 val progressBar =
                     viewCatProgressLayout.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
-                progressBar.progress = (c.current * 100 / multipliedBudget).roundToInt()
+                progressBar.progress = (currentModule * 100 / multipliedBudget).roundToInt()
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
                 // Set category budget of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
                     getString(R.string.euro_value, multipliedBudget)
                 // Set category current expenses of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
-                    String.format("%.2f€", c.current)
+                    String.format("%.2f€", currentModule)
                 // Set click listener for category line
                 viewCatProgressLayout.setOnClickListener {
                     parentFragmentManager.commit {
@@ -313,11 +320,24 @@ class MainFragment : Fragment() {
         val dataSet = PieDataSet(pieChartEntries, "Budgets")
         dataSet.colors = colors
         val pieData = PieData(dataSet)
+        pieData.setDrawValues(false)
         val chart = binding.pieChartMain
         chart.data = pieData
         chart.legend.isEnabled = false
         chart.description.isEnabled = false
         chart.setDrawEntryLabels(false)
+        chart.setDrawCenterText(true)
+        chart.setTouchEnabled(false)
+        val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
+        val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
+        val s1 = SpannableString("AVAILABLE \n BUDGET")
+        // TODO available budget viene calcolato solo sulle categorie caricate per quell'intervallo di tempo
+        // TODO caricare available budget con un'altra query con observer?
+        val s2 = SpannableString(String.format("%d€", ceil(budgetsSum).toInt()))
+        s1.setSpan(AbsoluteSizeSpan(textSize1), 0, s1.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        s2.setSpan(AbsoluteSizeSpan(textSize2), 0, s2.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        chart.centerText = TextUtils.concat(s1, "\n", s2)
+        chart.setCenterTextColor(R.color.dark)
         chart.invalidate()
     }
 }

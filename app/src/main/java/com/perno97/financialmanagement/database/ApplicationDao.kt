@@ -2,8 +2,10 @@ package com.perno97.financialmanagement.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.util.*
@@ -17,14 +19,23 @@ interface ApplicationDao {
     @Query("SELECT * FROM movement")
     fun getAllMovements(): Flow<List<Movement>>
 
-    @Insert
-    suspend fun insertAllCategories(vararg categories: Category)
+    @Query("SELECT SUM(daily_budget) as budget FROM category")
+    fun getAvailableDailyBudget(): Flow<Float>
 
     @Insert
-    suspend fun insertAllMovements(vararg movements: Movement)
+    suspend fun insertCategories(vararg categories: Category)
 
-    @Query("DELETE FROM category")
-    suspend fun deleteAllCategories()
+    @Insert
+    suspend fun insertMovements(vararg movements: Movement)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProfiles(vararg profiles: Profile)
+
+    @Query("SELECT * FROM profile WHERE profileId = :profileId")
+    fun getProfile(profileId: Int): Flow<Profile>
+
+    @Update
+    suspend fun updateProfiles(vararg profiles: Profile)
 
     @Query(
         "SELECT name, color, daily_budget AS budget, current FROM category" +

@@ -37,6 +37,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     val allMovements: LiveData<List<Movement>> = repository.allMovements.asLiveData()
 
+    val availableDailyBudget: LiveData<Float> = repository.availableDailyBudget.asLiveData()
+
     val movementsGroupByMonth: LiveData<Map<GroupInfo, List<MovementAndCategory>>> =
         repository.movementsGroupByMonth.asLiveData()
 
@@ -51,8 +53,12 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(movement)
     }
 
-    fun deleteAllCategories() = viewModelScope.launch {
-        repository.deleteAllCategories()
+    fun insert(profile: Profile) = viewModelScope.launch {
+        repository.insert(profile)
+    }
+
+    fun getProfile(profileId: Int): LiveData<Profile> {
+        return repository.getProfile(profileId).asLiveData()
     }
 
     fun getCategoryExpensesProgresses(

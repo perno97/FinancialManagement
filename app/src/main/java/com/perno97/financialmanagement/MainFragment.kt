@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
@@ -25,10 +26,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.perno97.financialmanagement.database.AppViewModel
-import com.perno97.financialmanagement.database.AppViewModelFactory
-import com.perno97.financialmanagement.database.Category
-import com.perno97.financialmanagement.database.CategoryWithExpensesSum
+import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
 import com.perno97.financialmanagement.utils.PeriodState
 import kotlinx.coroutines.launch
@@ -46,6 +44,7 @@ import kotlin.math.roundToInt
 private const val LOG_TAG = "MainFragment"
 private const val DATE_FROM_KEY = "dateFrom"
 private const val DATE_TO_KEY = "dateTo"
+private const val DEFAULT_PROFILE_ID = 0
 
 class MainFragment : Fragment() {
     /**
@@ -66,15 +65,24 @@ class MainFragment : Fragment() {
 
     private lateinit var dateFrom: LocalDate
     private lateinit var dateTo: LocalDate
+    private lateinit var defaultProfile: Profile
     private var datePickerSelection: Pair<Long, Long>? = null
     private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
     private var state = PeriodState.MONTH
+    private var availableDailyBudget: Float? = null
+    private var categoriesExpenses: List<CategoryWithExpensesSum>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
+        // Load profile
+        appViewModel.getProfile(DEFAULT_PROFILE_ID).observe(viewLifecycleOwner) { profile ->
+            defaultProfile = profile ?: Profile(DEFAULT_PROFILE_ID, 0f)
+            binding.txtCurrentValue.text = String.format("%.2f€", defaultProfile.assets)
+        }
+
         // Load UI data
         lifecycleScope.launch {
             appViewModel.uiState.collect {
@@ -108,8 +116,20 @@ class MainFragment : Fragment() {
         binding.categoryList.removeAllViews()
         appViewModel.getCategoryExpensesProgresses(dateFrom, dateTo)
             .observe(viewLifecycleOwner, Observer { list ->
-                categoriesLoaded(list)
+                categoriesExpenses = list
+                dataLoaded()
             })
+        appViewModel.availableDailyBudget.observe(viewLifecycleOwner) { budget ->
+            availableDailyBudget = budget
+            dataLoaded()
+        }
+    }
+
+    private fun dataLoaded() {
+        if (categoriesExpenses != null && availableDailyBudget != null) updateUI( //TODO controllare perché non viene aggiornata UI
+            categoriesExpenses!!,
+            availableDailyBudget!!
+        )
     }
 
     private fun setDay() {
@@ -247,23 +267,22 @@ class MainFragment : Fragment() {
         binding.txtTitle.text = title
     }
 
-    private fun categoriesLoaded(categories: List<CategoryWithExpensesSum>) {
+    private fun updateUI(categories: List<CategoryWithExpensesSum>, dailyBudget: Float) {
         val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
-        var budgetsSum = 0f
+        val budgetMultiplier: Int = when (state) {
+            PeriodState.DAY -> 1
+            PeriodState.WEEK -> 7
+            PeriodState.MONTH -> 30
+            PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
+                .toInt() + 1 // Add 1 because between is exclusive
+        } // Budget is defined as daily budget
         if (categories.isEmpty()) {
             pieChartEntries.add(PieEntry(1f, "No data"))
             colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
         } else {
             var currentSum = 0f
-            val budgetMultiplier: Int = when (state) {
-                PeriodState.DAY -> 1
-                PeriodState.WEEK -> 7
-                PeriodState.MONTH -> 30
-                PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
-                    .toInt() + 1 // Add 1 because between is exclusive
-            } // Budget is defined as daily budget
-
+            var budgetsSum = 0f
             for (c in categories) {
                 val multipliedBudget = c.budget * budgetMultiplier
                 val currentModule = -c.current
@@ -293,7 +312,7 @@ class MainFragment : Fragment() {
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
                 // Set category budget of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
-                    getString(R.string.euro_value, multipliedBudget)
+                    String.format("%.2f€", multipliedBudget)
                 // Set category current expenses of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
                     String.format("%.2f€", currentModule)
@@ -331,9 +350,7 @@ class MainFragment : Fragment() {
         val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
         val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
         val s1 = SpannableString("AVAILABLE \n BUDGET")
-        // TODO available budget viene calcolato solo sulle categorie caricate per quell'intervallo di tempo
-        // TODO caricare available budget con un'altra query con observer?
-        val s2 = SpannableString(String.format("%d€", ceil(budgetsSum).toInt()))
+        val s2 = SpannableString(String.format("%d€", ceil(dailyBudget * budgetMultiplier).toInt()))
         s1.setSpan(AbsoluteSizeSpan(textSize1), 0, s1.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         s2.setSpan(AbsoluteSizeSpan(textSize2), 0, s2.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         chart.centerText = TextUtils.concat(s1, "\n", s2)

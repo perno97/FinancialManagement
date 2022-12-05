@@ -8,5 +8,4 @@
     <string name="assets_label">ASSETS</string>
     <string name="current_assets_label">CURRENT</string>
     <string name="expected_assets_label">EXPECTED</string>
-    <string name="euro_value">%.2f€</string>
 </resources>

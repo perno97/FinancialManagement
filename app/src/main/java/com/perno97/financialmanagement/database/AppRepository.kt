@@ -10,6 +10,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
 
+    val availableDailyBudget: Flow<Float> = applicationDao.getAvailableDailyBudget()
+
     val movementsGroupByMonth: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByMonth()
 
@@ -18,17 +20,22 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     @WorkerThread
     suspend fun insert(category: Category) {
-        applicationDao.insertAllCategories(category)
+        applicationDao.insertCategories(category)
     }
 
     @WorkerThread
     suspend fun insert(movement: Movement) {
-        applicationDao.insertAllMovements(movement)
+        applicationDao.insertMovements(movement)
     }
 
     @WorkerThread
-    suspend fun deleteAllCategories() {
-        applicationDao.deleteAllCategories()
+    suspend fun insert(profile: Profile) {
+        applicationDao.insertProfiles(profile)
+    }
+
+    @WorkerThread
+    fun getProfile(profileId: Int): Flow<Profile> {
+        return applicationDao.getProfile(profileId)
     }
 
     @WorkerThread

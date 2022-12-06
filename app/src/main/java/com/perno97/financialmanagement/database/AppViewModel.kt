@@ -14,6 +14,7 @@ import java.util.*
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
+    val defaultProfileId = 0
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
     val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
 
@@ -53,12 +54,12 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(movement)
     }
 
-    fun insert(profile: Profile) = viewModelScope.launch {
-        repository.insert(profile)
+    fun insertDefaultProfile(assetValue: Float) = viewModelScope.launch {
+        repository.insert(Profile(defaultProfileId, assetValue))
     }
 
-    fun getProfile(profileId: Int): LiveData<Profile> {
-        return repository.getProfile(profileId).asLiveData()
+    fun getDefaultProfile(): LiveData<Profile> {
+        return repository.getProfile(defaultProfileId).asLiveData()
     }
 
     fun getCategoryExpensesProgresses(

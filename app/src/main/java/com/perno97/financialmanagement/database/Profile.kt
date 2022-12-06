@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Profile(
-    @PrimaryKey(autoGenerate = true) val profileId: Int,
+    @PrimaryKey val profileId: Int,
     val assets: Float
 )

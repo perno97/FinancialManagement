@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
@@ -44,7 +43,6 @@ import kotlin.math.roundToInt
 private const val LOG_TAG = "MainFragment"
 private const val DATE_FROM_KEY = "dateFrom"
 private const val DATE_TO_KEY = "dateTo"
-private const val DEFAULT_PROFILE_ID = 0
 
 class MainFragment : Fragment() {
     /**
@@ -71,6 +69,7 @@ class MainFragment : Fragment() {
     private var state = PeriodState.MONTH
     private var availableDailyBudget: Float? = null
     private var categoriesExpenses: List<CategoryWithExpensesSum>? = null
+    private var isAllDataLoaded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,8 +77,8 @@ class MainFragment : Fragment() {
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         // Load profile
-        appViewModel.getProfile(DEFAULT_PROFILE_ID).observe(viewLifecycleOwner) { profile ->
-            defaultProfile = profile ?: Profile(DEFAULT_PROFILE_ID, 0f)
+        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
+            defaultProfile = profile ?: Profile(appViewModel.defaultProfileId, 0f)
             binding.txtCurrentValue.text = String.format("%.2f€", defaultProfile.assets)
         }
 
@@ -126,10 +125,13 @@ class MainFragment : Fragment() {
     }
 
     private fun dataLoaded() {
-        if (categoriesExpenses != null && availableDailyBudget != null) updateUI( //TODO controllare perché non viene aggiornata UI
+        if (isAllDataLoaded) updateUI( //TODO controllare perché non viene aggiornata UI
             categoriesExpenses!!,
-            availableDailyBudget!!
+            availableDailyBudget
         )
+        else {
+            isAllDataLoaded = true
+        }
     }
 
     private fun setDay() {
@@ -267,7 +269,7 @@ class MainFragment : Fragment() {
         binding.txtTitle.text = title
     }
 
-    private fun updateUI(categories: List<CategoryWithExpensesSum>, dailyBudget: Float) {
+    private fun updateUI(categories: List<CategoryWithExpensesSum>, dailyBudget: Float?) {
         val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
         val budgetMultiplier: Int = when (state) {
@@ -350,7 +352,12 @@ class MainFragment : Fragment() {
         val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
         val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
         val s1 = SpannableString("AVAILABLE \n BUDGET")
-        val s2 = SpannableString(String.format("%d€", ceil(dailyBudget * budgetMultiplier).toInt()))
+        val s2 = SpannableString(
+            String.format(
+                "%d€",
+                ceil((dailyBudget ?: 0f) * budgetMultiplier).toInt() // If null show 0
+            )
+        )
         s1.setSpan(AbsoluteSizeSpan(textSize1), 0, s1.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         s2.setSpan(AbsoluteSizeSpan(textSize2), 0, s2.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         chart.centerText = TextUtils.concat(s1, "\n", s2)

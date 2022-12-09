@@ -40,4 +40,8 @@ class ColorsSpinnerAdapter(private val context: Context) : BaseAdapter() {
         return v
     }
 
+    fun getIndexFromColor(color: String): Int {
+        return colors.indexOf(color)
+    }
+
 }

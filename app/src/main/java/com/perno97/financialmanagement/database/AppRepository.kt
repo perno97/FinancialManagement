@@ -42,7 +42,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
-    ): Flow<List<CategoryWithExpensesSum>> {
+    ): Flow<Map<Category, Expense>> {
         return applicationDao.getCategoryExpensesProgresses(dateFrom, dateTo)
     }
 }

@@ -1,4 +1,4 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,15 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
-import com.perno97.financialmanagement.databinding.FragmentAddNewCategoryDialogBinding
+import com.perno97.financialmanagement.databinding.FragmentEditCategoryDialogBinding
 import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter
+import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 
-class AddNewCategoryDialog : DialogFragment() {
+class EditCategoryDialog(private val category: Category) : DialogFragment() {
 
-    private var _binding: FragmentAddNewCategoryDialogBinding? = null
+    private var _binding: FragmentEditCategoryDialogBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -23,26 +25,34 @@ class AddNewCategoryDialog : DialogFragment() {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAddNewCategoryDialogBinding.inflate(inflater, container, false)
+        _binding = FragmentEditCategoryDialogBinding.inflate(inflater, container, false)
         val colorsSpinnerAdapter = ColorsSpinnerAdapter(requireContext())
         binding.spinnerColor.adapter = colorsSpinnerAdapter
-        binding.btnConfirmNewCategory.setOnClickListener {
+        binding.btnConfirmEditCategory.setOnClickListener {
             confirmAction()
         }
-        binding.btnCancelNewCategory.setOnClickListener {
+        binding.btnCancelEditCategory.setOnClickListener {
             cancelAction()
         }
+        binding.editTextNewCatName.setText(category.name)
+        binding.editTextNewCatBudget.setText(String.format("%.2f", category.budget))
+        val index = colorsSpinnerAdapter.getIndexFromColor(category.color)
+        binding.spinnerColor.setSelection(index)
+        binding.editTextNewCatBudget.filters =
+            arrayOf(DecimalDigitsInputFilter(binding.editTextNewCatBudget))
         return binding.root
     }
 
     private fun confirmAction() {
         val name = binding.editTextNewCatName.text.toString()
         val color = binding.spinnerColor.selectedItem.toString()
-        val budget = binding.editTextNewCatBudget.text.toString().toFloat()
+        val budget = String.format("%.2f", binding.editTextNewCatBudget.text.toString()).toFloat()
         appViewModel.insert(
             Category(
                 name = name,
@@ -55,7 +65,6 @@ class AddNewCategoryDialog : DialogFragment() {
 
     private fun cancelAction() {
         dismiss()
-        //TODO
     }
 
     override fun onDestroyView() {
@@ -64,6 +73,6 @@ class AddNewCategoryDialog : DialogFragment() {
     }
 
     companion object {
-        const val TAG = "AddNewCategoryDialog"
+        const val TAG = "EditCategoryDialog"
     }
 }

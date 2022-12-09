@@ -1,13 +1,12 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.fragments
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
@@ -40,10 +39,11 @@ class EditCurrentAssetsDialog : DialogFragment() {
         binding.btnCancelEditAssets.setOnClickListener {
             cancelAction()
         }
-        binding.editTextCurrentAssets.filters = arrayOf(DecimalDigitsInputFilter(10,2))
+        binding.editTextCurrentAssets.filters =
+            arrayOf(DecimalDigitsInputFilter(binding.editTextCurrentAssets))
         appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
             if (profile != null) {
-                binding.editTextCurrentAssets.setText(profile.assets.toString())
+                binding.editTextCurrentAssets.setText(String.format("%.2f", profile.assets))
             } else {
                 binding.editTextCurrentAssets.setText("0")
             }
@@ -53,7 +53,7 @@ class EditCurrentAssetsDialog : DialogFragment() {
 
     private fun confirmAction() {
         appViewModel.insertDefaultProfile(
-                binding.editTextCurrentAssets.text.toString().toFloat()
+            binding.editTextCurrentAssets.text.toString().toFloat()
         )
         dismiss()
     }

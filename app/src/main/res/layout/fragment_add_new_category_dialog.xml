@@ -10,7 +10,7 @@
     android:paddingBottom="40dp"
     android:background="@drawable/all_rounded_20_style"
     android:backgroundTint="@color/white"
-    tools:context=".AddNewCategoryDialog">
+    tools:context=".fragments.AddNewCategoryDialog">
 
     <TextView
         android:id="@+id/txtAddNewCat"
@@ -76,7 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_weight=".5"
             android:gravity="center_vertical"
-            android:text="MONTH BUDGET" />
+            android:text="DAILY BUDGET" />
 
         <EditText
             android:id="@+id/editTextNewCatBudget"

@@ -1,4 +1,4 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.fragments
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -15,6 +15,8 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
 import java.time.Instant
@@ -23,22 +25,22 @@ import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
-private const val LOG_TAG = "RegMovementsFragment"
 
 class RegisteredMovementsFragment : Fragment() {
 
+    private val logTag = "RegMovementsFragment"
+
     private var _binding: FragmentRegisteredMovementsBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
     private val appViewModel: AppViewModel by viewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
-    private lateinit var dateFrom :LocalDate
-    private lateinit var dateTo :LocalDate
+    private lateinit var dateFrom: LocalDate
+    private lateinit var dateTo: LocalDate
     private var firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
 
     override fun onCreateView(
@@ -60,23 +62,28 @@ class RegisteredMovementsFragment : Fragment() {
     }
 
     private fun movementsLoaded(movements: Map<GroupInfo, List<MovementAndCategory>>) {
-        if(movements.isEmpty()){
+        if (movements.isEmpty()) {
             return
-        }
-        else {
-            for(group in movements.keys){
-                val card = LayoutInflater.from(requireContext()).inflate(R.layout.movement_card, binding.movementCardsContainer, false)
+        } else {
+            for (group in movements.keys) {
+                val card = LayoutInflater.from(requireContext())
+                    .inflate(R.layout.movement_card, binding.movementCardsContainer, false)
                 card.findViewById<TextView>(R.id.txtHeaderDate).text = group.newDate
-                card.findViewById<TextView>(R.id.txtHeaderNegative).text = String.format("%.2f€", group.negative)
-                card.findViewById<TextView>(R.id.txtHeaderPositive).text = String.format("%.2f€", group.positive)
-                for(mov in movements[group]!!){
+                card.findViewById<TextView>(R.id.txtHeaderNegative).text =
+                    String.format("%.2f€", group.negative)
+                card.findViewById<TextView>(R.id.txtHeaderPositive).text =
+                    String.format("%.2f€", group.positive)
+                for (mov in movements[group]!!) {
                     val lineContainer = card.findViewById<LinearLayout>(R.id.movementLinesContainer)
-                    val cardLine = LayoutInflater.from(requireContext()).inflate(R.layout.movement_line, lineContainer, false)
+                    val cardLine = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.movement_line, lineContainer, false)
                     cardLine.findViewById<TextView>(R.id.txtCatLineColor)
-                        .backgroundTintList = ColorStateList.valueOf(Color.parseColor(mov.category.color))
+                        .backgroundTintList =
+                        ColorStateList.valueOf(Color.parseColor(mov.category.color))
                     cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
                     cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
-                    cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text = String.format("%.2f€", mov.movement.amount)
+                    cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
+                        String.format("%.2f€", mov.movement.amount)
                     lineContainer.addView(cardLine)
                 }
                 binding.movementCardsContainer.addView(card)
@@ -84,7 +91,7 @@ class RegisteredMovementsFragment : Fragment() {
         }
     }
 
-    private fun initListeners(){
+    private fun initListeners() {
         /*binding.singleRegisteredMov.setOnClickListener {
             parentFragmentManager.commit {
                 add<FinancialMovementDetailsFragment>(R.id.fragment_container_view)
@@ -92,7 +99,7 @@ class RegisteredMovementsFragment : Fragment() {
             }
         }*/
         binding.fabAddMovement.setOnClickListener {
-            Log.i(LOG_TAG, "Clicked add financial movement")
+            Log.i(logTag, "Clicked add financial movement")
             parentFragmentManager.commit {
                 setCustomAnimations(
                     R.anim.slide_in_bottom,
@@ -143,14 +150,13 @@ class RegisteredMovementsFragment : Fragment() {
                         )
                     )
                     .build()
-            dateRangePicker.addOnPositiveButtonClickListener {
-                    pair ->
+            dateRangePicker.addOnPositiveButtonClickListener { pair ->
                 val from = Instant.ofEpochMilli(pair.first)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
                 val to = Instant.ofEpochMilli(pair.second)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
 
-                setCustomPeriod(from,to)
+                setCustomPeriod(from, to)
                 binding.btnPeriod.isEnabled = true
             }
             dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
@@ -165,22 +171,29 @@ class RegisteredMovementsFragment : Fragment() {
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
         setTitle("${dateTo.month} ${dateTo.year}")
     }
+
     private fun setPeriodDay() {
         dateTo = LocalDate.now()
         dateFrom = dateTo
         setTitle("${dateTo.dayOfMonth} ${dateTo.month} ${dateTo.year}")
     }
+
     private fun setPeriodWeek() {
         dateTo = LocalDate.now()
         dateFrom = LocalDate.now().with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
-        setTitle("${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}")
+        setTitle(
+            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
+                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+        )
     }
+
     fun setCustomPeriod(from: LocalDate, to: LocalDate) {
         dateTo = to
         dateFrom = from
-        setTitle("${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}")
+        setTitle(
+            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
+                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+        )
     }
 
     private fun setTitle(title: String) {

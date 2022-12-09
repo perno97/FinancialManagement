@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.perno97.financialmanagement.databinding.ActivityMainBinding
 
-private const val LOG_TAG = "MainActivity"
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

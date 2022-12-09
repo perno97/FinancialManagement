@@ -8,4 +8,8 @@
     <string name="assets_label">ASSETS</string>
     <string name="current_assets_label">CURRENT</string>
     <string name="expected_assets_label">EXPECTED</string>
+    <string name="open_assets_graphs_page">Open assets graphs page</string>
+    <string name="open_add_financial_movement_page">Open add financial movement page</string>
+    <string name="open_registered_movements_page">Open registered movements page</string>
+    <string name="open_incoming_movements_page">Open incoming movements page</string>
 </resources>

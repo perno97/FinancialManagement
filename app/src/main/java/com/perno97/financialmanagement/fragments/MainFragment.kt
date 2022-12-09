@@ -1,4 +1,4 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.fragments
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -18,13 +18,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
 import com.perno97.financialmanagement.utils.PeriodState
@@ -39,12 +40,10 @@ import java.util.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-
-private const val LOG_TAG = "MainFragment"
-private const val DATE_FROM_KEY = "dateFrom"
-private const val DATE_TO_KEY = "dateTo"
-
 class MainFragment : Fragment() {
+
+    private val logTag = "MainFragment"
+
     /**
      * Connection to persistent data
      */
@@ -52,23 +51,24 @@ class MainFragment : Fragment() {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
+
+    private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+
     /**
      * Binding to layout resource
      */
     private var _binding: FragmentMainBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
     private lateinit var dateFrom: LocalDate
     private lateinit var dateTo: LocalDate
     private lateinit var defaultProfile: Profile
     private var datePickerSelection: Pair<Long, Long>? = null
-    private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
     private var state = PeriodState.MONTH
     private var availableDailyBudget: Float? = null
-    private var categoriesExpenses: List<CategoryWithExpensesSum>? = null
+    private var categoriesExpenses: Map<Category, Expense>? = null
     private var isAllDataLoaded = false
 
     override fun onCreateView(
@@ -83,12 +83,13 @@ class MainFragment : Fragment() {
         }
 
         // Load UI data
-        lifecycleScope.launch {
+        lifecycleScope.launch { // TODO perché viene chiamato 2 volte?
             appViewModel.uiState.collect {
-                dateFrom = it.dateFrom ?: LocalDate.now().minusDays(1)
-                dateTo = it.dateTo ?: LocalDate.now()
-                state = it.state ?: PeriodState.MONTH
-                datePickerSelection = it.datePickerSelection
+                dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
+                dateTo = it.dateToMain ?: LocalDate.now()
+                state = it.stateMain ?: PeriodState.MONTH
+                datePickerSelection = it.datePickerSelectionMain
+                isAllDataLoaded = false
                 when (state) {
                     PeriodState.DAY -> setDay()
                     PeriodState.WEEK -> setWeek()
@@ -108,16 +109,16 @@ class MainFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        appViewModel.setPeriod(dateFrom, dateTo, state, datePickerSelection) // Saving UI state
+        appViewModel.setMainPeriod(dateFrom, dateTo, state, datePickerSelection) // Saving UI state
     }
 
     private fun updateData() {
-        binding.categoryList.removeAllViews()
+        binding.categoryList.removeAllViews() // TODO controllare perché viene chiamato cambiando fragment
         appViewModel.getCategoryExpensesProgresses(dateFrom, dateTo)
-            .observe(viewLifecycleOwner, Observer { list ->
+            .observe(viewLifecycleOwner) { list ->
                 categoriesExpenses = list
                 dataLoaded()
-            })
+            }
         appViewModel.availableDailyBudget.observe(viewLifecycleOwner) { budget ->
             availableDailyBudget = budget
             dataLoaded()
@@ -187,7 +188,7 @@ class MainFragment : Fragment() {
 
     private fun initListeners() {
         binding.fabAddMovement.setOnClickListener {
-            Log.i(LOG_TAG, "Clicked add financial movement")
+            Log.i(logTag, "Clicked add financial movement")
             parentFragmentManager.commit {
                 setCustomAnimations(
                     R.anim.slide_in_bottom,
@@ -238,20 +239,20 @@ class MainFragment : Fragment() {
         }
         binding.txtCurrentValue.setOnClickListener {
             // TODO non si capisce che il testo è cliccabile
-            Log.i(LOG_TAG, "Clicked edit current assets value")
+            Log.i(logTag, "Clicked edit current assets value")
             EditCurrentAssetsDialog().show(
                 childFragmentManager, EditCurrentAssetsDialog.TAG
             )
         }
         binding.imgBtnGraphs.setOnClickListener {
-            Log.i(LOG_TAG, "Clicked on graphs button")
+            Log.i(logTag, "Clicked on graphs button")
             parentFragmentManager.commit {
                 replace(R.id.fragment_container_view, AssetsGraphsFragment())
                 addToBackStack(null)
             }
         }
         binding.fabRegisteredMovements.setOnClickListener {
-            Log.i(LOG_TAG, "Clicked registered movements")
+            Log.i(logTag, "Clicked registered movements")
             parentFragmentManager.commit {
                 setCustomAnimations(
                     R.anim.slide_in_bottom,
@@ -269,13 +270,13 @@ class MainFragment : Fragment() {
         binding.txtTitle.text = title
     }
 
-    private fun updateUI(categories: List<CategoryWithExpensesSum>, dailyBudget: Float?) {
+    private fun updateUI(categories: Map<Category, Expense>, dailyBudget: Float?) {
         val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
         val budgetMultiplier: Int = when (state) {
             PeriodState.DAY -> 1
             PeriodState.WEEK -> 7
-            PeriodState.MONTH -> 30
+            PeriodState.MONTH -> LocalDate.now().lengthOfMonth()
             PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
                 .toInt() + 1 // Add 1 because between is exclusive
         } // Budget is defined as daily budget
@@ -285,14 +286,14 @@ class MainFragment : Fragment() {
         } else {
             var currentSum = 0f
             var budgetsSum = 0f
-            for (c in categories) {
+            for (c in categories.keys) {
                 val multipliedBudget = c.budget * budgetMultiplier
-                val currentModule = -c.current
+                val currentCatExpenseAsPositive = -categories[c]!!.expense
                 budgetsSum += multipliedBudget
-                currentSum += currentModule
+                currentSum += currentCatExpenseAsPositive
 
                 // Add category name and value to chart
-                pieChartEntries.add(PieEntry(currentModule, c.name))
+                pieChartEntries.add(PieEntry(currentCatExpenseAsPositive, c.name))
                 // Add category color to chart
                 colors.add(Color.parseColor(c.color))
 
@@ -310,21 +311,22 @@ class MainFragment : Fragment() {
                 val progressBar =
                     viewCatProgressLayout.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
-                progressBar.progress = (currentModule * 100 / multipliedBudget).roundToInt()
+                progressBar.progress =
+                    (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
                 // Set category budget of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
                     String.format("%.2f€", multipliedBudget)
                 // Set category current expenses of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
-                    String.format("%.2f€", currentModule)
+                    String.format("%.2f€", currentCatExpenseAsPositive)
                 // Set click listener for category line
                 viewCatProgressLayout.setOnClickListener {
                     parentFragmentManager.commit {
                         binding.categoryList.removeView(viewCatProgressLayout)
                         replace(
                             R.id.fragment_container_view,
-                            CategoryDetailsFragment(Category(c.name, c.color, c.budget))
+                            CategoryDetailsFragment(c, categories[c]!!)
                         )
                         addToBackStack(null)
                     }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/primary"
     android:id="@+id/addFinMovLayout"
-    tools:context=".AddFinancialMovementFragment">
+    tools:context=".fragments.AddFinancialMovementFragment">
 
     <TextView
         android:id="@+id/txtTitle"

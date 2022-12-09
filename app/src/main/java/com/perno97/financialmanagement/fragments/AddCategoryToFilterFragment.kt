@@ -1,4 +1,4 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

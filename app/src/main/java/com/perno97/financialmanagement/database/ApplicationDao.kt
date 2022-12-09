@@ -38,7 +38,7 @@ interface ApplicationDao {
     suspend fun updateProfiles(vararg profiles: Profile)
 
     @Query(
-        "SELECT name, color, daily_budget AS budget, current FROM category" +
+        "SELECT name, color, daily_budget, current AS expense FROM category" +
                 " INNER JOIN (SELECT movement.category AS catName, SUM(amount) AS current FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo AND amount < 0 GROUP BY catName)" +
                 " ON category.name = catName"
@@ -46,7 +46,7 @@ interface ApplicationDao {
     fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
-    ): Flow<List<CategoryWithExpensesSum>>
+    ): Flow<Map<Category, Expense>>
 
     @Transaction
     @Query("SELECT * FROM movement")

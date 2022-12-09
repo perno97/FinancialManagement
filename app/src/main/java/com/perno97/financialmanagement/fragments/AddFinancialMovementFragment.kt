@@ -1,4 +1,4 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -10,17 +10,17 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AppViewModel
 import com.perno97.financialmanagement.database.AppViewModelFactory
 import com.perno97.financialmanagement.database.Movement
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
+import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-
-private const val LOG_TAG = "AddFinMovFragment"
 
 class AddFinancialMovementFragment : Fragment() {
 
@@ -71,6 +71,8 @@ class AddFinancialMovementFragment : Fragment() {
             }
         }
         binding.spinnerCategory.adapter = spinnerAdapter
+        binding.editTextMovAmount.filters =
+            arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
         binding.btnAddNewCategory.setOnClickListener {
             AddNewCategoryDialog().show(
                 childFragmentManager, AddNewCategoryDialog.TAG

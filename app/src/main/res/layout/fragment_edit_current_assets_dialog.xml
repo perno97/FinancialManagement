@@ -10,7 +10,7 @@
     android:paddingBottom="40dp"
     android:background="@drawable/all_rounded_20_style"
     android:backgroundTint="@color/white"
-    tools:context=".EditCurrentAssetsDialog">
+    tools:context=".fragments.EditCurrentAssetsDialog">
 
     <TextView
         android:id="@+id/txtEditCurrentAssets"
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="65dp"
-        android:ems="10"
+        android:ems="6"
         android:textSize="28sp"
         android:textAlignment="center"
         android:background="@drawable/all_rounded_30_style"
@@ -37,10 +37,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtEditCurrentAssets" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="€"
+        android:textColor="@color/dark"
+        android:textSize="28sp"
+        android:layout_marginTop="65dp"
+        android:layout_marginBottom="72dp"
+        app:layout_constraintStart_toEndOf="@id/editTextCurrentAssets"
+        app:layout_constraintTop_toBottomOf="@id/txtEditCurrentAssets"
+        app:layout_constraintBottom_toTopOf="@id/rowCancelConfirm"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/rowCancelConfirm"
         android:layout_marginTop="72dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

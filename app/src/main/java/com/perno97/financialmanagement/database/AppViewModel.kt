@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import androidx.core.util.Pair
-import java.util.*
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
@@ -18,7 +17,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
     val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
 
-    fun setPeriod(
+    fun setMainPeriod(
         from: LocalDate,
         to: LocalDate,
         state: PeriodState,
@@ -26,10 +25,26 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     ) {
         _uiState.update { currentState ->
             currentState.copy(
-                dateFrom = from,
-                dateTo = to,
-                state = state,
-                datePickerSelection = datePickerSelection
+                dateFromMain = from,
+                dateToMain = to,
+                stateMain = state,
+                datePickerSelectionMain = datePickerSelection
+            )
+        }
+    }
+
+    fun setCatDetailsPeriod(
+        from: LocalDate,
+        to: LocalDate,
+        state: PeriodState,
+        datePickerSelection: Pair<Long, Long>?
+    ) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                dateFromCatDetails = from,
+                dateToCatDetails = to,
+                stateCatDetails = state,
+                datePickerSelectionCatDetails = datePickerSelection
             )
         }
     }
@@ -65,17 +80,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
-    ): LiveData<List<CategoryWithExpensesSum>> {
+    ): LiveData<Map<Category, Expense>> {
         return repository.getCategoryExpensesProgresses(dateFrom, dateTo).asLiveData()
-    }
-}
-
-class AppViewModelFactory(private val repository: AppRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AppViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

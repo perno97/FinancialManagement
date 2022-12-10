@@ -100,7 +100,6 @@
                         android:id="@+id/txtCategoryName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fuel"
                         android:textSize="22sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -111,7 +110,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="35dp"
                         android:max="100"
-                        android:progress="50"
+                        android:progress="0"
                         app:trackThickness="8dp"
                         app:trackCornerRadius="4dp"
                         app:trackColor="@color/dark"
@@ -123,7 +122,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="25dp"
-                        android:text="150€"
                         android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />
@@ -132,7 +130,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="25dp"
-                        android:text="120€"
                         android:textSize="14sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />
@@ -157,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:gravity="center"
-                android:text="STATISTICS"
+                android:text="COMPARE WITH"
                 android:textSize="12sp"/>
 
             <HorizontalScrollView
@@ -168,33 +165,10 @@
                 android:layout_marginEnd="25dp" >
 
                 <LinearLayout
+                    android:id="@+id/filtersContainer"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|center_vertical">
-
-                        <TextView
-                            android:id="@+id/categoryColorLabel"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:background="@drawable/all_rounded_10_style"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Food"
-                            android:layout_marginStart="15dp"
-                            app:layout_constraintBottom_toTopOf="@+id/txtMaxCategoryBudget"
-                            app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" />
             </HorizontalScrollView>
             <LinearLayout
                 android:layout_width="match_parent"

@@ -19,6 +19,8 @@ import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -92,12 +94,6 @@ class RegisteredMovementsFragment : Fragment() {
     }
 
     private fun initListeners() {
-        /*binding.singleRegisteredMov.setOnClickListener {
-            parentFragmentManager.commit {
-                add<FinancialMovementDetailsFragment>(R.id.fragment_container_view)
-                addToBackStack(null)
-            }
-        }*/
         binding.fabAddMovement.setOnClickListener {
             Log.i(logTag, "Clicked add financial movement")
             parentFragmentManager.commit {

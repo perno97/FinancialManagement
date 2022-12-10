@@ -1,7 +1,6 @@
-package com.perno97.financialmanagement.database
+package com.perno97.financialmanagement.viewmodels
 
 import androidx.lifecycle.*
-import com.perno97.financialmanagement.FinancialManagementUiState
 import com.perno97.financialmanagement.utils.PeriodState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import androidx.core.util.Pair
+import com.perno97.financialmanagement.database.*
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
@@ -45,6 +45,14 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
                 dateToCatDetails = to,
                 stateCatDetails = state,
                 datePickerSelectionCatDetails = datePickerSelection
+            )
+        }
+    }
+
+    fun setCategoryFilters(filters: List<Category>) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                categoryFilters = filters
             )
         }
     }

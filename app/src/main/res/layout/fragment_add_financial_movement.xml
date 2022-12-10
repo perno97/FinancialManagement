@@ -134,7 +134,7 @@
                         android:id="@+id/editTextMovementDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:ems="10"
+                        android:ems="6"
                         android:textAlignment="textEnd"
                         android:textSize="14sp"
                         android:focusable="false"

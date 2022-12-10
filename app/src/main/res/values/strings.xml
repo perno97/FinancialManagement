@@ -12,4 +12,5 @@
     <string name="open_add_financial_movement_page">Open add financial movement page</string>
     <string name="open_registered_movements_page">Open registered movements page</string>
     <string name="open_incoming_movements_page">Open incoming movements page</string>
+    <string name="no_categories_to_select">No categories to select</string>
 </resources>

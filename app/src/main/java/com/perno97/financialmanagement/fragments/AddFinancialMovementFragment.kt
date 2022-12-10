@@ -13,8 +13,8 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.AppViewModel
-import com.perno97.financialmanagement.database.AppViewModelFactory
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Movement
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
@@ -45,7 +45,7 @@ class AddFinancialMovementFragment : Fragment() {
         binding.editTextMovementDate.inputType = InputType.TYPE_NULL
         binding.editTextMovementDate.setText(LocalDate.now().toString())
 
-        binding.editTextMovementDate.setOnTouchListener { _, event ->
+        binding.editTextMovementDate.setOnTouchListener { _, event -> //TODO non si capisce che è cliccabile
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()

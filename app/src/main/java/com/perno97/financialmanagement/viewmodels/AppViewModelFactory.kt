@@ -1,7 +1,8 @@
-package com.perno97.financialmanagement.database
+package com.perno97.financialmanagement.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.perno97.financialmanagement.database.AppRepository
 
 class AppViewModelFactory(private val repository: AppRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

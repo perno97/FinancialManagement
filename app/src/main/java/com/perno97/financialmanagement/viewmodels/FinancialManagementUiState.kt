@@ -1,7 +1,8 @@
-package com.perno97.financialmanagement
+package com.perno97.financialmanagement.viewmodels
 
 import com.perno97.financialmanagement.utils.PeriodState
 import androidx.core.util.Pair
+import com.perno97.financialmanagement.database.Category
 import java.time.LocalDate
 
 data class FinancialManagementUiState(
@@ -15,5 +16,6 @@ data class FinancialManagementUiState(
     val dateFromCatDetails: LocalDate? = LocalDate.now().minusDays(1),
     val dateToCatDetails: LocalDate? = LocalDate.now(),
     val stateCatDetails: PeriodState? = PeriodState.MONTH,
-    val datePickerSelectionCatDetails: Pair<Long, Long>? = null
+    val datePickerSelectionCatDetails: Pair<Long, Long>? = null,
+    val categoryFilters: List<Category> = listOf()
 )

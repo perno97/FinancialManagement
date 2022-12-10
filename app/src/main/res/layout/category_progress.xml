@@ -17,29 +17,17 @@
         android:id="@+id/txtCategoryName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Food"
         android:layout_marginStart="15dp"
         app:layout_constraintBottom_toTopOf="@+id/txtMaxCategoryBudget"
         app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- <ProgressBar
-        android:id="@+id/progressBarCategoryBudget"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:max="100"
-        android:progress="120"
-        app:layout_constraintBottom_toTopOf="@+id/txtCurrentCategoryProgress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" /> -->
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progressBarCategoryBudget"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:max="100"
-        android:progress="50"
+        android:progress="0"
         app:trackThickness="8dp"
         app:trackCornerRadius="4dp"
         app:trackColor="@color/dark_30"
@@ -52,7 +40,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:text="150€"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
         app:layout_constraintTop_toBottomOf="@+id/txtCategoryName" />
@@ -61,7 +48,6 @@
         android:id="@+id/txtCurrentCategoryProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="120€"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />

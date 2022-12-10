@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
-import com.perno97.financialmanagement.database.AppViewModel
-import com.perno97.financialmanagement.database.AppViewModelFactory
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentEditCategoryDialogBinding
 import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter

@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
-import com.perno97.financialmanagement.database.AppViewModel
-import com.perno97.financialmanagement.database.AppViewModelFactory
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 
@@ -17,7 +17,7 @@ class EditCurrentAssetsDialog : DialogFragment() {
     private var _binding: FragmentEditCurrentAssetsDialogBinding? = null
 
     /**
-     * Connection to persistent data
+     * Connection to data
      */
     private val appViewModel: AppViewModel by viewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)

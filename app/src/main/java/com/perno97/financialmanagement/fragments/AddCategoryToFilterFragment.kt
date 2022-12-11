@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.core.view.MarginLayoutParamsCompat
 import androidx.core.view.children
 import androidx.core.view.marginTop
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.perno97.financialmanagement.FinancialManagementApplication
@@ -34,7 +35,7 @@ class AddCategoryToFilterFragment(private val parentCategory: Category) : Fragme
     /**
      * Connection to data
      */
-    private val appViewModel: AppViewModel by viewModels {
+    private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.viewmodels.AppViewModel
@@ -19,7 +20,7 @@ class EditCurrentAssetsDialog : DialogFragment() {
     /**
      * Connection to data
      */
-    private val appViewModel: AppViewModel by viewModels {
+    private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 

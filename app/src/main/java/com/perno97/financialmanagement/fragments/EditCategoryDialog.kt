@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.viewmodels.AppViewModel
@@ -21,7 +22,7 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private val appViewModel: AppViewModel by viewModels {
+    private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 

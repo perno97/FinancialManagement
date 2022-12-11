@@ -1,20 +1,25 @@
 package com.perno97.financialmanagement.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.perno97.financialmanagement.utils.PeriodState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import androidx.core.util.Pair
 import com.perno97.financialmanagement.database.*
+import kotlinx.coroutines.flow.*
+import kotlin.math.log
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
+    private val logTag = "AppViewModel"
+
     val defaultProfileId = 0
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
+    /*private val _categoryFiltersState: MutableLiveData<CategoryFiltersUiState> by lazy {
+        MutableLiveData<CategoryFiltersUiState>(CategoryFiltersUiState())
+    }*/
+    //val categoryFiltersState: LiveData<CategoryFiltersUiState> = _categoryFiltersState
     val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
 
     fun setMainPeriod(

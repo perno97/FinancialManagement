@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
@@ -29,7 +30,7 @@ class AddFinancialMovementFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private val appViewModel: AppViewModel by viewModels {
+    private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 

@@ -14,10 +14,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -49,9 +46,11 @@ class MainFragment : Fragment() {
     /**
      * Connection to data
      */
-    private val appViewModel: AppViewModel by viewModels {
+    private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
+
+    //TODO controllare se possibile evitare di chiamare update perché i dati vengono osservati
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -77,7 +76,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.e(logTag, "Called onCreateView()")
+        Log.i(logTag, "Called onCreateView()")
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
         // Load profile
@@ -88,9 +87,9 @@ class MainFragment : Fragment() {
 
         // Load UI data
         viewLifecycleOwner.lifecycleScope.launch {
-            Log.e(logTag, "Launched Coroutine")
+            Log.i(logTag, "Launched Coroutine")
             appViewModel.uiState.collect {
-                Log.e(logTag, "Collecting UI data")
+                Log.i(logTag, "Collecting UI data")
                 dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
                 dateTo = it.dateToMain ?: LocalDate.now()
                 state = it.stateMain ?: PeriodState.MONTH
@@ -109,7 +108,7 @@ class MainFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.e(logTag, "Called onResume()")
+        Log.i(logTag, "Called onResume()")
         initListeners()
     }
 
@@ -120,27 +119,27 @@ class MainFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e(logTag, "Called onDestroy()")
+        Log.i(logTag, "Called onDestroy()")
         _binding = null
     }
 
     private fun updateData() {
-        Log.e(logTag, "Called updateData()")
+        Log.i(logTag, "Called updateData()")
         appViewModel.getCategoryExpensesProgresses(dateFrom, dateTo)
             .observe(viewLifecycleOwner) { list ->
-                Log.e(logTag, "Observed getCategoryExpensesProgress")
+                Log.i(logTag, "Observed getCategoryExpensesProgress")
                 categoriesExpenses = list
                 dataLoaded()
             }
         appViewModel.availableDailyBudget.observe(viewLifecycleOwner) { budget ->
-            Log.e(logTag, "Observed availableDailyBudget")
+            Log.i(logTag, "Observed availableDailyBudget")
             availableDailyBudget = budget
             dataLoaded()
         }
     }
 
     private fun dataLoaded() {
-        Log.e(logTag, "Called dataLoaded with isAllDataLoaded = $isAllDataLoaded")
+        Log.i(logTag, "Called dataLoaded with isAllDataLoaded = $isAllDataLoaded")
         if (isAllDataLoaded) updateUI( //TODO controllare perché non viene aggiornata UI
             categoriesExpenses!!,
             availableDailyBudget
@@ -151,7 +150,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setDay() {
-        Log.e(logTag, "Called setDay()")
+        Log.i(logTag, "Called setDay()")
         binding.btnDay.isEnabled = false
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
@@ -163,7 +162,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setWeek() {
-        Log.e(logTag, "Called setWeek()")
+        Log.i(logTag, "Called setWeek()")
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
@@ -179,7 +178,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setMonth() {
-        Log.e(logTag, "Called setMonth()")
+        Log.i(logTag, "Called setMonth()")
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
@@ -191,7 +190,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
-        Log.e(logTag, "Called setPeriod()")
+        Log.i(logTag, "Called setPeriod()")
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
@@ -206,7 +205,7 @@ class MainFragment : Fragment() {
     }
 
     private fun initListeners() {
-        Log.e(logTag, "Called initListeners()")
+        Log.i(logTag, "Called initListeners()")
         binding.fabAddMovement.setOnClickListener {
             Log.i(logTag, "Clicked add financial movement")
             parentFragmentManager.commit {
@@ -291,7 +290,7 @@ class MainFragment : Fragment() {
     }
 
     private fun updateUI(categories: Map<Category, Expense>, dailyBudget: Float?) {
-        Log.e(logTag, "Called updateUI")
+        Log.i(logTag, "Called updateUI")
         binding.categoryList.removeAllViews()
         val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()

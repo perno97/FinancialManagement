@@ -4,25 +4,28 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.util.Pair
-import androidx.fragment.app.add
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.viewmodels.AppViewModel
-import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.Expense
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
 import com.perno97.financialmanagement.utils.PeriodState
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+import com.perno97.financialmanagement.viewmodels.CategoryFiltersUiState
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -40,7 +43,7 @@ class CategoryDetailsFragment(private val category: Category, private val expens
     /**
      * Connection to data
      */
-    private val appViewModel: AppViewModel by viewModels {
+    private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 
@@ -65,34 +68,41 @@ class CategoryDetailsFragment(private val category: Category, private val expens
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.e(logTag, "Called onCreateView") //TODO perché non viene aggiornata UI?
-        //TODO filter list è vuota?
-        //TODO cosa succede al lifecycle quando faccio popback?
+        Log.e(logTag, "Called onCreateView")
         _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
 
         updateCategoryProgress()
 
-        updateFiltersList()
+        //updateFiltersList()
 
         // Load UI data
         viewLifecycleOwner.lifecycleScope.launch {
-            appViewModel.uiState.collect {
-                dateFrom = it.dateFromCatDetails ?: LocalDate.now().minusDays(1)
-                dateTo = it.dateToCatDetails ?: LocalDate.now()
-                state = it.stateCatDetails ?: PeriodState.MONTH
-                datePickerSelection = it.datePickerSelectionCatDetails
-                categoryFilters = it.categoryFilters
-                updateFiltersList()
-                when (state) {
-                    PeriodState.WEEK -> setWeek()
-                    PeriodState.MONTH -> setMonth()
-                    PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
-                    else -> {
-                        setMonth()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                appViewModel.uiState.collect {
+                    Log.e(logTag, "Collected UI data")
+                    dateFrom = it.dateFromCatDetails ?: LocalDate.now().minusDays(1)
+                    dateTo = it.dateToCatDetails ?: LocalDate.now()
+                    state = it.stateCatDetails ?: PeriodState.MONTH
+                    datePickerSelection = it.datePickerSelectionCatDetails
+                    categoryFilters = it.categoryFilters
+                    updateFiltersList()
+                    when (state) {
+                        PeriodState.WEEK -> setWeek()
+                        PeriodState.MONTH -> setMonth()
+                        PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
+                        else -> {
+                            setMonth()
+                        }
                     }
                 }
             }
+
         }
+
+        /*appViewModel.categoryFiltersState.observe(viewLifecycleOwner) {
+            categoryFilters = it.categoryFilters
+            updateFiltersList()
+        }*/
 
         return binding.root
     }

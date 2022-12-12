@@ -346,7 +346,7 @@ class MainFragment : Fragment() {
                     parentFragmentManager.commit {
                         replace(
                             R.id.fragment_container_view,
-                            CategoryDetailsFragment(c, categories[c]!!)
+                            CategoryDetailsFragment(c.name)
                         )
                         addToBackStack(null)
                     }

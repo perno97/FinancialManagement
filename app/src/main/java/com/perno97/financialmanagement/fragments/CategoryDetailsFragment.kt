@@ -31,9 +31,11 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.math.absoluteValue
+import kotlin.math.log
 import kotlin.math.roundToInt
 
-class CategoryDetailsFragment(private val category: Category, private val expense: Expense) :
+class CategoryDetailsFragment(private val categoryName: String) :
     Fragment() {
     private val logTag = "CategoryDetailsFragment"
 
@@ -60,6 +62,8 @@ class CategoryDetailsFragment(private val category: Category, private val expens
     private var state = PeriodState.MONTH
     private var datePickerSelection: Pair<Long, Long>? = null
     private var categoryFilters: List<Category> = listOf()
+    private lateinit var category: Category
+    private var expense = 0f
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,20 +72,40 @@ class CategoryDetailsFragment(private val category: Category, private val expens
         Log.e(logTag, "Called onCreateView")
         _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
 
-        updateCategoryProgress()
+        appViewModel.getCategory(categoryName).observe(viewLifecycleOwner) {
+            if (it != null) {
+                category = it
+                loadUiData()
+            } else {
+                Log.e(logTag, "No category found with name: $categoryName")
+            }
+        }
+        return binding.root
+    }
 
-        //updateFiltersList()
-
-        // Load UI data
+    private fun loadUiData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 appViewModel.uiState.collect {
                     Log.e(logTag, "Collected UI data")
-                    dateFrom = it.dateFromCatDetails ?: LocalDate.now().minusDays(1)
                     dateTo = it.dateToCatDetails ?: LocalDate.now()
+                    dateFrom = it.dateFromCatDetails ?: LocalDate.of(dateTo.year, dateTo.month, 1)
                     state = it.stateCatDetails ?: PeriodState.MONTH
                     datePickerSelection = it.datePickerSelectionCatDetails
                     categoryFilters = it.categoryFilters
+                    loadCategoryExpenses()
+
+                }
+            }
+
+        }
+    }
+
+    private fun loadCategoryExpenses() {
+        appViewModel.getCategoryExpensesProgress(dateFrom, dateTo, categoryName)
+            .observe(viewLifecycleOwner) {
+                if (it != null) {
+                    expense = it.expense
                     updateFiltersList()
                     when (state) {
                         PeriodState.WEEK -> setWeek()
@@ -93,15 +117,6 @@ class CategoryDetailsFragment(private val category: Category, private val expens
                     }
                 }
             }
-
-        }
-
-        /*appViewModel.categoryFiltersState.observe(viewLifecycleOwner) {
-            categoryFilters = it.categoryFilters
-            updateFiltersList()
-        }*/
-
-        return binding.root
     }
 
     private fun updateFiltersList() {
@@ -129,7 +144,7 @@ class CategoryDetailsFragment(private val category: Category, private val expens
                 .toInt() + 1// Add 1 because between is exclusive
         } // Budget is defined as daily budget
         val multipliedBudget = category.budget * budgetMultiplier
-        val currentCatExpenseAsPositive = -expense.expense
+        val currentCatExpenseAsPositive = expense.absoluteValue
         val progress = (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
         binding.progressBarCategoryBudget.indicatorColor[0] = Color.parseColor(category.color)
         binding.progressBarCategoryBudget.progress = progress

@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -18,17 +19,20 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.Category
+import com.perno97.financialmanagement.database.Movement
 import com.perno97.financialmanagement.database.MovementAndCategory
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.math.absoluteValue
 
-class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCategory) : Fragment() {
-
+class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCategory) :
+    Fragment() {
+    private val logTag = "FinancialMovementDetailsFragment"
     private var _binding: FragmentFinancialMovementDetailsBinding? = null
 
     // This property is only valid between onCreateView and
@@ -41,6 +45,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
     private lateinit var categoryList: List<Category>
 
     private var editingEnabled = false
+    private var income = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,15 +66,18 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         val category = movAndCategory.category
         binding.editTextMovAmount.setText(movement.amount.absoluteValue.toString())
         if (movement.amount >= 0) {
+            income = true
             binding.btnIncome.isEnabled = false
             binding.btnOutcome.isEnabled = true
         } else {
+            income = false
             binding.btnIncome.isEnabled = true
             binding.btnOutcome.isEnabled = false
         }
 
-        val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
+
         appViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
+            val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
             categoryList = categories
             spinnerAdapter.clear()
             for (c in categories) {
@@ -77,9 +85,10 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
             }
             binding.spinnerCategory.isEnabled = false
             binding.spinnerCategory.adapter = spinnerAdapter
+            binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(movement.category))
         }
-        binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(movement.category))
 
+        binding.editTextMovementDate.isEnabled = false
         binding.categoryEditMovColor.backgroundTintList =
             ColorStateList.valueOf(Color.parseColor(category.color))
         binding.editTextMovementDate.setText(movement.date.toString())
@@ -99,7 +108,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
     @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
         binding.editTextMovementDate.setOnTouchListener { _, event -> //TODO non si capisce che è cliccabile
-            if (event.action == MotionEvent.ACTION_DOWN && editingEnabled) {
+            if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
                         .setTitleText("Select period")
@@ -117,11 +126,28 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
             false
         }
         binding.spinnerCategory.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val name = parent!!.getItemAtPosition(position) // TODO lanciare errore se non trovato
-                val category = categoryList.find { cat -> name == cat.name }
-                binding.categoryEditMovColor.backgroundTintList =
-                    ColorStateList.valueOf(Color.parseColor(category!!.color)) // TODO lanciare errore se non trovato
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (parent != null) {
+                    val name =
+                        parent.getItemAtPosition(position)
+                    val category = categoryList.find { cat -> name == cat.name }
+                    if (category != null) {
+                        binding.categoryEditMovColor.backgroundTintList =
+                            ColorStateList.valueOf(Color.parseColor(category!!.color))
+                    } else {
+                        Log.e(
+                            logTag,
+                            "Error selected spinner category not found in category list, is null"
+                        )
+                    }
+                } else {
+                    Log.e(logTag, "Error category spinner selection has null parent")
+                }
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -162,9 +188,14 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.fabConfirmEdit.hide()
         binding.fabAbortEdit.hide()
 
-        // TODO finire?
         // Disable inputs
         editingEnabled = false
+        binding.editTextMovementDate.isEnabled = false
+        binding.spinnerCategory.isEnabled = false
+        binding.editTextMovAmount.isEnabled = false
+        binding.editTextTitle.isEnabled = false
+        binding.editTextNotes.isEnabled = false
+        binding.checkNotify.isEnabled = false
     }
 
     private fun enableEditing() {
@@ -174,17 +205,52 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.fabAbortEdit.show()
         binding.fabConfirmEdit.show()
 
-        // TODO finire?
         // Enable inputs
         editingEnabled = true
+        binding.editTextMovementDate.isEnabled = true
         binding.spinnerCategory.isEnabled = true
         binding.editTextMovAmount.isEnabled = true
+        binding.editTextTitle.isEnabled = true
+        binding.editTextNotes.isEnabled = true
+        binding.checkNotify.isEnabled = true
 
     }
 
     private fun confirmEdit() {
+        val date = binding.editTextMovementDate.text
+        if (date.isEmpty()) {
+            //TODO toast inserire data
+            return
+        }
+        val amount: Float = binding.editTextMovAmount.text.toString().toFloat()
+        if (amount <= 0) {
+            //TODO toast amount > 0
+            return
+        }
+        val category = binding.spinnerCategory.selectedItem.toString()
+        if (category.isEmpty()) {
+            //TODO inserire categoria
+            return
+        }
+        val title = binding.editTextTitle.text.toString()
+        if (title.isEmpty()) {
+            //TODO inserire titolo
+            return
+        }
+        val notes = binding.editTextNotes.text.toString()
+        val notify = binding.checkNotify.isChecked
+        val movement = Movement(
+            movementId = movAndCategory.movement.movementId,
+            date = LocalDate.parse(date),
+            amount = if (income) amount else -amount,
+            category = category,
+            title = title,
+            notes = notes,
+            notify = notify
+        )
+        appViewModel.insert(movement)
         disableEditing()
-        // TODO aggiornare movement, cambiare [movAndCategory] e aggiornare UI
+        parentFragmentManager.popBackStack()
     }
 
     private fun cancelEdit() {

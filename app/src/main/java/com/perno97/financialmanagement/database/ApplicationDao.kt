@@ -22,10 +22,10 @@ interface ApplicationDao {
     @Query("SELECT SUM(daily_budget) as budget FROM category")
     fun getAvailableDailyBudget(): Flow<Float>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategories(vararg categories: Category)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMovements(vararg movements: Movement)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -33,6 +33,9 @@ interface ApplicationDao {
 
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
     fun getProfile(profileId: Int): Flow<Profile>
+
+    @Query("SELECT * FROM category WHERE name = :categoryName")
+    fun getCategory(categoryName: String): Flow<Category>
 
     @Update
     suspend fun updateProfiles(vararg profiles: Profile)
@@ -47,6 +50,15 @@ interface ApplicationDao {
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<Category, Expense>>
+
+    @Query(
+        "SELECT SUM(amount) AS expense FROM movement WHERE date >= :dateFrom AND date <= :dateTo AND amount < 0 AND movement.category LIKE :categoryName"
+    )
+    fun getCategoryExpensesProgress(
+        dateFrom: LocalDate,
+        dateTo: LocalDate,
+        categoryName: String
+    ): Flow<Expense>
 
     @Transaction
     @Query("SELECT * FROM movement")

@@ -55,10 +55,24 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
+    fun getCategory(categoryName: String): Flow<Category> {
+        return applicationDao.getCategory(categoryName)
+    }
+
+    @WorkerThread
     fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<Category, Expense>> {
         return applicationDao.getCategoryExpensesProgresses(dateFrom, dateTo)
+    }
+
+    @WorkerThread
+    fun getCategoryExpensesProgress(
+        dateFrom: LocalDate,
+        dateTo: LocalDate,
+        categoryName: String
+    ): Flow<Expense> {
+        return applicationDao.getCategoryExpensesProgress(dateFrom, dateTo, categoryName)
     }
 }

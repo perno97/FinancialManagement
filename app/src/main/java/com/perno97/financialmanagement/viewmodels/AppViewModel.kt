@@ -105,10 +105,22 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getProfile(defaultProfileId).asLiveData()
     }
 
+    fun getCategory(categoryName: String): LiveData<Category> {
+        return repository.getCategory(categoryName).asLiveData()
+    }
+
     fun getCategoryExpensesProgresses(
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): LiveData<Map<Category, Expense>> {
         return repository.getCategoryExpensesProgresses(dateFrom, dateTo).asLiveData()
+    }
+
+    fun getCategoryExpensesProgress(
+        dateFrom: LocalDate,
+        dateTo: LocalDate,
+        categoryName: String
+    ): LiveData<Expense> {
+        return repository.getCategoryExpensesProgress(dateFrom, dateTo, categoryName).asLiveData()
     }
 }

@@ -15,6 +15,9 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     val movementsGroupByMonth: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByMonth()
 
+    val movementsGroupByDay: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
+        applicationDao.getMovementsGroupByDay()
+
     val movementAndCategory: Flow<List<MovementAndCategory>> =
         applicationDao.getMovementAndCategory()
 
@@ -31,6 +34,19 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun insert(profile: Profile) {
         applicationDao.insertProfiles(profile)
+    }
+
+    @WorkerThread
+    fun getMovementsGroupByWeek(weekStartOffset: Int): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
+        return applicationDao.getMovementsGroupByWeek(weekStartOffset)
+    }
+
+    @WorkerThread
+    fun getMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
+        return applicationDao.getMovementsInPeriod(dateFrom, dateTo)
     }
 
     @WorkerThread

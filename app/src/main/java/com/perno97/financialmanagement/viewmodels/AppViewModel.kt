@@ -16,6 +16,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     val defaultProfileId = 0
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
+
     /*private val _categoryFiltersState: MutableLiveData<CategoryFiltersUiState> by lazy {
         MutableLiveData<CategoryFiltersUiState>(CategoryFiltersUiState())
     }*/
@@ -71,6 +72,9 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     val movementsGroupByMonth: LiveData<Map<GroupInfo, List<MovementAndCategory>>> =
         repository.movementsGroupByMonth.asLiveData()
 
+    val movementsGroupByDay: LiveData<Map<GroupInfo, List<MovementAndCategory>>> =
+        repository.movementsGroupByDay.asLiveData()
+
     val allMovementsAndCategories: LiveData<List<MovementAndCategory>> =
         repository.movementAndCategory.asLiveData()
 
@@ -84,6 +88,17 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun insertDefaultProfile(assetValue: Float) = viewModelScope.launch {
         repository.insert(Profile(defaultProfileId, assetValue))
+    }
+
+    fun getMovementsGroupByWeek(weekStartOffset: Int): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsGroupByWeek(weekStartOffset).asLiveData()
+    }
+
+    fun getMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsInPeriod(dateFrom, dateTo).asLiveData()
     }
 
     fun getDefaultProfile(): LiveData<Profile> {

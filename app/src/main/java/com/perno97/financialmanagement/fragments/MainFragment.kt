@@ -249,9 +249,9 @@ class MainFragment : Fragment() {
                 val to = Instant.ofEpochMilli(pair.second)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
                 datePickerSelection = dateRangePicker.selection
-                binding.btnPeriod.isEnabled = true
                 setPeriod(from, to)
             }
+            dateRangePicker.addOnDismissListener { binding.btnPeriod.isEnabled = true }
 
             // Show
             dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")

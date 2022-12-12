@@ -54,11 +54,45 @@ interface ApplicationDao {
 
     @Transaction
     @Query(
-        "SELECT STRFTIME('%Y-%m', a.date,'unixepoch') AS newDate," +
+        "SELECT a.date AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m', a.date,'unixepoch') = STRFTIME('%Y-%m', b.date,'unixepoch')" +
-                " JOIN category ON b.category = category.name GROUP BY b.movementId"
+                " JOIN category ON b.category = category.name GROUP BY b.movementId ORDER BY groupDate DESC"
     )
     fun getMovementsGroupByMonth(): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+
+    @Transaction
+    @Query(
+        "SELECT a.date AS groupDate," +
+                " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
+                " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch') = STRFTIME('%Y-%m-%d', b.date,'unixepoch')" +
+                " JOIN category ON b.category = category.name GROUP BY b.movementId ORDER BY groupDate DESC"
+    )
+    fun getMovementsGroupByDay(): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+
+    @Query(
+        "SELECT a.date AS groupDate," +
+                " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
+                " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
+                " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
+                " JOIN category ON b.category = category.name GROUP BY b.movementId ORDER BY groupDate DESC"
+    )
+    fun getMovementsGroupByWeek(weekStartOffset: Int): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+    // move to sunday then move to the first day of the week, if they're equal the events are in the same week
+
+    @Query(
+        "SELECT '' AS groupDate," +
+                " (SELECT SUM(CASE WHEN amount > 0 THEN amount else 0 END) FROM  movement WHERE date >= :dateFrom AND date <= :dateTo) AS positive," +
+                " (SELECT SUM(CASE WHEN amount < 0 THEN amount else 0 END) FROM movement WHERE date >= :dateFrom AND date <= :dateTo) AS negative," +
+                " movement.*, category.* FROM movement " +
+                " JOIN category ON category = name" +
+                " WHERE date >= :dateFrom AND date <= :dateTo ORDER BY date DESC"
+    )
+    fun getMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
 }

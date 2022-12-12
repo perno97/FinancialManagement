@@ -9,10 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.util.Pair
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -223,6 +220,18 @@ class CategoryDetailsFragment(private val category: Category, private val expens
                 addToBackStack(null)
             }
         }
+        binding.fabAddMovement.setOnClickListener {
+            parentFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in_bottom,
+                    R.anim.slide_out_bottom,
+                    R.anim.slide_in_bottom,
+                    R.anim.slide_out_bottom
+                )
+                add<AddFinancialMovementFragment>(R.id.fragment_container_view)
+                addToBackStack(null)
+            }
+        }
         binding.btnWeek.setOnClickListener {
             setWeek()
         }
@@ -250,9 +259,9 @@ class CategoryDetailsFragment(private val category: Category, private val expens
                 val to = Instant.ofEpochMilli(pair.second)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
                 datePickerSelection = dateRangePicker.selection
-                binding.btnPeriod.isEnabled = true
                 setPeriod(from, to)
             }
+            dateRangePicker.addOnDismissListener { binding.btnPeriod.isEnabled = true }
 
             // Show
             dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")

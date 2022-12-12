@@ -11,19 +11,25 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.util.Pair
 import androidx.fragment.app.*
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
+import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.math.abs
 
 
 class RegisteredMovementsFragment : Fragment() {
@@ -41,33 +47,98 @@ class RegisteredMovementsFragment : Fragment() {
     private lateinit var dateFrom: LocalDate
     private lateinit var dateTo: LocalDate
     private var firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+    private var datePickerSelection: Pair<Long, Long>? = null
+    private var state = PeriodState.MONTH
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisteredMovementsBinding.inflate(inflater, container, false)
-        initListeners()
-        setPeriodMonth()
+
+        // Load UI data
+        viewLifecycleOwner.lifecycleScope.launch {
+            Log.i(logTag, "Launched Coroutine")
+            appViewModel.uiState.collect {
+                Log.i(logTag, "Collecting UI data")
+                dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
+                dateTo = it.dateToMain ?: LocalDate.now()
+                state = it.stateMain ?: PeriodState.MONTH
+                datePickerSelection = it.datePickerSelectionMain
+                when (state) {
+                    PeriodState.DAY -> setDay()
+                    PeriodState.WEEK -> setWeek()
+                    PeriodState.MONTH -> setMonth()
+                    PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
+                }
+            }
+        }
+
+        setMonth()
         binding.btnMonth.isEnabled = false
-        loadData()
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        initListeners()
+    }
+
     private fun loadData() {
-        appViewModel.movementsGroupByMonth.observe(viewLifecycleOwner) {
-            movementsLoaded(it)
+        when (state) {
+            PeriodState.DAY -> appViewModel.movementsGroupByDay.observe(viewLifecycleOwner) {
+                movementsLoaded(it)
+            }
+            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
+                abs(
+                    ChronoUnit.DAYS.between(
+                        LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
+                        LocalDate.now()
+                    ).toInt()
+                )
+            ).observe(viewLifecycleOwner) {
+                movementsLoaded(it)
+            }
+            PeriodState.MONTH -> appViewModel.movementsGroupByMonth.observe(viewLifecycleOwner) {
+                movementsLoaded(it)
+            }
+            PeriodState.PERIOD -> appViewModel.getMovementsInPeriod(dateFrom, dateTo)
+                .observe(viewLifecycleOwner) {
+                    movementsLoaded(it)
+                }
         }
+
     }
 
     private fun movementsLoaded(movements: Map<GroupInfo, List<MovementAndCategory>>) {
+        binding.movementCardsContainer.removeAllViews()
         if (movements.isEmpty()) {
             return
         } else {
             for (group in movements.keys) {
                 val card = LayoutInflater.from(requireContext())
                     .inflate(R.layout.movement_card, binding.movementCardsContainer, false)
-                card.findViewById<TextView>(R.id.txtHeaderDate).text = group.newDate
+                var cardDate = ""
+                val groupDate = group.groupDate
+                when (state) {
+                    PeriodState.DAY -> cardDate =
+                        "${groupDate.dayOfMonth}/${groupDate.monthValue}/${groupDate.year}"
+                    PeriodState.WEEK -> {
+                        val weekFrom =
+                            groupDate.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                        val weekTo = groupDate.plusDays(7)
+                        cardDate =
+                            "${weekFrom.dayOfMonth}/${weekFrom.monthValue}/${weekFrom.year}" +
+                                    "-\n" +
+                                    "${weekTo.dayOfMonth}/${weekTo.monthValue}/${weekTo.year}"
+                    }
+                    PeriodState.MONTH -> cardDate = "${groupDate.month} ${groupDate.year}"
+                    PeriodState.PERIOD -> cardDate =
+                        "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year}" +
+                                "-\n" +
+                                "${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+                }
+                card.findViewById<TextView>(R.id.txtHeaderDate).text = cardDate
                 card.findViewById<TextView>(R.id.txtHeaderNegative).text =
                     String.format("%.2f€", group.negative)
                 card.findViewById<TextView>(R.id.txtHeaderPositive).text =
@@ -83,6 +154,15 @@ class RegisteredMovementsFragment : Fragment() {
                     cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
                         String.format("%.2f€", mov.movement.amount)
+                    cardLine.setOnClickListener {
+                        parentFragmentManager.commit {
+                            replace(
+                                R.id.fragment_container_view,
+                                FinancialMovementDetailsFragment()
+                            )
+                            addToBackStack(null)
+                        }
+                    }
                     lineContainer.addView(cardLine)
                 }
                 binding.movementCardsContainer.addView(card)
@@ -108,85 +188,84 @@ class RegisteredMovementsFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
         binding.btnMonth.setOnClickListener {
-            binding.btnDay.isEnabled = true
-            binding.btnWeek.isEnabled = true
-            binding.btnMonth.isEnabled = false
-            setPeriodMonth()
-            loadData()
+            setMonth()
         }
         binding.btnDay.setOnClickListener {
-            binding.btnDay.isEnabled = false
-            binding.btnWeek.isEnabled = true
-            binding.btnMonth.isEnabled = true
-            setPeriodDay()
-            loadData()
+            setDay()
         }
         binding.btnWeek.setOnClickListener {
-            binding.btnDay.isEnabled = true
-            binding.btnWeek.isEnabled = false
-            binding.btnMonth.isEnabled = true
-            setPeriodWeek()
-            loadData()
+            setWeek()
         }
         binding.btnPeriod.setOnClickListener {
             binding.btnPeriod.isEnabled = false
-            binding.btnDay.isEnabled = true
-            binding.btnWeek.isEnabled = true
-            binding.btnMonth.isEnabled = true
+
+            // Build
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select period")
                     .setSelection(
-                        Pair(
+                        datePickerSelection ?: Pair(
                             MaterialDatePicker.thisMonthInUtcMilliseconds(),
                             MaterialDatePicker.todayInUtcMilliseconds()
                         )
                     )
                     .build()
+            // Add confirm listener
             dateRangePicker.addOnPositiveButtonClickListener { pair ->
                 val from = Instant.ofEpochMilli(pair.first)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
                 val to = Instant.ofEpochMilli(pair.second)
                     .atZone(ZoneId.systemDefault()).toLocalDate()
-
-                setCustomPeriod(from, to)
-                binding.btnPeriod.isEnabled = true
+                datePickerSelection = dateRangePicker.selection
+                setPeriod(from, to)
             }
+            dateRangePicker.addOnDismissListener { binding.btnPeriod.isEnabled = true }
+
+            // Show
             dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
         }
     }
 
-    /**
-     *  Sets period of visualized data
-     */
-    private fun setPeriodMonth() {
-        dateTo = LocalDate.now()
-        dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
+    private fun setDay() {
+        Log.i(logTag, "Called setDay()")
+        binding.btnDay.isEnabled = false
+        binding.btnWeek.isEnabled = true
+        binding.btnMonth.isEnabled = true
+        state = PeriodState.DAY
+        setTitle("GROUP BY DAY")
+        loadData()
+    }
+
+    private fun setWeek() {
+        Log.i(logTag, "Called setWeek()")
+        binding.btnDay.isEnabled = true
+        binding.btnWeek.isEnabled = false
+        binding.btnMonth.isEnabled = true
+        state = PeriodState.WEEK
+        setTitle("GROUP BY WEEK")
+        loadData()
+    }
+
+    private fun setMonth() {
+        Log.i(logTag, "Called setMonth()")
+        binding.btnDay.isEnabled = true
+        binding.btnWeek.isEnabled = true
+        binding.btnMonth.isEnabled = false
+        state = PeriodState.MONTH
         setTitle("${dateTo.month} ${dateTo.year}")
+        loadData()
     }
 
-    private fun setPeriodDay() {
-        dateTo = LocalDate.now()
-        dateFrom = dateTo
-        setTitle("${dateTo.dayOfMonth} ${dateTo.month} ${dateTo.year}")
-    }
-
-    private fun setPeriodWeek() {
-        dateTo = LocalDate.now()
-        dateFrom = LocalDate.now().with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
-        setTitle(
-            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
-        )
-    }
-
-    fun setCustomPeriod(from: LocalDate, to: LocalDate) {
+    private fun setPeriod(from: LocalDate, to: LocalDate) {
+        Log.i(logTag, "Called setPeriod()")
+        binding.btnDay.isEnabled = true
+        binding.btnWeek.isEnabled = true
+        binding.btnMonth.isEnabled = true
         dateTo = to
         dateFrom = from
-        setTitle(
-            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
-        )
+        state = PeriodState.PERIOD
+        setTitle("SELECTED PERIOD")
+        loadData()
     }
 
     private fun setTitle(title: String) {

@@ -30,6 +30,7 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 
 class RegisteredMovementsFragment : Fragment() {
@@ -84,18 +85,21 @@ class RegisteredMovementsFragment : Fragment() {
         initListeners()
     }
 
+    override fun onStop() {
+        super.onStop()
+        appViewModel.setMainPeriod(dateFrom, dateTo, state, datePickerSelection) // Saving UI state
+    }
+
     private fun loadData() {
         when (state) {
             PeriodState.DAY -> appViewModel.movementsGroupByDay.observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
             PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
-                abs(
-                    ChronoUnit.DAYS.between(
-                        LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
-                        LocalDate.now()
-                    ).toInt()
-                )
+                ChronoUnit.DAYS.between(
+                    LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
+                    LocalDate.now()
+                ).toInt().absoluteValue
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
@@ -158,7 +162,7 @@ class RegisteredMovementsFragment : Fragment() {
                         parentFragmentManager.commit {
                             replace(
                                 R.id.fragment_container_view,
-                                FinancialMovementDetailsFragment()
+                                FinancialMovementDetailsFragment(mov)
                             )
                             addToBackStack(null)
                         }

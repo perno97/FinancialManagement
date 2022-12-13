@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.util.*
@@ -107,4 +108,21 @@ interface ApplicationDao {
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+
+    @Query(
+        "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
+                "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
+                " JOIN movement ON name = movement.category WHERE name IN (:categories)" +
+                " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch') LIMIT 12"
+    )
+    fun getCategoriesExpensesMonth(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>>
+
+    @Query(
+        "SELECT name, color, daily_budget, current AS value FROM category INNER JOIN " +
+                "(SELECT movement.category AS catName, SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
+                " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative FROM" +
+                " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +
+                " ON category.name = catName"
+    )
+    fun getCategoryProgresses(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<Category, PositiveNegativeSums>>
 }

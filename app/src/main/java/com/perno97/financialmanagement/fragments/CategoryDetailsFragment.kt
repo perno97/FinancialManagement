@@ -13,26 +13,28 @@ import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.github.mikephil.charting.data.*
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
+import com.perno97.financialmanagement.database.AmountWithDate
 import com.perno97.financialmanagement.database.Category
-import com.perno97.financialmanagement.database.Expense
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
-import com.perno97.financialmanagement.viewmodels.CategoryFiltersUiState
+import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.absoluteValue
-import kotlin.math.log
 import kotlin.math.roundToInt
 
 class CategoryDetailsFragment(private val categoryName: String) :
@@ -64,6 +66,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private var categoryFilters: List<Category> = listOf()
     private lateinit var category: Category
     private var expense = 0f
+    private var categoriesExpenses: Map<Category, PositiveNegativeSums>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,6 +86,216 @@ class CategoryDetailsFragment(private val categoryName: String) :
         return binding.root
     }
 
+    private fun loadGraphsData() {
+        when (state) {
+            PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
+                categoryFilters.map { c -> c.name } + listOf(category.name)
+            ).observe(viewLifecycleOwner) { categoryWithExpense ->
+                updateLineGraphs(categoryWithExpense, "Month")
+            }
+            PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
+            PeriodState.WEEK -> TODO()
+            PeriodState.PERIOD -> TODO()
+        }
+        updateHorizontalGraphs()
+    }
+
+    /*private fun updateHorizontalGraphs() {
+        val horizontalBarExpenses = binding.expensesHorizontalBar
+        val horizontalBarIncomes = binding.incomesHorizontalBar
+        val horizontalExpensesData = BarData()
+        val horizontalIncomesData = BarData()
+        val budgetMultiplier: Int = when (state) {
+            PeriodState.DAY -> 1
+            PeriodState.WEEK -> 7
+            PeriodState.MONTH -> LocalDate.now().lengthOfMonth()
+            PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
+                .toInt() + 1 // Add 1 because between is exclusive
+        } // Budget is defined as daily budget
+        if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
+            // TODO no data
+        } else {
+            var rowCount = 0f
+            for (category in categoriesExpenses!!.keys) {
+                val expEntries = arrayListOf<BarEntry>()
+                val gainEntries = arrayListOf<BarEntry>()
+                if (categoriesExpenses!![category] == null) {
+                    Log.e(logTag, "No horizontal chart data found for category ${category.name}")
+                    break
+                }
+                expEntries.add(
+                    BarEntry(
+                        rowCount * 1,
+                        categoriesExpenses!![category]!!.expense.absoluteValue
+                    )
+                )
+                rowCount++
+                val horizontalBarDataSetExpenses = BarDataSet(expEntries, category.name)
+                horizontalBarDataSetExpenses.color = Color.parseColor(category.color)
+                horizontalExpensesData.addDataSet(horizontalBarDataSetExpenses)
+            }
+            horizontalBarExpenses.data = horizontalExpensesData
+            horizontalBarExpenses.description.isEnabled = false
+
+            val xAxis = horizontalBarExpenses.xAxis
+            xAxis.axisMinimum = 0f
+            xAxis.axisMaximum
+
+
+
+            /*val axisLeft = horizontalBarExpenses.axisLeft
+            axisLeft.axisMinimum = 0f
+
+            val axisRight = horizontalBarExpenses.axisRight
+            axisRight.axisMinimum = 0f*/
+
+            horizontalBarExpenses.invalidate()
+        }
+    }*/
+
+    private fun updateHorizontalGraphs() {
+        binding.expensesProgressList.removeAllViews()
+        binding.incomesProgressList.removeAllViews()
+        val budgetMultiplier: Int = when (state) {
+            PeriodState.DAY -> 1
+            PeriodState.WEEK -> 7
+            PeriodState.MONTH -> LocalDate.now().lengthOfMonth()
+            PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
+                .toInt() + 1 // Add 1 because between is exclusive
+        } // Budget is defined as daily budget
+        if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
+            //TODO no data
+        } else {
+            //var currentSum = 0f
+            //var budgetsSum = 0f
+            for (c in categoriesExpenses!!.keys) {
+                val multipliedBudget = c.budget * budgetMultiplier
+                if (categoriesExpenses!![c] == null) {
+                    Log.e(logTag, "No expense progress data found for category ${category.name}")
+                    break
+                }
+                val currentCatExpenseAsPositive = categoriesExpenses!![c]!!.negative.absoluteValue
+                val currentCatGain = categoriesExpenses!![c]!!.positive
+                //budgetsSum += multipliedBudget
+                //currentSum += currentCatExpenseAsPositive
+
+                // Load layout
+                val viewCatProgressLayoutExp =
+                    layoutInflater.inflate(
+                        R.layout.category_progress_minimal,
+                        binding.expensesProgressList,
+                        false
+                    )
+                val viewCatProgressLayoutGain =
+                    layoutInflater.inflate(
+                        R.layout.category_progress_minimal,
+                        binding.incomesProgressList,
+                        false
+                    )
+                // Add progress layout to container
+                binding.expensesProgressList.addView(viewCatProgressLayoutExp)
+                // Load progress bar
+                val progressBarExp =
+                    viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+                val progressBarGain = viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+                // Set progress bar progress and color
+                progressBarExp.progress =
+                    (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
+                progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
+                // TODO come visualizzo progresso del guadagno?
+                // TODO prendo il massimo guadagno e lo fisso come maxprogress?
+                // Set category budget of category line
+                viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
+                    getString(
+                        R.string.current_on_max_budget,
+                        currentCatExpenseAsPositive,
+                        multipliedBudget
+                    )
+            }
+        }
+    }
+
+    private fun updateLineGraphs(
+        data: Map<Category, List<AmountWithDate>>,
+        columnName: String
+    ) {
+        if (data.isEmpty()) {
+            // TODO no data
+        } else {
+            val lineChartExp = binding.expensesLineChart
+            val lineChartGain = binding.incomesLineChart
+            val lineChartExpData = LineData()
+            val lineChartGainData = LineData()
+            for (category in data.keys) {
+                val expEntries = arrayListOf<Entry>()
+                val gainEntries = arrayListOf<Entry>()
+                if (data[category] == null) {
+                    Log.e(logTag, "No line chart data found for category ${category.name}")
+                    break
+                }
+                var columnCount = 0
+                var dateToCheckBefore: LocalDate
+                var dateToCheckAfter: LocalDate
+                while (columnCount < 12) {
+                    dateToCheckAfter =
+                        YearMonth.now().minusMonths(columnCount.toLong()).atDay(1)
+                    dateToCheckBefore =
+                        if (columnCount == 0) LocalDate.now()
+                        else YearMonth.now().minusMonths(columnCount.toLong())
+                            .atEndOfMonth()
+                    val amountWithDateFound = data[category]!!.filter { amountWithDate ->
+                        !amountWithDate.amountDate.isBefore(
+                            dateToCheckAfter
+                        ) && !amountWithDate.amountDate.isAfter(dateToCheckBefore)
+                    }
+                    if (amountWithDateFound.size > 1) {
+                        Log.e(
+                            logTag,
+                            "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
+                        )
+                    }
+                    val exp: Float = if (amountWithDateFound.isEmpty()) {
+                        0f
+                    } else {
+                        amountWithDateFound[0].expense.absoluteValue
+                    }
+
+                    val gain: Float = if (amountWithDateFound.isEmpty()) {
+                        0f
+                    } else {
+                        amountWithDateFound[0].gain
+                    }
+                    expEntries.add(
+                        Entry(
+                            columnCount.toFloat(),
+                            exp,
+                            "$columnName + $columnCount" //TODO non funziona
+                        )
+                    )
+                    gainEntries.add(
+                        Entry(
+                            columnCount.toFloat(),
+                            gain,
+                            "$columnName + $columnCount" //TODO non funziona
+                        )
+                    )
+                    columnCount++
+                }
+                val expensesDataSet = LineDataSet(expEntries, category.name)
+                val incomesDataSet = LineDataSet(gainEntries, category.name)
+                expensesDataSet.color = Color.parseColor(category.color)
+                incomesDataSet.color = Color.parseColor(category.color)
+                // TODO styling dataset
+                lineChartExpData.addDataSet(expensesDataSet)
+                lineChartGainData.addDataSet(incomesDataSet)
+            }
+            lineChartExp.data = lineChartExpData
+            lineChartGain.data = lineChartGainData
+            lineChartExp.invalidate()
+            lineChartGain.invalidate()
+        }
+    }
+
     private fun loadUiData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -93,8 +306,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     state = it.stateCatDetails ?: PeriodState.MONTH
                     datePickerSelection = it.datePickerSelectionCatDetails
                     categoryFilters = it.categoryFilters
+                    updateFiltersList()
                     loadCategoryExpenses()
-
                 }
             }
 
@@ -102,11 +315,11 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun loadCategoryExpenses() {
-        appViewModel.getCategoryExpensesProgress(dateFrom, dateTo, categoryName)
+        appViewModel.getCategoryProgresses(dateFrom, dateTo)
             .observe(viewLifecycleOwner) {
-                if (it != null) {
-                    expense = it.expense
-                    updateFiltersList()
+                if (it?.get(category) != null) {
+                    expense = it[category]!!.negative
+                    categoriesExpenses = it
                     when (state) {
                         PeriodState.WEEK -> setWeek()
                         PeriodState.MONTH -> setMonth()
@@ -170,10 +383,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
         appViewModel.setCategoryFilters(listOf())
     }
 
-    private fun updateData() {
-        //TODO
-    }
-
     private fun setWeek() {
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
@@ -186,7 +395,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
         updateCategoryProgress()
-        updateData()
+        loadGraphsData()
     }
 
     private fun setMonth() {
@@ -197,7 +406,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
         state = PeriodState.MONTH
         setTitle("${dateTo.month} ${dateTo.year}")
         updateCategoryProgress()
-        updateData()
+        loadGraphsData()
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
@@ -211,7 +420,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
         updateCategoryProgress()
-        updateData()
+        loadGraphsData()
     }
 
     private fun initListeners() {

@@ -36,6 +36,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -309,7 +310,7 @@ class MainFragment : Fragment() {
             var budgetsSum = 0f
             for (c in categories.keys) {
                 val multipliedBudget = c.budget * budgetMultiplier
-                val currentCatExpenseAsPositive = -categories[c]!!.expense
+                val currentCatExpenseAsPositive = categories[c]!!.expense.absoluteValue
                 budgetsSum += multipliedBudget
                 currentSum += currentCatExpenseAsPositive
 

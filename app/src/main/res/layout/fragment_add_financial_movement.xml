@@ -161,6 +161,15 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                    <TextView
+                        android:id="@+id/categoryEditMovColor"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/all_rounded_10_style"
+                        app:layout_constraintEnd_toStartOf="@id/spinnerCategory"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
                     <Spinner
                         android:id="@+id/spinnerCategory"
                         android:layout_width="wrap_content"

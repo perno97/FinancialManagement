@@ -192,21 +192,50 @@
                 android:layout_marginBottom="17dp"
                 android:gravity="center"
                 android:text="EXPENSES" />
-
-            <androidx.constraintlayout.utils.widget.MockView
-                android:id="@+id/mockView3"
+            
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/expensesLineChart"
                 android:layout_width="match_parent"
-                android:layout_height="500dp" />
+                android:layout_height="200dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"/>
 
-            <androidx.constraintlayout.utils.widget.MockView
-                android:id="@+id/mockView4"
+            <LinearLayout
+                android:id="@+id/expensesProgressList"
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="40dp"
+                android:orientation="vertical"/>
 
-            <androidx.constraintlayout.utils.widget.MockView
-                android:id="@+id/mockView6"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="500dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="17dp"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:text="INCOMES" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/incomes_line_chart"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"/>
+
+            <LinearLayout
+                android:id="@+id/incomesProgressList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="35dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="40dp"
+                android:orientation="vertical"/>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
         </LinearLayout>
     </ScrollView>
 

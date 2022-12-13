@@ -1,6 +1,5 @@
 package com.perno97.financialmanagement.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.perno97.financialmanagement.utils.PeriodState
 import kotlinx.coroutines.launch
@@ -8,7 +7,6 @@ import java.time.LocalDate
 import androidx.core.util.Pair
 import com.perno97.financialmanagement.database.*
 import kotlinx.coroutines.flow.*
-import kotlin.math.log
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
@@ -16,11 +14,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     val defaultProfileId = 0
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
-
-    /*private val _categoryFiltersState: MutableLiveData<CategoryFiltersUiState> by lazy {
-        MutableLiveData<CategoryFiltersUiState>(CategoryFiltersUiState())
-    }*/
-    //val categoryFiltersState: LiveData<CategoryFiltersUiState> = _categoryFiltersState
     val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
 
     fun setMainPeriod(
@@ -122,5 +115,13 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         categoryName: String
     ): LiveData<Expense> {
         return repository.getCategoryExpensesProgress(dateFrom, dateTo, categoryName).asLiveData()
+    }
+
+    fun getCategoriesExpensesMonth(categories: List<String>): LiveData<Map<Category, List<AmountWithDate>>> {
+        return repository.getCategoriesExpensesMonth(categories).asLiveData()
+    }
+
+    fun getCategoryProgresses(dateFrom: LocalDate, dateTo: LocalDate): LiveData<Map<Category, PositiveNegativeSums>> {
+        return repository.getCategoryProgresses(dateFrom, dateTo).asLiveData()
     }
 }

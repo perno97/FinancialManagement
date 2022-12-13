@@ -1,6 +1,7 @@
 package com.perno97.financialmanagement.database
 
 import androidx.annotation.WorkerThread
+import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -74,5 +75,15 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         categoryName: String
     ): Flow<Expense> {
         return applicationDao.getCategoryExpensesProgress(dateFrom, dateTo, categoryName)
+    }
+
+    @WorkerThread
+    fun getCategoriesExpensesMonth(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>> {
+        return applicationDao.getCategoriesExpensesMonth(categories)
+    }
+
+    @WorkerThread
+    fun getCategoryProgresses(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<Category, PositiveNegativeSums>> {
+        return applicationDao.getCategoryProgresses(dateFrom, dateTo)
     }
 }

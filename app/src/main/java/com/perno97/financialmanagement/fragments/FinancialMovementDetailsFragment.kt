@@ -21,6 +21,7 @@ import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.Movement
 import com.perno97.financialmanagement.database.MovementAndCategory
+import com.perno97.financialmanagement.database.UnusedCategoriesChecker
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
@@ -76,6 +77,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         }
 
 
+        binding.spinnerCategory.isEnabled = false
         appViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
             categoryList = categories
@@ -83,7 +85,6 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
             for (c in categories) {
                 spinnerAdapter.add(c.name)
             }
-            binding.spinnerCategory.isEnabled = false
             binding.spinnerCategory.adapter = spinnerAdapter
             binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(movement.category))
         }
@@ -98,11 +99,6 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.editTextMovementDate.inputType = InputType.TYPE_NULL
         binding.editTextMovAmount.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
-    }
-
-    override fun onPause() {
-        super.onPause()
-        initListeners()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -179,6 +175,11 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.fabAbortEdit.setOnClickListener {
             cancelEdit()
         }
+        binding.btnAddNewCategory.setOnClickListener {
+            AddNewCategoryDialog().show(
+                childFragmentManager, AddNewCategoryDialog.TAG
+            )
+        }
     }
 
     private fun disableEditing() {
@@ -187,6 +188,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.fabEditMovement.show()
         binding.fabConfirmEdit.hide()
         binding.fabAbortEdit.hide()
+        binding.btnAddNewCategory.visibility = View.GONE
 
         // Disable inputs
         editingEnabled = false
@@ -204,6 +206,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.fabEditMovement.hide()
         binding.fabAbortEdit.show()
         binding.fabConfirmEdit.show()
+        binding.btnAddNewCategory.visibility = View.VISIBLE
 
         // Enable inputs
         editingEnabled = true
@@ -239,6 +242,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         }
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
+
         val movement = Movement(
             movementId = movAndCategory.movement.movementId,
             date = LocalDate.parse(date),
@@ -248,9 +252,25 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
             notes = notes,
             notify = notify
         )
+
         appViewModel.insert(movement)
+        checkCategories()
         disableEditing()
         parentFragmentManager.popBackStack()
+    }
+
+    private fun checkCategories() { // TODO Viene osservato 2 volte il cambiamento?
+        Log.e(logTag, "Called check")
+        appViewModel.categoryWithMovements.observe(viewLifecycleOwner) { list ->
+            Log.e(logTag, "Category list of ${list.size} items") //TODO viene stampato 2 volte
+            for (item in list) {
+                Log.e(logTag, "Checking category ${item.category.name} with ${item.movements.size} movements")
+                if (item.movements.isEmpty()) {
+                    Log.e(logTag, "Category ${item.category.name} has no related movement")
+                    appViewModel.deleteCategory(item.category)
+                }
+            }
+        }
     }
 
     private fun cancelEdit() {

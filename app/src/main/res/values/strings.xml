@@ -14,4 +14,5 @@
     <string name="open_incoming_movements_page">Open incoming movements page</string>
     <string name="no_categories_to_select">No categories to select</string>
     <string name="current_on_max_budget">%.2f/%.2f€</string>
+    <string name="euro_value">%.2f€</string>
 </resources>

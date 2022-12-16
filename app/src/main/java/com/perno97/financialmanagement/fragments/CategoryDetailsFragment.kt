@@ -35,6 +35,7 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class CategoryDetailsFragment(private val categoryName: String) :
@@ -88,13 +89,13 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
     private fun loadGraphsData() {
         when (state) {
+            PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
+            PeriodState.WEEK -> TODO()
             PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
                 categoryFilters.map { c -> c.name } + listOf(category.name)
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
                 updateLineGraphs(categoryWithExpense, "Month")
             }
-            PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
-            PeriodState.WEEK -> TODO()
             PeriodState.PERIOD -> TODO()
         }
         updateHorizontalGraphs()
@@ -168,6 +169,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
         } else {
             //var currentSum = 0f
             //var budgetsSum = 0f
+            var maxGain = 0f
+            for (c in categoriesExpenses!!.keys) {
+                if (categoriesExpenses!![c] != null && maxGain < categoriesExpenses!![c]!!.positive) {
+                    maxGain = categoriesExpenses!![c]!!.positive
+                }
+            }
             for (c in categoriesExpenses!!.keys) {
                 val multipliedBudget = c.budget * budgetMultiplier
                 if (categoriesExpenses!![c] == null) {
@@ -194,22 +201,33 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     )
                 // Add progress layout to container
                 binding.expensesProgressList.addView(viewCatProgressLayoutExp)
+                binding.incomesProgressList.addView(viewCatProgressLayoutGain)
                 // Load progress bar
                 val progressBarExp =
                     viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
-                val progressBarGain = viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+                val progressBarGain =
+                    viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
                 progressBarExp.progress =
-                    (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
+                    if (multipliedBudget != 0f) 100 else // If multiplied budget is 0 then fill progress bar (progress 100/100)
+                        (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                 progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
+                progressBarGain.progress =
+                    if (maxGain == 0f) currentCatGain.roundToInt() else (currentCatGain * 100 / maxGain).roundToInt()
+                progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
                 // TODO come visualizzo progresso del guadagno?
-                // TODO prendo il massimo guadagno e lo fisso come maxprogress?
+                // TODO prendo il massimo guadagno e lo fisso come maxprogress? Fatto
                 // Set category budget of category line
                 viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
                     getString(
                         R.string.current_on_max_budget,
                         currentCatExpenseAsPositive,
                         multipliedBudget
+                    )
+                viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtCategoryBudget).text =
+                    getString(
+                        R.string.euro_value,
+                        currentCatGain
                     )
             }
         }

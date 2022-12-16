@@ -1,6 +1,7 @@
 package com.perno97.financialmanagement.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -14,15 +15,9 @@ import java.util.*
 @Dao
 interface ApplicationDao {
 
-    @Query("SELECT * FROM category")
-    fun getAllCategories(): Flow<List<Category>>
-
-    @Query("SELECT * FROM movement")
-    fun getAllMovements(): Flow<List<Movement>>
-
-    @Query("SELECT SUM(daily_budget) as budget FROM category")
-    fun getAvailableDailyBudget(): Flow<Float>
-
+    /*
+    Insert
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategories(vararg categories: Category)
 
@@ -32,15 +27,51 @@ interface ApplicationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProfiles(vararg profiles: Profile)
 
+
+    /*
+    Update
+     */
+    @Update
+    suspend fun updateProfiles(vararg profiles: Profile)
+
+
+    /*
+    Delete
+     */
+    @Delete
+    suspend fun deleteCategory(category: Category)
+
+
+    /*
+    Basic getters
+     */
+    @Query("SELECT * FROM category")
+    fun getAllCategories(): Flow<List<Category>>
+
+    @Query("SELECT * FROM movement")
+    fun getAllMovements(): Flow<List<Movement>>
+
+    @Query("SELECT SUM(daily_budget) as budget FROM category")
+    fun getAvailableDailyBudget(): Flow<Float>
+
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
     fun getProfile(profileId: Int): Flow<Profile>
 
     @Query("SELECT * FROM category WHERE name = :categoryName")
     fun getCategory(categoryName: String): Flow<Category>
 
-    @Update
-    suspend fun updateProfiles(vararg profiles: Profile)
+    @Transaction
+    @Query("SELECT * FROM movement")
+    fun getMovementAndCategory(): Flow<List<MovementAndCategory>>
 
+    @Transaction
+    @Query("SELECT * FROM category")
+    fun getCategoryWithMovements(): Flow<List<CategoryWithMovements>>
+
+
+    /*
+    Advanced getters
+     */
     @Query(
         "SELECT name, color, daily_budget, current AS expense FROM category" +
                 " INNER JOIN (SELECT movement.category AS catName, SUM(amount) AS current FROM" +
@@ -60,10 +91,6 @@ interface ApplicationDao {
         dateTo: LocalDate,
         categoryName: String
     ): Flow<Expense>
-
-    @Transaction
-    @Query("SELECT * FROM movement")
-    fun getMovementAndCategory(): Flow<List<MovementAndCategory>>
 
     @Transaction
     @Query(
@@ -118,11 +145,14 @@ interface ApplicationDao {
     fun getCategoriesExpensesMonth(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>>
 
     @Query(
-        "SELECT name, color, daily_budget, current AS value FROM category INNER JOIN " +
+        "SELECT name, color, daily_budget, positive, negative FROM category INNER JOIN " +
                 "(SELECT movement.category AS catName, SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
                 " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +
                 " ON category.name = catName"
     )
-    fun getCategoryProgresses(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<Category, PositiveNegativeSums>>
+    fun getCategoryProgresses(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<Category, PositiveNegativeSums>>
 }

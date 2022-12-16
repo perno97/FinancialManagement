@@ -6,37 +6,25 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 class AppRepository(private val applicationDao: ApplicationDao) {
-
+    /*
+    Getters without parameters
+     */
     val allCategories: Flow<List<Category>> = applicationDao.getAllCategories()
-
     val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
-
     val availableDailyBudget: Flow<Float> = applicationDao.getAvailableDailyBudget()
-
     val movementsGroupByMonth: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByMonth()
-
     val movementsGroupByDay: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByDay()
-
     val movementAndCategory: Flow<List<MovementAndCategory>> =
         applicationDao.getMovementAndCategory()
+    val categoryWithMovements: Flow<List<CategoryWithMovements>> =
+        applicationDao.getCategoryWithMovements()
 
-    @WorkerThread
-    suspend fun insert(category: Category) {
-        applicationDao.insertCategories(category)
-    }
 
-    @WorkerThread
-    suspend fun insert(movement: Movement) {
-        applicationDao.insertMovements(movement)
-    }
-
-    @WorkerThread
-    suspend fun insert(profile: Profile) {
-        applicationDao.insertProfiles(profile)
-    }
-
+    /*
+    Getters with parameters
+     */
     @WorkerThread
     fun getMovementsGroupByWeek(weekStartOffset: Int): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
         return applicationDao.getMovementsGroupByWeek(weekStartOffset)
@@ -83,7 +71,40 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategoryProgresses(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<Category, PositiveNegativeSums>> {
+    fun getCategoryProgresses(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<Category, PositiveNegativeSums>> {
         return applicationDao.getCategoryProgresses(dateFrom, dateTo)
     }
+
+
+    /*
+    Insert
+     */
+    @WorkerThread
+    suspend fun insert(category: Category) {
+        applicationDao.insertCategories(category)
+    }
+
+    @WorkerThread
+    suspend fun insert(movement: Movement) {
+        applicationDao.insertMovements(movement)
+    }
+
+    @WorkerThread
+    suspend fun insert(profile: Profile) {
+        applicationDao.insertProfiles(profile)
+    }
+
+
+    /*
+    Delete
+     */
+    @WorkerThread
+    suspend fun delete(category: Category) {
+        applicationDao.deleteCategory(category)
+    }
+
+
 }

@@ -22,6 +22,7 @@ import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Movement
+import com.perno97.financialmanagement.database.UnusedCategoriesChecker
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import java.time.Instant
@@ -186,6 +187,8 @@ class AddFinancialMovementFragment : Fragment() {
             notes = notes,
             notify = notify
         )
+
+        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
         appViewModel.insert(movement)
         parentFragmentManager.popBackStack()
     }

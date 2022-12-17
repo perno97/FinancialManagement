@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
@@ -44,7 +44,12 @@ class EditCurrentAssetsDialog : DialogFragment() {
             arrayOf(DecimalDigitsInputFilter(binding.editTextCurrentAssets))
         appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
             if (profile != null) {
-                binding.editTextCurrentAssets.setText(String.format("%.2f", profile.assets))
+                binding.editTextCurrentAssets.setText(
+                    getString(
+                        R.string.euro_value,
+                        profile.assets
+                    )
+                )
             } else {
                 binding.editTextCurrentAssets.setText("0")
             }
@@ -53,7 +58,7 @@ class EditCurrentAssetsDialog : DialogFragment() {
     }
 
     private fun confirmAction() {
-        appViewModel.insertDefaultProfile(
+        appViewModel.insertNewAssets(
             binding.editTextCurrentAssets.text.toString().toFloat()
         )
         dismiss()

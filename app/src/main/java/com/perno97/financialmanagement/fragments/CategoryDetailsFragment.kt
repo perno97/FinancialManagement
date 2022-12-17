@@ -90,7 +90,11 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun loadGraphsData() {
         when (state) {
             PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
-            PeriodState.WEEK -> TODO()
+            PeriodState.WEEK -> appViewModel.getCategoriesExpensesWeek(
+                categoryFilters.map { c -> c.name } + listOf(category.name)
+            ).observe(viewLifecycleOwner) { categoryWithExpense ->
+                updateLineGraphs(categoryWithExpense, "Week")
+            }
             PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
                 categoryFilters.map { c -> c.name } + listOf(category.name)
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
@@ -100,59 +104,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
         }
         updateHorizontalGraphs()
     }
-
-    /*private fun updateHorizontalGraphs() {
-        val horizontalBarExpenses = binding.expensesHorizontalBar
-        val horizontalBarIncomes = binding.incomesHorizontalBar
-        val horizontalExpensesData = BarData()
-        val horizontalIncomesData = BarData()
-        val budgetMultiplier: Int = when (state) {
-            PeriodState.DAY -> 1
-            PeriodState.WEEK -> 7
-            PeriodState.MONTH -> LocalDate.now().lengthOfMonth()
-            PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
-                .toInt() + 1 // Add 1 because between is exclusive
-        } // Budget is defined as daily budget
-        if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
-            // TODO no data
-        } else {
-            var rowCount = 0f
-            for (category in categoriesExpenses!!.keys) {
-                val expEntries = arrayListOf<BarEntry>()
-                val gainEntries = arrayListOf<BarEntry>()
-                if (categoriesExpenses!![category] == null) {
-                    Log.e(logTag, "No horizontal chart data found for category ${category.name}")
-                    break
-                }
-                expEntries.add(
-                    BarEntry(
-                        rowCount * 1,
-                        categoriesExpenses!![category]!!.expense.absoluteValue
-                    )
-                )
-                rowCount++
-                val horizontalBarDataSetExpenses = BarDataSet(expEntries, category.name)
-                horizontalBarDataSetExpenses.color = Color.parseColor(category.color)
-                horizontalExpensesData.addDataSet(horizontalBarDataSetExpenses)
-            }
-            horizontalBarExpenses.data = horizontalExpensesData
-            horizontalBarExpenses.description.isEnabled = false
-
-            val xAxis = horizontalBarExpenses.xAxis
-            xAxis.axisMinimum = 0f
-            xAxis.axisMaximum
-
-
-
-            /*val axisLeft = horizontalBarExpenses.axisLeft
-            axisLeft.axisMinimum = 0f
-
-            val axisRight = horizontalBarExpenses.axisRight
-            axisRight.axisMinimum = 0f*/
-
-            horizontalBarExpenses.invalidate()
-        }
-    }*/
 
     private fun updateHorizontalGraphs() {
         binding.expensesProgressList.removeAllViews()
@@ -207,6 +158,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 val progressBarGain =
                     viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+
+                // Set category name for progress bar
+                viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
+                    c.name
+                viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
+                    c.name
                 // Set progress bar progress and color
                 progressBarExp.progress =
                     if (multipliedBudget == 0f) 100 else // If multiplied budget is 0 then fill progress bar (progress 100/100)
@@ -337,7 +294,11 @@ class CategoryDetailsFragment(private val categoryName: String) :
             .observe(viewLifecycleOwner) {
                 if (it?.get(category) != null) {
                     expense = it[category]!!.negative
-                    categoriesExpenses = it
+                    categoriesExpenses =
+                            // Assign list of categories expenses that are in filters and the main category
+                        it.filter { (cat, _) ->
+                            cat.name == category.name || categoryFilters.any { filter -> cat.name == filter.name }
+                        }
                     when (state) {
                         PeriodState.WEEK -> setWeek()
                         PeriodState.MONTH -> setMonth()
@@ -379,8 +340,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
         val progress = (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
         binding.progressBarCategoryBudget.indicatorColor[0] = Color.parseColor(category.color)
         binding.progressBarCategoryBudget.progress = progress
-        binding.txtMaxCategoryBudget.text = String.format("%.2f", multipliedBudget)
-        binding.txtCurrentCategoryProgress.text = String.format("%.2f", currentCatExpenseAsPositive)
+        binding.txtMaxCategoryBudget.text = getString(R.string.euro_value, multipliedBudget)
+        binding.txtCurrentCategoryProgress.text =
+            getString(R.string.euro_value, currentCatExpenseAsPositive)
     }
 
     override fun onResume() {

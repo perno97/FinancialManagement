@@ -15,6 +15,8 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
@@ -25,6 +27,7 @@ import com.perno97.financialmanagement.database.Movement
 import com.perno97.financialmanagement.database.UnusedCategoriesChecker
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -52,7 +55,7 @@ class AddFinancialMovementFragment : Fragment() {
     ): View {
         _binding = FragmentAddFinancialMovementBinding.inflate(inflater, container, false)
 
-        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
+        //UnusedCategoriesChecker.check(appViewModel, lifecycleScope)
 
         appViewModel.allCategories.observe(viewLifecycleOwner) {
             val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
@@ -181,18 +184,26 @@ class AddFinancialMovementFragment : Fragment() {
         }
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
+        val newAmount = if (income) amount else -amount
         val movement = Movement(
             date = LocalDate.parse(date),
-            amount = if (income) amount else -amount,
+            amount = newAmount,
             category = category,
             title = title,
             notes = notes,
             notify = notify
         )
 
-        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
         appViewModel.insert(movement)
+        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
+        updateAssets(newAmount)
         parentFragmentManager.popBackStack()
+    }
+
+    private fun updateAssets(newAmount: Float) {
+        appViewModel.viewModelScope.launch {
+            appViewModel.insertNewAssets(appViewModel.getCurrentAssetDefault() + newAmount)
+        }
     }
 
     override fun onDestroyView() {

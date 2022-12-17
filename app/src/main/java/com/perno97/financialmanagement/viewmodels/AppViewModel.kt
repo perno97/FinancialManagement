@@ -42,6 +42,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return toreturn
     }
 
+    suspend fun getCurrentAssetDefault(): Float {
+        return repository.getCurrentAsset(defaultProfileId)
+    }
+
 
     /*
     Getters with parameters
@@ -78,6 +82,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun getCategoriesExpensesMonth(categories: List<String>): LiveData<Map<Category, List<AmountWithDate>>> {
         return repository.getCategoriesExpensesMonth(categories).asLiveData()
+    }
+
+    fun getCategoriesExpensesWeek(categories: List<String>): LiveData<Map<Category, List<AmountWithDate>>> {
+        return repository.getCategoriesExpensesWeek(categories).asLiveData()
     }
 
     fun getCategoryProgresses(
@@ -143,7 +151,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(movement)
     }
 
-    fun insertDefaultProfile(assetValue: Float) = viewModelScope.launch {
+    fun insertNewAssets(assetValue: Float) = viewModelScope.launch {
         repository.insert(Profile(defaultProfileId, assetValue))
     }
 

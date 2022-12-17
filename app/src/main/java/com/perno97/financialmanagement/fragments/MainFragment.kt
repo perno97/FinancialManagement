@@ -82,8 +82,13 @@ class MainFragment : Fragment() {
 
         // Load profile
         appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
-            defaultProfile = profile ?: Profile(appViewModel.defaultProfileId, 0f)
-            binding.txtCurrentValue.text = String.format("%.2f€", defaultProfile.assets)
+            if (profile != null) {
+                defaultProfile = profile
+                binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
+            } else {
+                createNewDefaultProfile()
+            }
+
         }
 
         // Load UI data
@@ -105,6 +110,10 @@ class MainFragment : Fragment() {
             }
         }
         return binding.root
+    }
+
+    private fun createNewDefaultProfile() {
+        appViewModel.insertNewAssets(0f)
     }
 
     override fun onResume() {
@@ -338,10 +347,13 @@ class MainFragment : Fragment() {
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
                 // Set category budget of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
-                    String.format("%.2f€", multipliedBudget)
+                    if (multipliedBudget != 0f) getString(
+                        R.string.euro_value,
+                        multipliedBudget
+                    ) else ""
                 // Set category current expenses of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
-                    String.format("%.2f€", currentCatExpenseAsPositive)
+                    getString(R.string.euro_value, categories[c]!!.expense)
                 // Set click listener for category line
                 viewCatProgressLayout.setOnClickListener {
                     parentFragmentManager.commit {

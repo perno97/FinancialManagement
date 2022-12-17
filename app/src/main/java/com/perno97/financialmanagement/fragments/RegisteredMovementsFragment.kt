@@ -144,9 +144,9 @@ class RegisteredMovementsFragment : Fragment() {
                 }
                 card.findViewById<TextView>(R.id.txtHeaderDate).text = cardDate
                 card.findViewById<TextView>(R.id.txtHeaderNegative).text =
-                    String.format("%.2f€", group.negative)
+                    getString(R.string.euro_value, group.negative)
                 card.findViewById<TextView>(R.id.txtHeaderPositive).text =
-                    String.format("%.2f€", group.positive)
+                    getString(R.string.euro_value, group.positive)
                 for (mov in movements[group]!!) {
                     val lineContainer = card.findViewById<LinearLayout>(R.id.movementLinesContainer)
                     val cardLine = LayoutInflater.from(requireContext())
@@ -157,7 +157,7 @@ class RegisteredMovementsFragment : Fragment() {
                     cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
                     cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
-                        String.format("%.2f€", mov.movement.amount)
+                        getString(R.string.euro_value, mov.movement.amount)
                     cardLine.setOnClickListener {
                         parentFragmentManager.commit {
                             replace(

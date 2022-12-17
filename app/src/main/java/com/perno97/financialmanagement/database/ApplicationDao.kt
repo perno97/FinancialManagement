@@ -57,6 +57,9 @@ interface ApplicationDao {
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
     fun getProfile(profileId: Int): Flow<Profile>
 
+    @Query("SELECT assets AS value FROM profile WHERE profileId = :defaultProfileId")
+    suspend fun getCurrentAsset(defaultProfileId: Int): Float
+
     @Query("SELECT * FROM category WHERE name = :categoryName")
     fun getCategory(categoryName: String): Flow<Category>
 
@@ -142,6 +145,17 @@ interface ApplicationDao {
                 " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch') LIMIT 12"
     )
     fun getCategoriesExpensesMonth(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>>
+
+    @Query(
+        "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
+                "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
+                " JOIN movement ON name = movement.category WHERE name IN (:categories)" +
+                " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch') LIMIT 12"
+    )
+    fun getCategoriesExpensesWeek(
+        categories: List<String>,
+        weekStartOffset: Int
+    ): Flow<Map<Category, List<AmountWithDate>>>
 
     @Query(
         "SELECT name, color, daily_budget, positive, negative FROM category INNER JOIN " +

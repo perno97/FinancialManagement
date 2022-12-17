@@ -16,6 +16,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
@@ -56,7 +57,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
     ): View {
         _binding = FragmentFinancialMovementDetailsBinding.inflate(inflater, container, false)
 
-        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
+        //UnusedCategoriesChecker.check(appViewModel, lifecycleScope)
 
         loadMovementData()
         return binding.root
@@ -248,10 +249,13 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
 
+        val previousAmount = movAndCategory.movement.amount
+        val newAmount = if (income) amount else -amount
+
         val movement = Movement(
             movementId = movAndCategory.movement.movementId,
             date = LocalDate.parse(date),
-            amount = if (income) amount else -amount,
+            amount = newAmount,
             category = category,
             title = title,
             notes = notes,
@@ -259,28 +263,17 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         )
 
         appViewModel.insert(movement)
-        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
+        updateAssets(previousAmount, newAmount)
+        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
         disableEditing()
         parentFragmentManager.popBackStack()
     }
 
-    private fun checkCategories() { // TODO Viene osservato 2 volte il cambiamento?
-        Log.e(logTag, "Called check")
-        viewLifecycleOwner.lifecycleScope.launch {
-            Log.e(logTag, "Started checking")
-            val list = appViewModel.getCategoryWithMovements()
-            Log.e(logTag, "Category list of ${list.size} items") //TODO viene stampato 2 volte
-            for (item in list) {
-                Log.e(
-                    logTag,
-                    "Checking category ${item.category.name} with ${item.movements.size} movements"
-                )
-                if (item.movements.isEmpty()) {
-                    Log.e(logTag, "Category ${item.category.name} has no related movement")
-                    appViewModel.deleteCategory(item.category)
-                }
-            }
-            Log.e(logTag, "Finished checking")
+    private fun updateAssets(previousAmount: Float, newAmount: Float) {
+        appViewModel.viewModelScope.launch {
+            val current = appViewModel.getCurrentAssetDefault()
+            val newAssets = current - previousAmount + newAmount
+            appViewModel.insertNewAssets(newAssets)
         }
     }
 

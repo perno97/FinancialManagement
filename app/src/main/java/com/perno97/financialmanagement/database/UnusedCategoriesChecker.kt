@@ -1,17 +1,19 @@
 package com.perno97.financialmanagement.database
 
 import android.util.Log
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.perno97.financialmanagement.viewmodels.AppViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 object UnusedCategoriesChecker {
     private const val logTag = "UnusedCategoriesChecker"
 
-    fun check(appViewModel: AppViewModel, viewLifecycleOwner: LifecycleOwner) {
+    fun check(appViewModel: AppViewModel, scope: CoroutineScope) {
         Log.e(logTag, "Called check")
-        viewLifecycleOwner.lifecycleScope.launch {
+        scope.launch {
             Log.e(logTag, "Started checking")
             val list = appViewModel.getCategoryWithMovements()
             Log.e(logTag, "Category list of ${list.size} items") //TODO viene stampato 2 volte

@@ -8,6 +8,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
@@ -42,7 +43,9 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
             cancelAction()
         }
         binding.editTextNewCatName.setText(category.name)
-        binding.editTextNewCatBudget.setText(String.format("%.2f", category.budget))
+        binding.editTextNewCatBudget.setText(
+            getString(R.string.euro_value, category.budget)
+        )
         val index = colorsSpinnerAdapter.getIndexFromColor(category.color)
         binding.spinnerColor.setSelection(index)
         binding.editTextNewCatBudget.filters =

@@ -53,6 +53,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
+    suspend fun getCurrentAsset(defaultProfileId: Int): Float {
+        return applicationDao.getCurrentAsset(defaultProfileId)
+    }
+
+    @WorkerThread
     fun getCategory(categoryName: String): Flow<Category> {
         return applicationDao.getCategory(categoryName)
     }
@@ -77,6 +82,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     fun getCategoriesExpensesMonth(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>> {
         return applicationDao.getCategoriesExpensesMonth(categories)
+    }
+
+    @WorkerThread
+    fun getCategoriesExpensesWeek(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>> {
+        return applicationDao.getCategoriesExpensesWeek(categories)
     }
 
     @WorkerThread
@@ -114,6 +124,4 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     suspend fun delete(category: Category) {
         applicationDao.deleteCategory(category)
     }
-
-
 }

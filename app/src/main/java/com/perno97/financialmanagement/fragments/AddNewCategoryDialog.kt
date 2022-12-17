@@ -8,6 +8,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
@@ -48,8 +49,7 @@ class AddNewCategoryDialog : DialogFragment() {
     private fun confirmAction() {
         val name = binding.editTextNewCatName.text.toString()
         val color = binding.spinnerColor.selectedItem.toString()
-        val budget =
-            String.format("%.2f", binding.editTextNewCatBudget.text.toString().toFloat()).toFloat()
+        val budget = binding.editTextNewCatBudget.text.toString().toFloat()
         appViewModel.insert(
             Category(
                 name = name,

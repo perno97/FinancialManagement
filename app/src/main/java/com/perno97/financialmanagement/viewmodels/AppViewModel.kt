@@ -1,5 +1,6 @@
 package com.perno97.financialmanagement.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.perno97.financialmanagement.utils.PeriodState
 import kotlinx.coroutines.launch
@@ -29,11 +30,16 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.movementsGroupByDay.asLiveData()
     val allMovementsAndCategories: LiveData<List<MovementAndCategory>> =
         repository.movementAndCategory.asLiveData()
-    val categoryWithMovements: LiveData<List<CategoryWithMovements>> =
-        repository.categoryWithMovements.asLiveData()
 
     fun getDefaultProfile(): LiveData<Profile> {
         return repository.getProfile(defaultProfileId).asLiveData()
+    }
+
+    suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
+        Log.e(logTag, "Getting categories with movements")
+        val toreturn = repository.getCategoryWithMovements()
+        Log.e(logTag, "Returning $toreturn value")
+        return toreturn
     }
 
 

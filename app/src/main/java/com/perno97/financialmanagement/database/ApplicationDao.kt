@@ -64,9 +64,8 @@ interface ApplicationDao {
     @Query("SELECT * FROM movement")
     fun getMovementAndCategory(): Flow<List<MovementAndCategory>>
 
-    @Transaction
     @Query("SELECT * FROM category")
-    fun getCategoryWithMovements(): Flow<List<CategoryWithMovements>>
+    suspend fun getCategoryWithMovements(): List<CategoryWithMovements>
 
 
     /*

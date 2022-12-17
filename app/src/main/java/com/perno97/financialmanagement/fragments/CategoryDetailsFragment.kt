@@ -209,7 +209,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
                 progressBarExp.progress =
-                    if (multipliedBudget != 0f) 100 else // If multiplied budget is 0 then fill progress bar (progress 100/100)
+                    if (multipliedBudget == 0f) 100 else // If multiplied budget is 0 then fill progress bar (progress 100/100)
                         (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                 progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
                 progressBarGain.progress =

@@ -1,14 +1,18 @@
 package com.perno97.financialmanagement.database
 
+import android.util.Log
 import androidx.annotation.WorkerThread
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import kotlin.math.log
 
 class AppRepository(private val applicationDao: ApplicationDao) {
+    private val logTag = "AppRepository"
+
     /*
-    Getters without parameters
-     */
+        Getters without parameters
+         */
     val allCategories: Flow<List<Category>> = applicationDao.getAllCategories()
     val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
     val availableDailyBudget: Flow<Float> = applicationDao.getAvailableDailyBudget()
@@ -18,8 +22,13 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         applicationDao.getMovementsGroupByDay()
     val movementAndCategory: Flow<List<MovementAndCategory>> =
         applicationDao.getMovementAndCategory()
-    val categoryWithMovements: Flow<List<CategoryWithMovements>> =
-        applicationDao.getCategoryWithMovements()
+
+    suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
+        Log.e(logTag, "Getting categories with movements")
+        val toreturn = applicationDao.getCategoryWithMovements()
+        Log.e(logTag, "Returning ${toreturn} value")
+        return toreturn
+    }
 
 
     /*

@@ -52,6 +52,8 @@ class AddFinancialMovementFragment : Fragment() {
     ): View {
         _binding = FragmentAddFinancialMovementBinding.inflate(inflater, container, false)
 
+        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
+
         appViewModel.allCategories.observe(viewLifecycleOwner) {
             val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
             appViewModel.allCategories.observe(viewLifecycleOwner) { categories ->

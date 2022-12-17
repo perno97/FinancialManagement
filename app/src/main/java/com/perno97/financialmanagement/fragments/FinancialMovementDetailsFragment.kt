@@ -15,6 +15,7 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
@@ -26,6 +27,7 @@ import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDeta
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -53,6 +55,9 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFinancialMovementDetailsBinding.inflate(inflater, container, false)
+
+        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
+
         loadMovementData()
         return binding.root
     }
@@ -254,22 +259,28 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         )
 
         appViewModel.insert(movement)
-        checkCategories()
+        UnusedCategoriesChecker.check(appViewModel, viewLifecycleOwner)
         disableEditing()
         parentFragmentManager.popBackStack()
     }
 
     private fun checkCategories() { // TODO Viene osservato 2 volte il cambiamento?
         Log.e(logTag, "Called check")
-        appViewModel.categoryWithMovements.observe(viewLifecycleOwner) { list ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            Log.e(logTag, "Started checking")
+            val list = appViewModel.getCategoryWithMovements()
             Log.e(logTag, "Category list of ${list.size} items") //TODO viene stampato 2 volte
             for (item in list) {
-                Log.e(logTag, "Checking category ${item.category.name} with ${item.movements.size} movements")
+                Log.e(
+                    logTag,
+                    "Checking category ${item.category.name} with ${item.movements.size} movements"
+                )
                 if (item.movements.isEmpty()) {
                     Log.e(logTag, "Category ${item.category.name} has no related movement")
                     appViewModel.deleteCategory(item.category)
                 }
             }
+            Log.e(logTag, "Finished checking")
         }
     }
 

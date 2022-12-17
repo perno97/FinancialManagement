@@ -14,10 +14,10 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.Category
@@ -164,22 +164,38 @@ class AddFinancialMovementFragment : Fragment() {
     private fun addMovementToDatabase() {
         val date = binding.editTextMovementDate.text
         if (date.isEmpty()) {
-            //TODO toast inserire data
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_no_date,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).show()
             return
         }
         val amount: Float = binding.editTextMovAmount.text.toString().toFloat()
         if (amount <= 0) {
-            //TODO toast amount > 0
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_null_or_negative_amount,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).show()
             return
         }
         val category = binding.spinnerCategory.selectedItem.toString()
         if (category.isEmpty()) {
-            //TODO inserire categoria
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_no_category,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).show()
             return
         }
         val title = binding.editTextTitle.text.toString()
         if (title.isEmpty()) {
-            //TODO inserire titolo
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_no_title,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).show()
             return
         }
         val notes = binding.editTextNotes.text.toString()

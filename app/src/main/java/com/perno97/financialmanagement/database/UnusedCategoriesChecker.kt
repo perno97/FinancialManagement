@@ -16,7 +16,7 @@ object UnusedCategoriesChecker {
         scope.launch {
             Log.e(logTag, "Started checking")
             val list = appViewModel.getCategoryWithMovements()
-            Log.e(logTag, "Category list of ${list.size} items") //TODO viene stampato 2 volte
+            Log.e(logTag, "Category list of ${list.size} items")
             for (item in list) {
                 Log.e(
                     logTag,

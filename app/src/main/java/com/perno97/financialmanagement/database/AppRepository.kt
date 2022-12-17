@@ -85,8 +85,20 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategoriesExpensesWeek(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>> {
-        return applicationDao.getCategoriesExpensesWeek(categories)
+    fun getCategoriesExpensesWeek(
+        categories: List<String>,
+        weekStartOffset: Int
+    ): Flow<Map<Category, List<AmountWithDate>>> {
+        return applicationDao.getCategoriesExpensesWeek(categories, weekStartOffset)
+    }
+
+    @WorkerThread
+    fun getCategoriesExpensesPeriod(
+        categories: List<String>,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<Category, List<AmountWithDate>>> {
+        return applicationDao.getCategoriesExpensesPeriod(categories, dateFrom, dateTo)
     }
 
     @WorkerThread

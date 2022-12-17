@@ -84,8 +84,19 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getCategoriesExpensesMonth(categories).asLiveData()
     }
 
-    fun getCategoriesExpensesWeek(categories: List<String>): LiveData<Map<Category, List<AmountWithDate>>> {
-        return repository.getCategoriesExpensesWeek(categories).asLiveData()
+    fun getCategoriesExpensesWeek(
+        categories: List<String>,
+        weekStartOffset: Int
+    ): LiveData<Map<Category, List<AmountWithDate>>> {
+        return repository.getCategoriesExpensesWeek(categories, weekStartOffset).asLiveData()
+    }
+
+    fun getCategoriesExpensesPeriod(
+        categories: List<String>,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): LiveData<Map<Category, List<AmountWithDate>>> {
+        return repository.getCategoriesExpensesPeriod(categories, dateFrom, dateTo).asLiveData()
     }
 
     fun getCategoryProgresses(

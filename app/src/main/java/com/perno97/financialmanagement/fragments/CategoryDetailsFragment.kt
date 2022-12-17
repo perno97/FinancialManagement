@@ -16,6 +16,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.data.*
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AmountWithDate
@@ -26,16 +28,12 @@ import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.ZoneId
+import java.time.*
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.absoluteValue
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 class CategoryDetailsFragment(private val categoryName: String) :
@@ -88,19 +86,30 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun loadGraphsData() {
+        val catList = categoryFilters.map { c -> c.name } + listOf(category.name)
         when (state) {
             PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
             PeriodState.WEEK -> appViewModel.getCategoriesExpensesWeek(
-                categoryFilters.map { c -> c.name } + listOf(category.name)
+                catList,
+                ChronoUnit.DAYS.between(
+                    LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
+                    LocalDate.now()
+                ).toInt().absoluteValue
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphs(categoryWithExpense, "Week")
+                updateLineGraphs(categoryWithExpense, state)
             }
             PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
-                categoryFilters.map { c -> c.name } + listOf(category.name)
+                catList
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphs(categoryWithExpense, "Month")
+                updateLineGraphs(categoryWithExpense, state)
             }
-            PeriodState.PERIOD -> TODO()
+            PeriodState.PERIOD -> appViewModel.getCategoriesExpensesPeriod(
+                catList,
+                dateFrom,
+                dateTo
+            ).observe(viewLifecycleOwner) { categoryWithExpense ->
+                updateLineGraphs(categoryWithExpense, state)
+            }
         }
         updateHorizontalGraphs()
     }
@@ -116,7 +125,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 .toInt() + 1 // Add 1 because between is exclusive
         } // Budget is defined as daily budget
         if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
-            //TODO no data
+            //TODO usare snackbar o scrivere nel grafico o non fare niente
+            Log.e(logTag, "No category movements to show in horizontal graphs")
         } else {
             //var currentSum = 0f
             //var budgetsSum = 0f
@@ -172,8 +182,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 progressBarGain.progress =
                     if (maxGain == 0f) currentCatGain.roundToInt() else (currentCatGain * 100 / maxGain).roundToInt()
                 progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
-                // TODO come visualizzo progresso del guadagno?
-                // TODO prendo il massimo guadagno e lo fisso come maxprogress? Fatto
                 // Set category budget of category line
                 viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
                     getString(
@@ -192,10 +200,11 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
     private fun updateLineGraphs(
         data: Map<Category, List<AmountWithDate>>,
-        columnName: String
+        state: PeriodState
     ) {
         if (data.isEmpty()) {
-            // TODO no data
+            //TODO usare snackbar o scrivere nel grafico o non fare niente
+            Log.e(logTag, "No category movements to show in line graphs")
         } else {
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
@@ -243,17 +252,15 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     expEntries.add(
                         Entry(
                             columnCount.toFloat(),
-                            exp,
-                            "$columnName + $columnCount" //TODO non funziona
+                            exp
                         )
                     )
                     gainEntries.add(
                         Entry(
                             columnCount.toFloat(),
-                            gain,
-                            "$columnName + $columnCount" //TODO non funziona
+                            gain
                         )
-                    )
+                    ) // TODO mettere valori sull'asse delle ascisse
                     columnCount++
                 }
                 val expensesDataSet = LineDataSet(expEntries, category.name)
@@ -326,7 +333,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
         }
     }
 
-    private fun updateCategoryProgress() { // TODO unire a updateData()?
+    private fun updateCategoryProgress() {
         binding.txtCategoryName.text = category.name
         val budgetMultiplier: Int = when (state) {
             PeriodState.DAY -> 1
@@ -363,12 +370,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
         appViewModel.setCategoryFilters(listOf())
     }
 
-    private fun setWeek() {
+    private fun setWeek() {//TODO provare periodi in questa schermata
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
         dateTo = LocalDate.now()
         dateFrom = LocalDate.now()
-            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek)) //TODO controllare
+            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
         state = PeriodState.WEEK
         setTitle(
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +

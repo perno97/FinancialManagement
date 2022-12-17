@@ -1,5 +1,7 @@
 package com.perno97.financialmanagement.fragments
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +36,9 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentEditCategoryDialogBinding.inflate(inflater, container, false)
+        if (dialog != null)
+            dialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         val colorsSpinnerAdapter = ColorsSpinnerAdapter(requireContext())
         binding.spinnerColor.adapter = colorsSpinnerAdapter
         binding.btnConfirmEditCategory.setOnClickListener {

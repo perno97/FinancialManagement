@@ -150,7 +150,7 @@ class MainFragment : Fragment() {
 
     private fun dataLoaded() {
         Log.i(logTag, "Called dataLoaded with isAllDataLoaded = $isAllDataLoaded")
-        if (isAllDataLoaded) updateUI( //TODO controllare perché non viene aggiornata UI
+        if (isAllDataLoaded) updateUI(
             categoriesExpenses!!,
             availableDailyBudget
         )
@@ -178,7 +178,7 @@ class MainFragment : Fragment() {
         binding.btnMonth.isEnabled = true
         dateTo = LocalDate.now()
         dateFrom = LocalDate.now()
-            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek)) //TODO controllare
+            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
         state = PeriodState.WEEK
         setTitle(
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +

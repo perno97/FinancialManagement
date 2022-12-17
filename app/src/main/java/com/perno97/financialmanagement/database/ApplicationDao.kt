@@ -148,13 +148,26 @@ interface ApplicationDao {
 
     @Query(
         "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
-                "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
-                " JOIN movement ON name = movement.category WHERE name IN (:categories)" +
-                " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch') LIMIT 12"
+                "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate " +
+                "FROM category JOIN movement ON name = movement.category WHERE name IN (:categories)" +
+                " GROUP BY STRFTIME('%Y-%m-%d', movement.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days') LIMIT 12"
     )
     fun getCategoriesExpensesWeek(
         categories: List<String>,
         weekStartOffset: Int
+    ): Flow<Map<Category, List<AmountWithDate>>>
+
+    @Query(
+        "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
+                "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
+                " JOIN movement ON name = movement.category WHERE name IN (:categories)" +
+                " AND movement.date >= :dateFrom AND movement.date <= :dateTo" +
+                " GROUP BY movement.date LIMIT 12"
+    )
+    fun getCategoriesExpensesPeriod(
+        categories: List<String>,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
     ): Flow<Map<Category, List<AmountWithDate>>>
 
     @Query(

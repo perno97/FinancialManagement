@@ -1,5 +1,7 @@
 package com.perno97.financialmanagement.fragments
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +36,9 @@ class EditCurrentAssetsDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentEditCurrentAssetsDialogBinding.inflate(inflater, container, false)
+        if (dialog != null)
+            dialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         binding.btnConfirmEditAssets.setOnClickListener {
             confirmAction()
         }
@@ -66,7 +71,6 @@ class EditCurrentAssetsDialog : DialogFragment() {
 
     private fun cancelAction() {
         dismiss()
-        //TODO
     }
 
     override fun onDestroyView() {

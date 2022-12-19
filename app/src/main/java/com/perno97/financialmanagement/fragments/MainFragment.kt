@@ -109,6 +109,14 @@ class MainFragment : Fragment() {
                 }
             }
         }
+
+        // Setup chart styling
+        val chart = binding.pieChartMain
+        chart.legend.isEnabled = false
+        chart.description.isEnabled = false
+        chart.setDrawEntryLabels(false)
+        chart.setDrawCenterText(true)
+        chart.setTouchEnabled(false)
         return binding.root
     }
 
@@ -353,7 +361,7 @@ class MainFragment : Fragment() {
                     ) else ""
                 // Set category current expenses of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
-                    getString(R.string.euro_value, categories[c]!!.expense)
+                    getString(R.string.euro_value, currentCatExpenseAsPositive)
                 // Set click listener for category line
                 viewCatProgressLayout.setOnClickListener {
                     parentFragmentManager.commit {
@@ -379,11 +387,6 @@ class MainFragment : Fragment() {
         pieData.setDrawValues(false)
         val chart = binding.pieChartMain
         chart.data = pieData
-        chart.legend.isEnabled = false
-        chart.description.isEnabled = false
-        chart.setDrawEntryLabels(false)
-        chart.setDrawCenterText(true)
-        chart.setTouchEnabled(false)
         val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
         val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
         val s1 = SpannableString("AVAILABLE \n BUDGET")

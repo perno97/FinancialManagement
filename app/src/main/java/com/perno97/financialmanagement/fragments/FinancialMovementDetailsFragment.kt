@@ -75,13 +75,9 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         val category = movAndCategory.category
         binding.editTextMovAmount.setText(movement.amount.absoluteValue.toString())
         if (movement.amount >= 0) {
-            income = true
-            binding.btnIncome.isEnabled = false
-            binding.btnOutcome.isEnabled = true
+            incomeSelected()
         } else {
-            income = false
-            binding.btnIncome.isEnabled = true
-            binding.btnOutcome.isEnabled = false
+            outcomeSelected()
         }
 
 
@@ -107,6 +103,18 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         binding.editTextMovementDate.inputType = InputType.TYPE_NULL
         binding.editTextMovAmount.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
+    }
+
+    private fun outcomeSelected() {
+        income = false
+        binding.btnIncome.isEnabled = true
+        binding.btnOutcome.isEnabled = false
+    }
+
+    private fun incomeSelected() {
+        income = true
+        binding.btnIncome.isEnabled = false
+        binding.btnOutcome.isEnabled = true
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -161,14 +169,12 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         }
         binding.btnIncome.setOnClickListener {
             if (editingEnabled) {
-                binding.btnIncome.isEnabled = false
-                binding.btnOutcome.isEnabled = true
+                incomeSelected()
             }
         }
         binding.btnOutcome.setOnClickListener {
             if (editingEnabled) {
-                binding.btnIncome.isEnabled = true
-                binding.btnOutcome.isEnabled = false
+                outcomeSelected()
             }
         }
         binding.fabEditMovement.setOnClickListener {

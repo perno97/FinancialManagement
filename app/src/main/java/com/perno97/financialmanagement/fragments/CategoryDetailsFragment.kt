@@ -8,21 +8,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AmountWithDate
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
+import com.perno97.financialmanagement.utils.MonthValueFormatter
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -82,6 +83,39 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 Log.e(logTag, "No category found with name: $categoryName")
             }
         }
+
+        val expChart = binding.expensesLineChart
+        val gainsChart = binding.incomesLineChart
+        expChart.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_30))
+        expChart.setExtraOffsets(30f, 30f, 30f, 30f)
+        expChart.description.isEnabled = false
+        gainsChart.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_30))
+        gainsChart.description.isEnabled = false
+
+        val xAxisExp = expChart.xAxis
+        xAxisExp.setDrawGridLines(false)
+        xAxisExp.setDrawAxisLine(false)
+        xAxisExp.position = XAxis.XAxisPosition.BOTTOM
+        xAxisExp.labelRotationAngle = -90f
+        xAxisExp.granularity = 1f
+
+        val xAxisGain = gainsChart.xAxis
+        xAxisGain.setDrawGridLines(false)
+        xAxisGain.setDrawAxisLine(false)
+        xAxisGain.position = XAxis.XAxisPosition.BOTTOM
+        xAxisGain.labelRotationAngle = -90f
+        xAxisGain.granularity = 1f
+
+        val leftAxisExp = expChart.axisLeft
+        leftAxisExp.isEnabled = false
+        val leftAxisGain = gainsChart.axisLeft
+        leftAxisGain.isEnabled = false
+
+        val rightAxisExp = expChart.axisRight
+        rightAxisExp.isEnabled = false
+        val rightAxisGain = gainsChart.axisRight
+        rightAxisGain.isEnabled = false
+
         return binding.root
     }
 
@@ -96,19 +130,19 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     LocalDate.now()
                 ).toInt().absoluteValue
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphs(categoryWithExpense, state)
+                updateLineGraphsMonth(categoryWithExpense)
             }
             PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
                 catList
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphs(categoryWithExpense, state)
+                updateLineGraphsMonth(categoryWithExpense)
             }
             PeriodState.PERIOD -> appViewModel.getCategoriesExpensesPeriod(
                 catList,
                 dateFrom,
                 dateTo
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphs(categoryWithExpense, state)
+                updateLineGraphsMonth(categoryWithExpense)
             }
         }
         updateHorizontalGraphs()
@@ -118,7 +152,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
         binding.expensesProgressList.removeAllViews()
         binding.incomesProgressList.removeAllViews()
         val budgetMultiplier: Int = when (state) {
-            PeriodState.DAY -> 1
+            PeriodState.DAY -> {
+                Log.e(logTag, "Period day not defined in this screen")
+                1
+            }
             PeriodState.WEEK -> 7
             PeriodState.MONTH -> LocalDate.now().lengthOfMonth()
             PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
@@ -198,9 +235,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
         }
     }
 
-    private fun updateLineGraphs(
-        data: Map<Category, List<AmountWithDate>>,
-        state: PeriodState
+    private fun updateLineGraphsMonth(
+        data: Map<Category, List<AmountWithDate>>
     ) {
         if (data.isEmpty()) {
             //TODO usare snackbar o scrivere nel grafico o non fare niente
@@ -210,6 +246,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGain = binding.incomesLineChart
             val lineChartExpData = LineData()
             val lineChartGainData = LineData()
+            val labels = arrayListOf<LocalDate>()
+            var labelsLoaded = false
             for (category in data.keys) {
                 val expEntries = arrayListOf<Entry>()
                 val gainEntries = arrayListOf<Entry>()
@@ -221,6 +259,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 var dateToCheckBefore: LocalDate
                 var dateToCheckAfter: LocalDate
                 while (columnCount < 12) {
+                    // x value must be between these dates to be in this column
                     dateToCheckAfter =
                         YearMonth.now().minusMonths(columnCount.toLong()).atDay(1)
                     dateToCheckBefore =
@@ -239,14 +278,16 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         )
                     }
                     val exp: Float = if (amountWithDateFound.isEmpty()) {
-                        0f
+                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
                     } else {
+                        // Found a value for this column for this category
                         amountWithDateFound[0].expense.absoluteValue
                     }
 
                     val gain: Float = if (amountWithDateFound.isEmpty()) {
-                        0f
+                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
                     } else {
+                        // Found a value for this column for this category
                         amountWithDateFound[0].gain
                     }
                     expEntries.add(
@@ -260,7 +301,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
                             columnCount.toFloat(),
                             gain
                         )
-                    ) // TODO mettere valori sull'asse delle ascisse
+                    )
+                    // Adding date for formatter (to have x labels) only at first cycle
+                    if (!labelsLoaded)
+                        labels.add(dateToCheckAfter)
                     columnCount++
                 }
                 val expensesDataSet = LineDataSet(expEntries, category.name)
@@ -269,10 +313,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 incomesDataSet.color = Color.parseColor(category.color)
                 // TODO styling dataset
                 lineChartExpData.addDataSet(expensesDataSet)
+                //lineChartExpData.setValueFormatter(MonthValueFormatter(labels))
                 lineChartGainData.addDataSet(incomesDataSet)
+                //lineChartGainData.setValueFormatter(MonthValueFormatter(labels))
+                labelsLoaded = true
             }
+            val valueFormatter = MonthValueFormatter(labels)
             lineChartExp.data = lineChartExpData
+            lineChartExp.xAxis.valueFormatter = valueFormatter
+
             lineChartGain.data = lineChartGainData
+            lineChartGain.xAxis.valueFormatter = valueFormatter
+
             lineChartExp.invalidate()
             lineChartGain.invalidate()
         }

@@ -19,4 +19,8 @@
     <string name="error_null_or_negative_amount">Movement amount must be greater than zero</string>
     <string name="error_no_category">Category input is empty</string>
     <string name="error_no_title">Title field can\'t be empty</string>
+    <string name="open_edit_current_category">Open edit current category</string>
+    <string name="open_add_a_new_financial_movement">Open add a new financial movement</string>
+    <string name="go_back_to_previous_screen">Go back to previous screen</string>
+    <string name="open_add_new_category_to_comparison">Open add new category to comparison</string>
 </resources>

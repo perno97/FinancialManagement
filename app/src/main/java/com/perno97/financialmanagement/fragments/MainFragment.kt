@@ -31,6 +31,7 @@ import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
@@ -41,7 +42,6 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class MainFragment : Fragment() {
-
     private val logTag = "MainFragment"
 
     /**
@@ -85,6 +85,7 @@ class MainFragment : Fragment() {
             if (profile != null) {
                 defaultProfile = profile
                 binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
+                computeExpectedAssets()
             } else {
                 createNewDefaultProfile()
             }
@@ -118,6 +119,65 @@ class MainFragment : Fragment() {
         chart.setDrawCenterText(true)
         chart.setTouchEnabled(false)
         return binding.root
+    }
+
+    private fun updateExpectedAssets(prev: Float, new: Float) {
+
+        binding.txtExpectedValue.text =
+            getString(R.string.euro_value, new)
+        if (new > prev)
+            binding.txtExpectedValue.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.primary
+                )
+            )
+        else if (new < prev)
+            binding.txtExpectedValue.setTextColor(Color.RED) // TODO controllare colori
+        else
+            binding.txtExpectedValue.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.dark
+                )
+            )
+    }
+
+    private fun computeExpectedAssets() {
+        val currentAssets = defaultProfile.assets
+        when (state) {
+            // ----------------- DAY -----------------
+            PeriodState.DAY -> appViewModel.getExpectedSum(LocalDate.now(), LocalDate.now())
+                .observe(viewLifecycleOwner) { movementsSum ->
+                    updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                }
+            // ----------------- WEEK ----------------
+            PeriodState.WEEK -> appViewModel.getExpectedSum(
+                LocalDate.now(),
+                LocalDate.now().with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
+            ).observe(viewLifecycleOwner) { movementsSum ->
+                updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+            }
+            // ---------------- MONTH ----------------
+            PeriodState.MONTH -> appViewModel.getExpectedSum(
+                LocalDate.now(),
+                LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
+            ).observe(viewLifecycleOwner) { movementsSum ->
+                updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+            }
+            // ---------------- PERIOD ----------------
+            PeriodState.PERIOD -> {
+                val from = if (dateFrom.isBefore(LocalDate.now())) LocalDate.now() else dateFrom
+                val to = if (dateTo.isBefore(from)) from else dateTo
+                appViewModel.getExpectedSum(
+                    from,
+                    to
+                ).observe(viewLifecycleOwner) { movementsSum ->
+                    updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                }
+            }
+            // ----------------------------------------
+        }
     }
 
     private fun createNewDefaultProfile() {

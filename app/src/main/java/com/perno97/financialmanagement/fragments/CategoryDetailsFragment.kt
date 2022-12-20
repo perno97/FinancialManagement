@@ -25,6 +25,8 @@ import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
 import com.perno97.financialmanagement.utils.MonthValueFormatter
 import com.perno97.financialmanagement.utils.PeriodState
+import com.perno97.financialmanagement.utils.PeriodValueFormatter
+import com.perno97.financialmanagement.utils.WeekValueFormatter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
@@ -40,6 +42,7 @@ import kotlin.math.roundToInt
 class CategoryDetailsFragment(private val categoryName: String) :
     Fragment() {
     private val logTag = "CategoryDetailsFragment"
+    private val numberOfColumnsInGraphs = 12
 
     /**
      * Connection to data
@@ -87,9 +90,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
         val expChart = binding.expensesLineChart
         val gainsChart = binding.incomesLineChart
         expChart.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_30))
-        expChart.setExtraOffsets(30f, 30f, 30f, 30f)
+        expChart.setExtraOffsets(10f, 0f, 10f, 30f)
         expChart.description.isEnabled = false
         gainsChart.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_30))
+        gainsChart.setExtraOffsets(10f, 0f, 10f, 30f)
         gainsChart.description.isEnabled = false
 
         val xAxisExp = expChart.xAxis
@@ -97,14 +101,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
         xAxisExp.setDrawAxisLine(false)
         xAxisExp.position = XAxis.XAxisPosition.BOTTOM
         xAxisExp.labelRotationAngle = -90f
-        xAxisExp.granularity = 1f
 
         val xAxisGain = gainsChart.xAxis
         xAxisGain.setDrawGridLines(false)
         xAxisGain.setDrawAxisLine(false)
         xAxisGain.position = XAxis.XAxisPosition.BOTTOM
         xAxisGain.labelRotationAngle = -90f
-        xAxisGain.granularity = 1f
 
         val leftAxisExp = expChart.axisLeft
         leftAxisExp.isEnabled = false
@@ -122,7 +124,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun loadGraphsData() {
         val catList = categoryFilters.map { c -> c.name } + listOf(category.name)
         when (state) {
+            // ----------------- DAY -----------------
             PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
+            // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getCategoriesExpensesWeek(
                 catList,
                 ChronoUnit.DAYS.between(
@@ -130,20 +134,23 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     LocalDate.now()
                 ).toInt().absoluteValue
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphsMonth(categoryWithExpense)
+                updateLineGraphsWeek(categoryWithExpense)
             }
+            // ---------------- MONTH ----------------
             PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
                 catList
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
                 updateLineGraphsMonth(categoryWithExpense)
             }
+            // ---------------- PERIOD ----------------
             PeriodState.PERIOD -> appViewModel.getCategoriesExpensesPeriod(
                 catList,
                 dateFrom,
                 dateTo
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphsMonth(categoryWithExpense)
+                updateLineGraphsPeriod(categoryWithExpense)
             }
+            // ----------------------------------------
         }
         updateHorizontalGraphs()
     }
@@ -181,8 +188,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 }
                 val currentCatExpenseAsPositive = categoriesExpenses!![c]!!.negative.absoluteValue
                 val currentCatGain = categoriesExpenses!![c]!!.positive
-                //budgetsSum += multipliedBudget
-                //currentSum += currentCatExpenseAsPositive
 
                 // Load layout
                 val viewCatProgressLayoutExp =
@@ -258,7 +263,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 var columnCount = 0
                 var dateToCheckBefore: LocalDate
                 var dateToCheckAfter: LocalDate
-                while (columnCount < 12) {
+                while (columnCount < numberOfColumnsInGraphs) {
                     // x value must be between these dates to be in this column
                     dateToCheckAfter =
                         YearMonth.now().minusMonths(columnCount.toLong()).atDay(1)
@@ -313,17 +318,210 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 incomesDataSet.color = Color.parseColor(category.color)
                 // TODO styling dataset
                 lineChartExpData.addDataSet(expensesDataSet)
-                //lineChartExpData.setValueFormatter(MonthValueFormatter(labels))
                 lineChartGainData.addDataSet(incomesDataSet)
-                //lineChartGainData.setValueFormatter(MonthValueFormatter(labels))
                 labelsLoaded = true
             }
-            val valueFormatter = MonthValueFormatter(labels)
-            lineChartExp.data = lineChartExpData
-            lineChartExp.xAxis.valueFormatter = valueFormatter
+            val xAxisExp = lineChartExp.xAxis
+            xAxisExp.labelCount = numberOfColumnsInGraphs
+            xAxisExp.granularity = 1f
+            val xAxisGain = lineChartGain.xAxis
+            xAxisGain.labelCount = numberOfColumnsInGraphs
+            xAxisGain.granularity = 1f
 
-            lineChartGain.data = lineChartGainData
+            val valueFormatter = MonthValueFormatter(labels)
+            lineChartExp.xAxis.valueFormatter = valueFormatter
+            lineChartExp.data = lineChartExpData
+
             lineChartGain.xAxis.valueFormatter = valueFormatter
+            lineChartGain.data = lineChartGainData
+
+            lineChartExp.invalidate()
+            lineChartGain.invalidate()
+        }
+    }
+
+    private fun updateLineGraphsWeek(
+        data: Map<Category, List<AmountWithDate>>
+    ) {
+        if (data.isEmpty()) {
+            //TODO usare snackbar o scrivere nel grafico o non fare niente
+            Log.e(logTag, "No category movements to show in line graphs")
+        } else {
+            val lineChartExp = binding.expensesLineChart
+            val lineChartGain = binding.incomesLineChart
+            val lineChartExpData = LineData()
+            val lineChartGainData = LineData()
+            for (category in data.keys) {
+                val expEntries = arrayListOf<Entry>()
+                val gainEntries = arrayListOf<Entry>()
+                if (data[category] == null) {
+                    Log.e(logTag, "No line chart data found for category ${category.name}")
+                    break
+                }
+                var columnCount = 0
+                var dateToCheckBefore: LocalDate
+                var dateToCheckAfter: LocalDate
+                while (columnCount < numberOfColumnsInGraphs) {
+                    // x value must be between these dates to be in this column
+                    dateToCheckAfter =
+                        LocalDate.now()
+                            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                    dateToCheckBefore =
+                        if (columnCount == 0) LocalDate.now()
+                        else LocalDate.now()
+                            .with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
+                    val amountWithDateFound = data[category]!!.filter { amountWithDate ->
+                        !amountWithDate.amountDate.isBefore(
+                            dateToCheckAfter
+                        ) && !amountWithDate.amountDate.isAfter(dateToCheckBefore)
+                    }
+                    if (amountWithDateFound.size > 1) {
+                        Log.e(
+                            logTag,
+                            "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
+                        )
+                    }
+                    val exp: Float = if (amountWithDateFound.isEmpty()) {
+                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    } else {
+                        // Found a value for this column for this category
+                        amountWithDateFound[0].expense.absoluteValue
+                    }
+
+                    val gain: Float = if (amountWithDateFound.isEmpty()) {
+                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    } else {
+                        // Found a value for this column for this category
+                        amountWithDateFound[0].gain
+                    }
+                    expEntries.add(
+                        Entry(
+                            columnCount.toFloat(),
+                            exp
+                        )
+                    )
+                    gainEntries.add(
+                        Entry(
+                            columnCount.toFloat(),
+                            gain
+                        )
+                    )
+                    columnCount++
+                }
+                val expensesDataSet = LineDataSet(expEntries, category.name)
+                val incomesDataSet = LineDataSet(gainEntries, category.name)
+                expensesDataSet.color = Color.parseColor(category.color)
+                incomesDataSet.color = Color.parseColor(category.color)
+                // TODO styling dataset
+                lineChartExpData.addDataSet(expensesDataSet)
+                lineChartGainData.addDataSet(incomesDataSet)
+            }
+            val xAxisExp = lineChartExp.xAxis
+            xAxisExp.labelCount = numberOfColumnsInGraphs
+            xAxisExp.granularity = 1f
+            val xAxisGain = lineChartGain.xAxis
+            xAxisGain.labelCount = numberOfColumnsInGraphs
+            xAxisGain.granularity = 1f
+
+            val valueFormatter = WeekValueFormatter()
+            lineChartExp.xAxis.valueFormatter = valueFormatter
+            lineChartExp.data = lineChartExpData
+
+            lineChartGain.xAxis.valueFormatter = valueFormatter
+            lineChartGain.data = lineChartGainData
+
+            lineChartExp.invalidate()
+            lineChartGain.invalidate()
+        }
+    }
+
+    private fun updateLineGraphsPeriod(
+        data: Map<Category, List<AmountWithDate>>
+    ) {
+        if (data.isEmpty()) {
+            //TODO usare snackbar o scrivere nel grafico o non fare niente
+            Log.e(logTag, "No category movements to show in line graphs")
+        } else {
+            val lineChartExp = binding.expensesLineChart
+            val lineChartGain = binding.incomesLineChart
+            val lineChartExpData = LineData()
+            val lineChartGainData = LineData()
+            val labels = arrayListOf<LocalDate>()
+            var labelsLoaded = false
+            for (category in data.keys) {
+                val expEntries = arrayListOf<Entry>()
+                val gainEntries = arrayListOf<Entry>()
+                if (data[category] == null) {
+                    Log.e(logTag, "No line chart data found for category ${category.name}")
+                    break
+                }
+                var currentColumnDate = dateTo
+                var columnCount = 0
+                while (!currentColumnDate.isBefore(dateFrom)) {
+                    val amountWithDateFound = data[category]!!.filter { amountWithDate ->
+                        amountWithDate.amountDate.isEqual(currentColumnDate)
+                    }
+                    if (amountWithDateFound.size > 1) {
+                        Log.e(
+                            logTag,
+                            "Found multiple expenses for same column.\nCategory: ${category.name}, date: $currentColumnDate"
+                        )
+                    }
+                    val exp: Float = if (amountWithDateFound.isEmpty()) {
+                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    } else {
+                        // Found a value for this column for this category
+                        amountWithDateFound[0].expense.absoluteValue
+                    }
+
+                    val gain: Float = if (amountWithDateFound.isEmpty()) {
+                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    } else {
+                        // Found a value for this column for this category
+                        amountWithDateFound[0].gain
+                    }
+                    expEntries.add(
+                        Entry(
+                            columnCount.toFloat(),
+                            exp
+                        )
+                    )
+                    gainEntries.add(
+                        Entry(
+                            columnCount.toFloat(),
+                            gain
+                        )
+                    )
+                    // Adding date for formatter (to have x labels) only at first cycle
+                    if (!labelsLoaded)
+                        labels.add(currentColumnDate)
+                    columnCount++
+                    currentColumnDate = currentColumnDate.minusDays(1)
+                }
+                val expensesDataSet = LineDataSet(expEntries, category.name)
+                val incomesDataSet = LineDataSet(gainEntries, category.name)
+                expensesDataSet.color = Color.parseColor(category.color)
+                incomesDataSet.color = Color.parseColor(category.color)
+                // TODO styling dataset
+                lineChartExpData.addDataSet(expensesDataSet)
+                lineChartGainData.addDataSet(incomesDataSet)
+                labelsLoaded = true
+            }
+            val xAxisExp = lineChartExp.xAxis
+            val numberOfDays = ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() + 1
+            xAxisExp.labelCount = numberOfDays
+            xAxisExp.granularity = 1f
+            val xAxisGain = lineChartGain.xAxis
+            xAxisGain.labelCount = numberOfDays
+            xAxisGain.granularity = 1f
+
+            val valueFormatter = PeriodValueFormatter(labels)
+            lineChartExp.xAxis.valueFormatter = valueFormatter
+            lineChartExp.data = lineChartExpData
+
+
+            lineChartGain.xAxis.valueFormatter = valueFormatter
+            lineChartGain.data = lineChartGainData
 
             lineChartExp.invalidate()
             lineChartGain.invalidate()

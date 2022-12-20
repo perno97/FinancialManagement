@@ -5,7 +5,6 @@ import androidx.annotation.WorkerThread
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
-import kotlin.math.log
 
 class AppRepository(private val applicationDao: ApplicationDao) {
     private val logTag = "AppRepository"
@@ -16,10 +15,6 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     val allCategories: Flow<List<Category>> = applicationDao.getAllCategories()
     val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
     val availableDailyBudget: Flow<Float> = applicationDao.getAvailableDailyBudget()
-    val movementsGroupByMonth: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
-        applicationDao.getMovementsGroupByMonth()
-    val movementsGroupByDay: Flow<Map<GroupInfo, List<MovementAndCategory>>> =
-        applicationDao.getMovementsGroupByDay()
     val movementAndCategory: Flow<List<MovementAndCategory>> =
         applicationDao.getMovementAndCategory()
 
@@ -35,9 +30,20 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     Getters with parameters
      */
     @WorkerThread
-    fun getMovementsGroupByWeek(weekStartOffset: Int): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
-        return applicationDao.getMovementsGroupByWeek(weekStartOffset)
+    fun getMovementsGroupByWeek(
+        weekStartOffset: Int,
+        beforeDate: LocalDate
+    ): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
+        return applicationDao.getMovementsGroupByWeek(weekStartOffset, beforeDate)
     }
+
+    @WorkerThread
+    fun getMovementsGroupByDay(beforeDate: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
+        applicationDao.getMovementsGroupByDay(beforeDate)
+
+    @WorkerThread
+    fun getMovementsGroupByMonth(beforeDate: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
+        applicationDao.getMovementsGroupByMonth(beforeDate)
 
     @WorkerThread
     fun getMovementsInPeriod(
@@ -107,6 +113,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         dateTo: LocalDate
     ): Flow<Map<Category, PositiveNegativeSums>> {
         return applicationDao.getCategoryProgresses(dateFrom, dateTo)
+    }
+
+    @WorkerThread
+    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): Flow<Float> {
+        return applicationDao.getExpectedSum(dateFrom, dateTo)
     }
 
 

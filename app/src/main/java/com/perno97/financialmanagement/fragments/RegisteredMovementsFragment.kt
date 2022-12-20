@@ -29,7 +29,6 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
-import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 
@@ -92,24 +91,32 @@ class RegisteredMovementsFragment : Fragment() {
 
     private fun loadData() {
         when (state) {
-            PeriodState.DAY -> appViewModel.movementsGroupByDay.observe(viewLifecycleOwner) {
-                movementsLoaded(it)
-            }
+            // ----------------- DAY -----------------
+            PeriodState.DAY -> appViewModel.getMovementsGroupByDay(LocalDate.now())
+                .observe(viewLifecycleOwner) {
+                    movementsLoaded(it)
+                }
+            // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
                 ChronoUnit.DAYS.between(
                     LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
                     LocalDate.now()
-                ).toInt().absoluteValue
+                ).toInt().absoluteValue,
+                LocalDate.now()
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
-            PeriodState.MONTH -> appViewModel.movementsGroupByMonth.observe(viewLifecycleOwner) {
-                movementsLoaded(it)
-            }
+            // ---------------- MONTH ----------------
+            PeriodState.MONTH -> appViewModel.movementsGroupByMonth(LocalDate.now())
+                .observe(viewLifecycleOwner) {
+                    movementsLoaded(it)
+                }
+            // ---------------- PERIOD ----------------
             PeriodState.PERIOD -> appViewModel.getMovementsInPeriod(dateFrom, dateTo)
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
+            // ----------------------------------------
         }
 
     }

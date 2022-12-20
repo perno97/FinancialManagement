@@ -24,10 +24,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
     val allMovements: LiveData<List<Movement>> = repository.allMovements.asLiveData()
     val availableDailyBudget: LiveData<Float> = repository.availableDailyBudget.asLiveData()
-    val movementsGroupByMonth: LiveData<Map<GroupInfo, List<MovementAndCategory>>> =
-        repository.movementsGroupByMonth.asLiveData()
-    val movementsGroupByDay: LiveData<Map<GroupInfo, List<MovementAndCategory>>> =
-        repository.movementsGroupByDay.asLiveData()
     val allMovementsAndCategories: LiveData<List<MovementAndCategory>> =
         repository.movementAndCategory.asLiveData()
 
@@ -50,8 +46,19 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     /*
     Getters with parameters
      */
-    fun getMovementsGroupByWeek(weekStartOffset: Int): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
-        return repository.getMovementsGroupByWeek(weekStartOffset).asLiveData()
+    fun getMovementsGroupByWeek(
+        weekStartOffset: Int,
+        beforeDate: LocalDate
+    ): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsGroupByWeek(weekStartOffset, beforeDate).asLiveData()
+    }
+
+    fun getMovementsGroupByDay(beforeDate: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsGroupByDay(beforeDate).asLiveData()
+    }
+
+    fun movementsGroupByMonth(beforeDate: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsGroupByMonth(beforeDate).asLiveData()
     }
 
     fun getMovementsInPeriod(
@@ -104,6 +111,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         dateTo: LocalDate
     ): LiveData<Map<Category, PositiveNegativeSums>> {
         return repository.getCategoryProgresses(dateFrom, dateTo).asLiveData()
+    }
+
+    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): LiveData<Float> {
+        return repository.getExpectedSum(dateFrom, dateTo).asLiveData()
     }
 
 

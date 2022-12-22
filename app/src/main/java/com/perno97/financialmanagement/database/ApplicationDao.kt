@@ -174,8 +174,12 @@ interface ApplicationDao {
         dateTo: LocalDate
     ): Flow<Map<Category, List<AmountWithDate>>>
 
+    /*
+    LEFT JOIN in order to return category data with some null columns if there's no movement
+    in the selected period
+     */
     @Query(
-        "SELECT name, color, daily_budget, positive, negative FROM category INNER JOIN " +
+        "SELECT name, color, daily_budget, positive, negative FROM category LEFT JOIN " +
                 "(SELECT movement.category AS catName, SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
                 " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +

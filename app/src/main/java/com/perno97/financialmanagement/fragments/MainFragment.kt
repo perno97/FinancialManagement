@@ -51,8 +51,6 @@ class MainFragment : Fragment() {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
 
-    //TODO controllare se possibile evitare di chiamare update perché i dati vengono osservati
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!

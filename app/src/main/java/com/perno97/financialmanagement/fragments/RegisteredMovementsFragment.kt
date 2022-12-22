@@ -77,9 +77,6 @@ class RegisteredMovementsFragment : Fragment() {
                 }
             }
         }
-
-        setMonth()
-        binding.btnMonth.isEnabled = false
         return binding.root
     }
 
@@ -101,7 +98,7 @@ class RegisteredMovementsFragment : Fragment() {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
-            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek( // TODO non funziona, vengono prese due settimane circa
+            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
                 weekStartOffset,
                 LocalDate.now()
             ).observe(viewLifecycleOwner) {
@@ -131,11 +128,15 @@ class RegisteredMovementsFragment : Fragment() {
                 val card = LayoutInflater.from(requireContext())
                     .inflate(R.layout.movement_card, binding.movementCardsContainer, false)
                 var cardDate = ""
-                val groupDate = LocalDate.parse(group.groupDate)
+                //val groupDate = LocalDate.parse(group.groupDate)
                 when (state) {
-                    PeriodState.DAY -> cardDate =
-                        "${groupDate.dayOfMonth}/${groupDate.monthValue}/${groupDate.year}"
+                    PeriodState.DAY -> {
+                        val groupDate = LocalDate.parse(group.groupDate)
+                        cardDate =
+                            "${groupDate.dayOfMonth}/${groupDate.monthValue}/${groupDate.year}"
+                    }
                     PeriodState.WEEK -> {
+                        val groupDate = LocalDate.parse(group.groupDate)
                         val weekFrom =
                             groupDate.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
                         val weekTo = groupDate.plusDays(6)
@@ -144,11 +145,16 @@ class RegisteredMovementsFragment : Fragment() {
                                     "-\n" +
                                     "${weekTo.dayOfMonth}/${weekTo.monthValue}/${weekTo.year}"
                     }
-                    PeriodState.MONTH -> cardDate = "${groupDate.month} ${groupDate.year}"
-                    PeriodState.PERIOD -> cardDate =
-                        "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year}" +
-                                "-\n" +
-                                "${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+                    PeriodState.MONTH -> {
+                        val groupDate = LocalDate.parse(group.groupDate)
+                        cardDate = "${groupDate.month} ${groupDate.year}"
+                    }
+                    PeriodState.PERIOD -> {
+                        cardDate =
+                            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year}" +
+                                    "-\n" +
+                                    "${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+                    }
                 }
                 card.findViewById<TextView>(R.id.txtHeaderDate).text = cardDate
                 card.findViewById<TextView>(R.id.txtHeaderNegative).text =

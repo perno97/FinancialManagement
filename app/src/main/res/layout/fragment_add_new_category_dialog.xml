@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_weight=".4"
             android:ems="10"
-            android:inputType="number"/>
+            android:inputType="numberDecimal"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"

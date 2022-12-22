@@ -38,6 +38,7 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.log
 import kotlin.math.roundToInt
 
 class CategoryDetailsFragment(private val categoryName: String) :
@@ -127,6 +128,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun loadGraphsData() {
+        Log.i(logTag, "Called loadGraphsData()")
         val catList = categoryFilters.map { c -> c.name } + listOf(category.name)
         when (state) {
             // ----------------- DAY -----------------
@@ -159,6 +161,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun updateHorizontalGraphs() {
+        Log.i(logTag, "Called updateHorizontalGraphs()")
         binding.expensesProgressList.removeAllViews()
         binding.incomesProgressList.removeAllViews()
         val budgetMultiplier: Int = when (state) {
@@ -172,7 +175,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 .toInt() + 1 // Add 1 because between is exclusive
         } // Budget is defined as daily budget
         if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
-            //TODO usare snackbar o scrivere nel grafico o non fare niente
             Log.e(logTag, "No category movements to show in horizontal graphs")
         } else {
             //var currentSum = 0f
@@ -257,8 +259,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun updateLineGraphsMonth(
         data: Map<Category, List<AmountWithDate>>
     ) {
+        Log.i(logTag, "Called updateLineGraphsMonth()")
         if (data.isEmpty()) {
-            //TODO usare snackbar o scrivere nel grafico o non fare niente
             Log.e(logTag, "No category movements to show in line graphs")
         } else {
             val lineChartExp = binding.expensesLineChart
@@ -342,7 +344,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 val incomesDataSet = LineDataSet(gainEntries, category.name)
                 expensesDataSet.color = Color.parseColor(category.color)
                 incomesDataSet.color = Color.parseColor(category.color)
-                // TODO styling dataset
                 lineChartExpData.addDataSet(expensesDataSet)
                 lineChartGainData.addDataSet(incomesDataSet)
                 labelsLoaded = true
@@ -380,8 +381,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun updateLineGraphsWeek(
         data: Map<Category, List<AmountWithDate>>
     ) {
+        Log.i(logTag, "Called updateLineGraphsWeek()")
         if (data.isEmpty()) {
-            //TODO usare snackbar o scrivere nel grafico o non fare niente
             Log.e(logTag, "No category movements to show in line graphs")
         } else {
             val lineChartExp = binding.expensesLineChart
@@ -458,7 +459,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 val incomesDataSet = LineDataSet(gainEntries, category.name)
                 expensesDataSet.color = Color.parseColor(category.color)
                 incomesDataSet.color = Color.parseColor(category.color)
-                // TODO styling dataset
                 lineChartExpData.addDataSet(expensesDataSet)
                 lineChartGainData.addDataSet(incomesDataSet)
             }
@@ -496,8 +496,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun updateLineGraphsPeriod(
         data: Map<Category, List<AmountWithDate>>
     ) {
+        Log.i(logTag, "Called updateLineGraphsPeriod()")
         if (data.isEmpty()) {
-            //TODO usare snackbar o scrivere nel grafico o non fare niente
             Log.e(logTag, "No category movements to show in line graphs")
         } else {
             val lineChartExp = binding.expensesLineChart
@@ -568,7 +568,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 val incomesDataSet = LineDataSet(gainEntries, category.name)
                 expensesDataSet.color = Color.parseColor(category.color)
                 incomesDataSet.color = Color.parseColor(category.color)
-                // TODO styling dataset
                 lineChartExpData.addDataSet(expensesDataSet)
                 lineChartGainData.addDataSet(incomesDataSet)
                 labelsLoaded = true
@@ -606,6 +605,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun loadUiData() {
+        Log.i(logTag, "Called loadUiData()")
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 appViewModel.uiState.collect {
@@ -632,10 +632,15 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun loadCategoryExpenses() {
+        Log.i(logTag, "Called loadCategoryExpenses()")
         appViewModel.getCategoryProgresses(dateFrom, dateTo)
             .observe(viewLifecycleOwner) {
-                if (it?.get(category) != null) {
-                    expense = it[category]!!.negative // Non viene caricata la spesa corretta
+                if (it != null) {
+                    expense = if (it[category] != null) {
+                        it[category]!!.negative
+                    } else {
+                        0f
+                    }
                     categoriesExpenses =
                             // Assign list of categories expenses that are in filters and the main category
                         it.filter { (cat, _) ->
@@ -643,11 +648,14 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         }
                     updateCategoryProgress()
                     loadGraphsData()
+                } else {
+                    Log.e(logTag, "No category progresses found. No categories in database?")
                 }
             }
     }
 
     private fun updateFiltersList() {
+        Log.i(logTag, "Called updateFiltersList()")
         binding.filtersContainer.removeAllViews()
         for (filter in categoryFilters) {
             val itemView = layoutInflater.inflate(
@@ -663,6 +671,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun updateCategoryProgress() {
+        Log.i(logTag, "Called updateCategoryProgress()")
         binding.txtCategoryName.text = category.name
         val budgetMultiplier: Int = when (state) {
             PeriodState.DAY -> 1
@@ -685,12 +694,14 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
     override fun onResume() {
         super.onResume()
+        Log.i(logTag, "Called onResume()")
         initListeners()
         updateFiltersList()
     }
 
     override fun onStop() {
         super.onStop()
+        Log.i(logTag, "Called onStop()")
         appViewModel.setCatDetailsPeriod(
             dateFrom,
             dateTo,
@@ -701,7 +712,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
         appViewModel.setCategoryFilters(listOf())
     }
 
-    private fun setWeek() {//TODO provare periodi in questa schermata
+    private fun setWeek() {
+        Log.i(logTag, "Called setWeek()")
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
         dateTo = LocalDate.now()
@@ -713,11 +725,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
         loadCategoryExpenses()
-        //updateCategoryProgress()
-        //loadGraphsData()
     }
 
     private fun setMonth() {
+        Log.i(logTag, "Called setMonth()")
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
         dateTo = LocalDate.now()
@@ -725,12 +736,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
         state = PeriodState.MONTH
         setTitle("${dateTo.month} ${dateTo.year}")
         loadCategoryExpenses()
-        //updateCategoryProgress() // TODO riorganizzare ordine in cui vengono caricati i dati
-        //TODO expense non viene mai aggiornato, va aggiornato quando vengono caricate le spese
-        //loadGraphsData()
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
+        Log.i(logTag, "Called setPeriod()")
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
         dateTo = to
@@ -741,11 +750,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
         loadCategoryExpenses()
-        //updateCategoryProgress()
-        //loadGraphsData()
     }
 
     private fun initListeners() {
+        Log.i(logTag, "Called initListeners()")
         binding.fabBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -820,6 +828,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.i(logTag, "Called onDestroyView()")
         _binding = null
     }
 }

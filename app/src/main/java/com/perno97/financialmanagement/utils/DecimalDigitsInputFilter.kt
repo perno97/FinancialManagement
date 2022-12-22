@@ -18,19 +18,21 @@ class DecimalDigitsInputFilter(private val view: EditText) : InputFilter {
         dend: Int
     ): CharSequence? {
         if (source != null && dest != null && (source.isNotEmpty() || dest.isNotEmpty())) {
-            val string = dest.toString().replaceRange(dstart, dend, source.subSequence(start, end))
+            val string = dest.toString()
+                .replaceRange(dstart, dend, source.subSequence(start, end))
             if (string.isNotEmpty()) {
                 val matcher = mPattern.matcher(string)
                 if (!matcher.matches()) {
-                    /*var count = 0
-                    for (char in string) {
-                        if (char.isDigit() && char != '0') break
-                        count++
-                    }*/
-                    view.setText(String.format("%.2f", string.toFloat()))
+                    if (string.toFloatOrNull() == null)
+                        return ""
+                    else {
+                        view.setText(String.format("%.2f", string.toFloat()))
+                        return ""
+                    }
                 }
+                return null
             }
         }
-        return null
+        return ""
     }
 }

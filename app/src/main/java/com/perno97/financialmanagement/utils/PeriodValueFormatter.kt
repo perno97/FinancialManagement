@@ -11,6 +11,7 @@ class PeriodValueFormatter(private val values: ArrayList<LocalDate>) : ValueForm
     }
 
     override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+        if (value >= values.size) return ""
         val date = values[value.toInt()]
         return "${date.dayOfMonth}/${date.monthValue}/${date.year}"
     }

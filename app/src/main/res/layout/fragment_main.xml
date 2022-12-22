@@ -188,7 +188,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="55dp"
                 android:layout_marginEnd="55dp"
-                android:layout_marginBottom="45dp">
+                android:layout_marginBottom="20dp">
 
             </com.github.mikephil.charting.charts.PieChart>
 
@@ -202,8 +202,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:text="BUDGET AND EXPENSE"
+                    android:layout_marginBottom="15dp"
+                    android:text="EXPENSE/BUDGET PROGRESS"
                     android:textColor="@color/dark"
                     android:textSize="12sp"/>
             </LinearLayout>

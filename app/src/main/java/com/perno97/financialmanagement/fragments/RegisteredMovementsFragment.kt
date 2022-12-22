@@ -49,6 +49,10 @@ class RegisteredMovementsFragment : Fragment() {
     private var firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
     private var datePickerSelection: Pair<Long, Long>? = null
     private var state = PeriodState.MONTH
+    private val weekStartOffset = ChronoUnit.DAYS.between(
+        LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)),
+        LocalDate.now().with(TemporalAdjusters.previous(firstDayOfWeek))
+    ).toInt().absoluteValue
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -97,11 +101,8 @@ class RegisteredMovementsFragment : Fragment() {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
-            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
-                ChronoUnit.DAYS.between(
-                    LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
-                    LocalDate.now()
-                ).toInt().absoluteValue,
+            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek( // TODO non funziona, vengono prese due settimane circa
+                weekStartOffset,
                 LocalDate.now()
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
@@ -130,14 +131,14 @@ class RegisteredMovementsFragment : Fragment() {
                 val card = LayoutInflater.from(requireContext())
                     .inflate(R.layout.movement_card, binding.movementCardsContainer, false)
                 var cardDate = ""
-                val groupDate = group.groupDate
+                val groupDate = LocalDate.parse(group.groupDate)
                 when (state) {
                     PeriodState.DAY -> cardDate =
                         "${groupDate.dayOfMonth}/${groupDate.monthValue}/${groupDate.year}"
                     PeriodState.WEEK -> {
                         val weekFrom =
                             groupDate.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
-                        val weekTo = groupDate.plusDays(7)
+                        val weekTo = groupDate.plusDays(6)
                         cardDate =
                             "${weekFrom.dayOfMonth}/${weekFrom.monthValue}/${weekFrom.year}" +
                                     "-\n" +
@@ -165,15 +166,25 @@ class RegisteredMovementsFragment : Fragment() {
                     cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
                         getString(R.string.euro_value, mov.movement.amount)
-                    cardLine.setOnClickListener {
+                    cardLine.findViewById<LinearLayout>(R.id.movementCategory).setOnClickListener {
                         parentFragmentManager.commit {
                             replace(
                                 R.id.fragment_container_view,
-                                FinancialMovementDetailsFragment(mov)
+                                CategoryDetailsFragment(mov.category.name)
                             )
                             addToBackStack(null)
                         }
                     }
+                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle)
+                        .setOnClickListener {
+                            parentFragmentManager.commit {
+                                replace(
+                                    R.id.fragment_container_view,
+                                    FinancialMovementDetailsFragment(mov)
+                                )
+                                addToBackStack(null)
+                            }
+                        }
                     lineContainer.addView(cardLine)
                 }
                 binding.movementCardsContainer.addView(card)

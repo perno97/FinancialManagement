@@ -2,6 +2,7 @@ package com.perno97.financialmanagement.fragments
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -70,6 +71,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private lateinit var category: Category
     private var expense = 0f
     private var categoriesExpenses: Map<Category, PositiveNegativeSums>? = null
+    private val weekStartOffset = ChronoUnit.DAYS.between(
+        LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)),
+        LocalDate.now().with(TemporalAdjusters.previous(firstDayOfWeek))
+    ).toInt().absoluteValue
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,16 +134,14 @@ class CategoryDetailsFragment(private val categoryName: String) :
             // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getCategoriesExpensesWeek(
                 catList,
-                ChronoUnit.DAYS.between(
-                    LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)),
-                    LocalDate.now()
-                ).toInt().absoluteValue
+                weekStartOffset
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
                 updateLineGraphsWeek(categoryWithExpense)
             }
             // ---------------- MONTH ----------------
             PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
-                catList
+                catList,
+                LocalDate.now()
             ).observe(viewLifecycleOwner) { categoryWithExpense ->
                 updateLineGraphsMonth(categoryWithExpense)
             }
@@ -188,54 +191,65 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 }
                 val currentCatExpenseAsPositive = categoriesExpenses!![c]!!.negative.absoluteValue
                 val currentCatGain = categoriesExpenses!![c]!!.positive
+                if (currentCatExpenseAsPositive != 0f || currentCatGain != 0f) {
+                    if (currentCatExpenseAsPositive != 0f) {
+                        // Load layout
+                        val viewCatProgressLayoutExp =
+                            layoutInflater.inflate(
+                                R.layout.category_progress_minimal,
+                                binding.expensesProgressList,
+                                false
+                            )
+                        // Add progress layout to container
+                        binding.expensesProgressList.addView(viewCatProgressLayoutExp)
+                        // Load progress bar
+                        val progressBarExp =
+                            viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+                        // Set category name for progress bar
+                        viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
+                            c.name
+                        // Set progress bar progress and color
+                        progressBarExp.progress =
+                            if (multipliedBudget == 0f) 100 else // If multiplied budget is 0 then fill progress bar (progress 100/100)
+                                (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
+                        progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
+                        // Set category budget of category line
+                        viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
+                            getString(
+                                R.string.current_on_max_budget,
+                                currentCatExpenseAsPositive,
+                                multipliedBudget
+                            )
+                    }
+                    if (currentCatGain != 0f) {
+                        // Load layout
+                        val viewCatProgressLayoutGain =
+                            layoutInflater.inflate(
+                                R.layout.category_progress_minimal,
+                                binding.incomesProgressList,
+                                false
+                            )
+                        // Add progress layout to container
+                        binding.incomesProgressList.addView(viewCatProgressLayoutGain)
+                        // Load progress bar
+                        val progressBarGain =
+                            viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
 
-                // Load layout
-                val viewCatProgressLayoutExp =
-                    layoutInflater.inflate(
-                        R.layout.category_progress_minimal,
-                        binding.expensesProgressList,
-                        false
-                    )
-                val viewCatProgressLayoutGain =
-                    layoutInflater.inflate(
-                        R.layout.category_progress_minimal,
-                        binding.incomesProgressList,
-                        false
-                    )
-                // Add progress layout to container
-                binding.expensesProgressList.addView(viewCatProgressLayoutExp)
-                binding.incomesProgressList.addView(viewCatProgressLayoutGain)
-                // Load progress bar
-                val progressBarExp =
-                    viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
-                val progressBarGain =
-                    viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
-
-                // Set category name for progress bar
-                viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
-                    c.name
-                viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
-                    c.name
-                // Set progress bar progress and color
-                progressBarExp.progress =
-                    if (multipliedBudget == 0f) 100 else // If multiplied budget is 0 then fill progress bar (progress 100/100)
-                        (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
-                progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
-                progressBarGain.progress =
-                    if (maxGain == 0f) currentCatGain.roundToInt() else (currentCatGain * 100 / maxGain).roundToInt()
-                progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
-                // Set category budget of category line
-                viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
-                    getString(
-                        R.string.current_on_max_budget,
-                        currentCatExpenseAsPositive,
-                        multipliedBudget
-                    )
-                viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtCategoryBudget).text =
-                    getString(
-                        R.string.euro_value,
-                        currentCatGain
-                    )
+                        // Set category name for progress bar
+                        viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
+                            c.name
+                        // Set progress bar progress and color
+                        progressBarGain.progress =
+                            if (maxGain == 0f) currentCatGain.roundToInt() else (currentCatGain * 100 / maxGain).roundToInt()
+                        progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
+                        // Set category budget of category line
+                        viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtCategoryBudget).text =
+                            getString(
+                                R.string.euro_value,
+                                currentCatGain
+                            )
+                    }
+                }
             }
         }
     }
@@ -253,6 +267,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGainData = LineData()
             val labels = arrayListOf<LocalDate>()
             var labelsLoaded = false
+            var expensesFound = false
+            var gainsFound = false
             for (category in data.keys) {
                 val expEntries = arrayListOf<Entry>()
                 val gainEntries = arrayListOf<Entry>()
@@ -277,23 +293,33 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         ) && !amountWithDate.amountDate.isAfter(dateToCheckBefore)
                     }
                     if (amountWithDateFound.size > 1) {
-                        Log.e(
+                        /* Log.e(
                             logTag,
                             "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
+                        ) */
+                        throw Exception(
+                            "Found multiple expenses for same column.\n" +
+                                    "Category: ${category.name}, column: $columnCount"
                         )
                     }
-                    val exp: Float = if (amountWithDateFound.isEmpty()) {
-                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    val exp: Float
+                    if (amountWithDateFound.isEmpty()) {
+                        // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                        exp = 0f
                     } else {
                         // Found a value for this column for this category
-                        amountWithDateFound[0].expense.absoluteValue
+                        exp = amountWithDateFound[0].expense.absoluteValue
+                        expensesFound = exp != 0f
                     }
 
-                    val gain: Float = if (amountWithDateFound.isEmpty()) {
-                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    val gain: Float
+                    if (amountWithDateFound.isEmpty()) {
+                        // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                        gain = 0f
                     } else {
                         // Found a value for this column for this category
-                        amountWithDateFound[0].gain
+                        gain = amountWithDateFound[0].gain
+                        gainsFound = gain != 0f
                     }
                     expEntries.add(
                         Entry(
@@ -321,22 +347,33 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGainData.addDataSet(incomesDataSet)
                 labelsLoaded = true
             }
-            val xAxisExp = lineChartExp.xAxis
-            xAxisExp.labelCount = numberOfColumnsInGraphs
-            xAxisExp.granularity = 1f
-            val xAxisGain = lineChartGain.xAxis
-            xAxisGain.labelCount = numberOfColumnsInGraphs
-            xAxisGain.granularity = 1f
-
             val valueFormatter = MonthValueFormatter(labels)
-            lineChartExp.xAxis.valueFormatter = valueFormatter
-            lineChartExp.data = lineChartExpData
+            if (!expensesFound)
+                binding.expensesSectionCatDetails.visibility = View.GONE
+            else {
+                binding.expensesSectionCatDetails.visibility = View.VISIBLE
+                val xAxisExp = lineChartExp.xAxis
+                xAxisExp.labelCount = numberOfColumnsInGraphs
+                xAxisExp.granularity = 1f
 
-            lineChartGain.xAxis.valueFormatter = valueFormatter
-            lineChartGain.data = lineChartGainData
+                lineChartExp.xAxis.valueFormatter = valueFormatter
+                lineChartExp.data = lineChartExpData
 
-            lineChartExp.invalidate()
-            lineChartGain.invalidate()
+                lineChartExp.invalidate()
+            }
+            if (!gainsFound)
+                binding.incomesSectionCatDetails.visibility = View.GONE
+            else {
+                binding.incomesSectionCatDetails.visibility = View.VISIBLE
+                val xAxisGain = lineChartGain.xAxis
+                xAxisGain.labelCount = numberOfColumnsInGraphs
+                xAxisGain.granularity = 1f
+
+                lineChartGain.xAxis.valueFormatter = valueFormatter
+                lineChartGain.data = lineChartGainData
+
+                lineChartGain.invalidate()
+            }
         }
     }
 
@@ -351,6 +388,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGain = binding.incomesLineChart
             val lineChartExpData = LineData()
             val lineChartGainData = LineData()
+            var expensesFound = false
+            var gainsFound = false
             for (category in data.keys) {
                 val expEntries = arrayListOf<Entry>()
                 val gainEntries = arrayListOf<Entry>()
@@ -376,23 +415,30 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         ) && !amountWithDate.amountDate.isAfter(dateToCheckBefore)
                     }
                     if (amountWithDateFound.size > 1) {
-                        Log.e(
+                        /*Log.e(
                             logTag,
                             "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
-                        )
+                        )*/
+                        throw Exception("Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount")
                     }
-                    val exp: Float = if (amountWithDateFound.isEmpty()) {
-                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    val exp: Float
+                    if (amountWithDateFound.isEmpty()) {
+                        // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                        exp = 0f
                     } else {
                         // Found a value for this column for this category
-                        amountWithDateFound[0].expense.absoluteValue
+                        exp = amountWithDateFound[0].expense.absoluteValue
+                        expensesFound = exp != 0f
                     }
 
-                    val gain: Float = if (amountWithDateFound.isEmpty()) {
-                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    val gain: Float
+                    if (amountWithDateFound.isEmpty()) {
+                        // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                        gain = 0f
                     } else {
                         // Found a value for this column for this category
-                        amountWithDateFound[0].gain
+                        gain = amountWithDateFound[0].gain
+                        gainsFound = gain != 0f
                     }
                     expEntries.add(
                         Entry(
@@ -416,22 +462,34 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartExpData.addDataSet(expensesDataSet)
                 lineChartGainData.addDataSet(incomesDataSet)
             }
-            val xAxisExp = lineChartExp.xAxis
-            xAxisExp.labelCount = numberOfColumnsInGraphs
-            xAxisExp.granularity = 1f
-            val xAxisGain = lineChartGain.xAxis
-            xAxisGain.labelCount = numberOfColumnsInGraphs
-            xAxisGain.granularity = 1f
 
             val valueFormatter = WeekValueFormatter()
-            lineChartExp.xAxis.valueFormatter = valueFormatter
-            lineChartExp.data = lineChartExpData
+            if (!expensesFound)
+                binding.expensesSectionCatDetails.visibility = View.GONE
+            else {
+                binding.expensesSectionCatDetails.visibility = View.VISIBLE
+                val xAxisExp = lineChartExp.xAxis
+                xAxisExp.labelCount = numberOfColumnsInGraphs
+                xAxisExp.granularity = 1f
 
-            lineChartGain.xAxis.valueFormatter = valueFormatter
-            lineChartGain.data = lineChartGainData
+                lineChartExp.xAxis.valueFormatter = valueFormatter
+                lineChartExp.data = lineChartExpData
 
-            lineChartExp.invalidate()
-            lineChartGain.invalidate()
+                lineChartExp.invalidate()
+            }
+            if (!gainsFound)
+                binding.incomesSectionCatDetails.visibility = View.GONE
+            else {
+                binding.incomesSectionCatDetails.visibility = View.VISIBLE
+                val xAxisGain = lineChartGain.xAxis
+                xAxisGain.labelCount = numberOfColumnsInGraphs
+                xAxisGain.granularity = 1f
+
+                lineChartGain.xAxis.valueFormatter = valueFormatter
+                lineChartGain.data = lineChartGainData
+
+                lineChartGain.invalidate()
+            }
         }
     }
 
@@ -448,6 +506,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGainData = LineData()
             val labels = arrayListOf<LocalDate>()
             var labelsLoaded = false
+            var expensesFound = false
+            var gainsFound = false
             for (category in data.keys) {
                 val expEntries = arrayListOf<Entry>()
                 val gainEntries = arrayListOf<Entry>()
@@ -467,18 +527,24 @@ class CategoryDetailsFragment(private val categoryName: String) :
                             "Found multiple expenses for same column.\nCategory: ${category.name}, date: $currentColumnDate"
                         )
                     }
-                    val exp: Float = if (amountWithDateFound.isEmpty()) {
-                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    val exp: Float
+                    if (amountWithDateFound.isEmpty()) {
+                        // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                        exp = 0f
                     } else {
                         // Found a value for this column for this category
-                        amountWithDateFound[0].expense.absoluteValue
+                        exp = amountWithDateFound[0].expense.absoluteValue
+                        expensesFound = exp != 0f
                     }
 
-                    val gain: Float = if (amountWithDateFound.isEmpty()) {
-                        0f // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                    val gain: Float
+                    if (amountWithDateFound.isEmpty()) {
+                        // Couldn't find a movement with date to put in this column, hence no date satisfying before and after boundaries
+                        gain = 0f
                     } else {
                         // Found a value for this column for this category
-                        amountWithDateFound[0].gain
+                        gain = amountWithDateFound[0].gain
+                        gainsFound = gain != 0f
                     }
                     expEntries.add(
                         Entry(
@@ -507,24 +573,35 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGainData.addDataSet(incomesDataSet)
                 labelsLoaded = true
             }
-            val xAxisExp = lineChartExp.xAxis
-            val numberOfDays = ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() + 1
-            xAxisExp.labelCount = numberOfDays
-            xAxisExp.granularity = 1f
-            val xAxisGain = lineChartGain.xAxis
-            xAxisGain.labelCount = numberOfDays
-            xAxisGain.granularity = 1f
 
             val valueFormatter = PeriodValueFormatter(labels)
-            lineChartExp.xAxis.valueFormatter = valueFormatter
-            lineChartExp.data = lineChartExpData
+            val numberOfDays = ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() + 1
+            if (!expensesFound)
+                binding.expensesSectionCatDetails.visibility = View.GONE
+            else {
+                binding.expensesSectionCatDetails.visibility = View.VISIBLE
+                val xAxisExp = lineChartExp.xAxis
+                xAxisExp.labelCount = numberOfDays
+                xAxisExp.granularity = 1f
 
+                lineChartExp.xAxis.valueFormatter = valueFormatter
+                lineChartExp.data = lineChartExpData
 
-            lineChartGain.xAxis.valueFormatter = valueFormatter
-            lineChartGain.data = lineChartGainData
+                lineChartExp.invalidate()
+            }
+            if (!gainsFound)
+                binding.incomesSectionCatDetails.visibility = View.GONE
+            else {
+                binding.incomesSectionCatDetails.visibility = View.VISIBLE
+                val xAxisGain = lineChartGain.xAxis
+                xAxisGain.labelCount = numberOfDays
+                xAxisGain.granularity = 1f
 
-            lineChartExp.invalidate()
-            lineChartGain.invalidate()
+                lineChartGain.xAxis.valueFormatter = valueFormatter
+                lineChartGain.data = lineChartGainData
+
+                lineChartGain.invalidate()
+            }
         }
     }
 
@@ -539,7 +616,15 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     datePickerSelection = it.datePickerSelectionCatDetails
                     categoryFilters = it.categoryFilters
                     updateFiltersList()
-                    loadCategoryExpenses()
+                    //loadCategoryExpenses()
+                    when (state) {
+                        PeriodState.WEEK -> setWeek()
+                        PeriodState.MONTH -> setMonth()
+                        PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
+                        else -> {
+                            setMonth()
+                        }
+                    }
                 }
             }
 
@@ -550,20 +635,14 @@ class CategoryDetailsFragment(private val categoryName: String) :
         appViewModel.getCategoryProgresses(dateFrom, dateTo)
             .observe(viewLifecycleOwner) {
                 if (it?.get(category) != null) {
-                    expense = it[category]!!.negative
+                    expense = it[category]!!.negative // Non viene caricata la spesa corretta
                     categoriesExpenses =
                             // Assign list of categories expenses that are in filters and the main category
                         it.filter { (cat, _) ->
                             cat.name == category.name || categoryFilters.any { filter -> cat.name == filter.name }
                         }
-                    when (state) {
-                        PeriodState.WEEK -> setWeek()
-                        PeriodState.MONTH -> setMonth()
-                        PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
-                        else -> {
-                            setMonth()
-                        }
-                    }
+                    updateCategoryProgress()
+                    loadGraphsData()
                 }
             }
     }
@@ -594,7 +673,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
         } // Budget is defined as daily budget
         val multipliedBudget = category.budget * budgetMultiplier
         val currentCatExpenseAsPositive = expense.absoluteValue
-        val progress = (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
+        val progress =
+            if (multipliedBudget == 0f) 100 else
+                (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
         binding.progressBarCategoryBudget.indicatorColor[0] = Color.parseColor(category.color)
         binding.progressBarCategoryBudget.progress = progress
         binding.txtMaxCategoryBudget.text = getString(R.string.euro_value, multipliedBudget)
@@ -631,8 +712,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
-        updateCategoryProgress()
-        loadGraphsData()
+        loadCategoryExpenses()
+        //updateCategoryProgress()
+        //loadGraphsData()
     }
 
     private fun setMonth() {
@@ -642,8 +724,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
         state = PeriodState.MONTH
         setTitle("${dateTo.month} ${dateTo.year}")
-        updateCategoryProgress()
-        loadGraphsData()
+        loadCategoryExpenses()
+        //updateCategoryProgress() // TODO riorganizzare ordine in cui vengono caricati i dati
+        //TODO expense non viene mai aggiornato, va aggiornato quando vengono caricate le spese
+        //loadGraphsData()
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
@@ -656,8 +740,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
-        updateCategoryProgress()
-        loadGraphsData()
+        loadCategoryExpenses()
+        //updateCategoryProgress()
+        //loadGraphsData()
     }
 
     private fun initListeners() {

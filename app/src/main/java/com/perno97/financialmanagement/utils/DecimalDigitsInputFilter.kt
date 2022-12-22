@@ -22,6 +22,11 @@ class DecimalDigitsInputFilter(private val view: EditText) : InputFilter {
             if (string.isNotEmpty()) {
                 val matcher = mPattern.matcher(string)
                 if (!matcher.matches()) {
+                    /*var count = 0
+                    for (char in string) {
+                        if (char.isDigit() && char != '0') break
+                        count++
+                    }*/
                     view.setText(String.format("%.2f", string.toFloat()))
                 }
             }

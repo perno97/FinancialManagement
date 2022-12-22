@@ -113,6 +113,7 @@ class MainFragment : Fragment() {
 
         // Setup chart styling
         val chart = binding.pieChartMain
+        chart.setNoDataText(getString(R.string.loading_data))
         chart.legend.isEnabled = false
         chart.description.isEnabled = false
         chart.setDrawEntryLabels(false)
@@ -411,17 +412,16 @@ class MainFragment : Fragment() {
                     viewCatProgressLayout.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
                 progressBar.progress =
-                    (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
+                    if (multipliedBudget == 0f) 100 else
+                        (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
-                // Set category budget of category line
-                viewCatProgressLayout.findViewById<TextView>(R.id.txtMaxCategoryBudget).text =
-                    if (multipliedBudget != 0f) getString(
-                        R.string.euro_value,
-                        multipliedBudget
-                    ) else ""
                 // Set category current expenses of category line
                 viewCatProgressLayout.findViewById<TextView>(R.id.txtCurrentCategoryProgress).text =
-                    getString(R.string.euro_value, currentCatExpenseAsPositive)
+                    getString(
+                        R.string.current_on_max_budget,
+                        currentCatExpenseAsPositive,
+                        multipliedBudget
+                    )
                 // Set click listener for category line
                 viewCatProgressLayout.setOnClickListener {
                     parentFragmentManager.commit {

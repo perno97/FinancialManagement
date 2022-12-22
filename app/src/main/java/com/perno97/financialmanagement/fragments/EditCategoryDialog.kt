@@ -48,9 +48,7 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
             cancelAction()
         }
         binding.editTextNewCatName.setText(category.name)
-        binding.editTextNewCatBudget.setText(
-            getString(R.string.euro_value, category.budget)
-        )
+        binding.editTextNewCatBudget.setText(String.format("%.2f", category.budget))
         val index = colorsSpinnerAdapter.getIndexFromColor(category.color)
         binding.spinnerColor.setSelection(index)
         binding.editTextNewCatBudget.filters =

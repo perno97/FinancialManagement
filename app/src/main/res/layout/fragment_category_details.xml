@@ -124,7 +124,7 @@
                         android:layout_marginTop="25dp"
                         android:textSize="14sp"
                         android:text="Budget"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />
                     <TextView
                         android:id="@+id/txtCurrentCategoryProgressLabel"
@@ -133,21 +133,21 @@
                         android:layout_marginTop="25dp"
                         android:textSize="14sp"
                         android:text="Expense"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/progressBarCategoryBudget" />
                     <TextView
                         android:id="@+id/txtMaxCategoryBudget"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/txtMaxCategoryBudgetLabel" />
                     <TextView
                         android:id="@+id/txtCurrentCategoryProgress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/txtCurrentCategoryProgressLabel" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -205,52 +205,67 @@
                     android:focusable="true"
                     android:contentDescription="@string/open_add_new_category_to_comparison"/>
             </LinearLayout>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="17dp"
-                android:gravity="center"
-                android:text="EXPENSES" />
-            
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/expensesLineChart"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
 
             <LinearLayout
-                android:id="@+id/expensesProgressList"
+                android:id="@+id/expensesSectionCatDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="35dp"
-                android:layout_marginEnd="40dp"
-                android:layout_marginTop="40dp"
-                android:orientation="vertical"/>
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="17dp"
+                    android:gravity="center"
+                    android:text="EXPENSES" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="17dp"
-                android:layout_marginTop="40dp"
-                android:gravity="center"
-                android:text="INCOMES" />
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/expensesLineChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"/>
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/incomes_line_chart"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
+                <LinearLayout
+                    android:id="@+id/expensesProgressList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="40dp"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+
 
             <LinearLayout
-                android:id="@+id/incomesProgressList"
+                android:id="@+id/incomesSectionCatDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="35dp"
-                android:layout_marginEnd="40dp"
-                android:layout_marginTop="40dp"
-                android:orientation="vertical"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="17dp"
+                    android:gravity="center"
+                    android:text="INCOMES" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/incomes_line_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"/>
+
+                <LinearLayout
+                    android:id="@+id/incomesProgressList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginTop="40dp"
+                    android:orientation="vertical"/>
+            </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"

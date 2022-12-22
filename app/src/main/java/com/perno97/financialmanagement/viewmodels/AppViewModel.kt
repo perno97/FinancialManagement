@@ -48,17 +48,17 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
      */
     fun getMovementsGroupByWeek(
         weekStartOffset: Int,
-        beforeDate: LocalDate
+        beforeDateInclusive: LocalDate
     ): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
-        return repository.getMovementsGroupByWeek(weekStartOffset, beforeDate).asLiveData()
+        return repository.getMovementsGroupByWeek(weekStartOffset, beforeDateInclusive).asLiveData()
     }
 
-    fun getMovementsGroupByDay(beforeDate: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
-        return repository.getMovementsGroupByDay(beforeDate).asLiveData()
+    fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsGroupByDay(beforeDateInclusive).asLiveData()
     }
 
-    fun movementsGroupByMonth(beforeDate: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
-        return repository.getMovementsGroupByMonth(beforeDate).asLiveData()
+    fun movementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+        return repository.getMovementsGroupByMonth(beforeDateInclusive).asLiveData()
     }
 
     fun getMovementsInPeriod(
@@ -87,8 +87,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getCategoryExpensesProgress(dateFrom, dateTo, categoryName).asLiveData()
     }
 
-    fun getCategoriesExpensesMonth(categories: List<String>): LiveData<Map<Category, List<AmountWithDate>>> {
-        return repository.getCategoriesExpensesMonth(categories).asLiveData()
+    fun getCategoriesExpensesMonth(categories: List<String>, beforeDateInclusive: LocalDate): LiveData<Map<Category, List<AmountWithDate>>> {
+        return repository.getCategoriesExpensesMonth(categories, beforeDateInclusive).asLiveData()
     }
 
     fun getCategoriesExpensesWeek(

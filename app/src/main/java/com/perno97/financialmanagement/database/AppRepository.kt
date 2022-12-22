@@ -32,18 +32,18 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     fun getMovementsGroupByWeek(
         weekStartOffset: Int,
-        beforeDate: LocalDate
+        beforeDateInclusive: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
-        return applicationDao.getMovementsGroupByWeek(weekStartOffset, beforeDate)
+        return applicationDao.getMovementsGroupByWeek(weekStartOffset, beforeDateInclusive)
     }
 
     @WorkerThread
-    fun getMovementsGroupByDay(beforeDate: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
-        applicationDao.getMovementsGroupByDay(beforeDate)
+    fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
+        applicationDao.getMovementsGroupByDay(beforeDateInclusive)
 
     @WorkerThread
-    fun getMovementsGroupByMonth(beforeDate: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
-        applicationDao.getMovementsGroupByMonth(beforeDate)
+    fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
+        applicationDao.getMovementsGroupByMonth(beforeDateInclusive)
 
     @WorkerThread
     fun getMovementsInPeriod(
@@ -86,8 +86,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategoriesExpensesMonth(categories: List<String>): Flow<Map<Category, List<AmountWithDate>>> {
-        return applicationDao.getCategoriesExpensesMonth(categories)
+    fun getCategoriesExpensesMonth(categories: List<String>, beforeDateInclusive: LocalDate): Flow<Map<Category, List<AmountWithDate>>> {
+        return applicationDao.getCategoriesExpensesMonth(categories, beforeDateInclusive)
     }
 
     @WorkerThread

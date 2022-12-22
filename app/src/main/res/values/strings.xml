@@ -23,4 +23,5 @@
     <string name="open_add_a_new_financial_movement">Open add a new financial movement</string>
     <string name="go_back_to_previous_screen">Go back to previous screen</string>
     <string name="open_add_new_category_to_comparison">Open add new category to comparison</string>
+    <string name="loading_data">Loading data</string>
 </resources>

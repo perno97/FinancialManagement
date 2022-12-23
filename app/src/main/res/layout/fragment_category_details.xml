@@ -113,7 +113,7 @@
                         android:progress="0"
                         app:trackThickness="8dp"
                         app:trackCornerRadius="4dp"
-                        app:trackColor="@color/dark"
+                        app:trackColor="@color/dark_30"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/txtCategoryName" />
@@ -167,49 +167,56 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:text="COMPARE WITH"
-                android:textSize="12sp"/>
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:layout_marginStart="25dp"
-                android:layout_marginEnd="25dp" >
-
-                <LinearLayout
-                    android:id="@+id/filtersContainer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fabAddFilterCat"
-                    android:layout_width="wrap_content"
+                android:background="@drawable/all_rounded_20_style"
+                android:backgroundTint="@color/dark_10"
+                android:orientation="vertical"
+                android:layout_marginTop="25dp"
+                android:layout_marginStart="27dp"
+                android:layout_marginEnd="27dp">
+                <TextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    app:useCompatPadding="true"
-                    app:srcCompat="@drawable/ic_baseline_add_24"
-                    android:backgroundTint="@color/dark"
-                    app:fabCustomSize="20dp"
-                    android:focusable="true"
-                    android:contentDescription="@string/open_add_new_category_to_comparison"/>
-            </LinearLayout>
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="COMPARE WITH"
+                    android:textSize="12sp"/>
 
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/filtersContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fabAddFilterCat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        app:useCompatPadding="true"
+                        app:srcCompat="@drawable/ic_baseline_compare_arrows_24"
+                        android:backgroundTint="@color/dark"
+                        app:fabCustomSize="35dp"
+                        android:focusable="true"
+                        android:contentDescription="@string/open_add_new_category_to_comparison"/>
+                </LinearLayout>
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/expensesSectionCatDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
@@ -223,7 +230,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
                     android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"/>
+                    android:layout_marginEnd="30dp"
+                    android:background="@drawable/all_rounded_20_style"
+                    android:backgroundTint="@color/dark_30"/>
 
                 <LinearLayout
                     android:id="@+id/expensesProgressList"
@@ -255,7 +264,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
                     android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"/>
+                    android:layout_marginEnd="30dp"
+                    android:background="@drawable/all_rounded_20_style"
+                    android:backgroundTint="@color/dark_30"/>
 
                 <LinearLayout
                     android:id="@+id/incomesProgressList"

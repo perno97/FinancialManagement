@@ -3,19 +3,14 @@ package com.perno97.financialmanagement.fragments
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.MarginLayoutParamsCompat
 import androidx.core.view.children
-import androidx.core.view.marginTop
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
@@ -101,7 +96,7 @@ class AddCategoryToFilterFragment(private val parentCategory: Category) : Fragme
                     )
                 itemView.findViewById<TextView>(R.id.txtCategoryFilterName).text = category.name
                 if (selectedCategories.contains(category))
-                    itemView.findViewById<CheckBox>(R.id.checkSelectedFilter).isSelected = true
+                    itemView.findViewById<CheckBox>(R.id.checkSelectedFilter).isChecked = true
                 binding.categoryListContainer.addView(itemView)
             }
         }

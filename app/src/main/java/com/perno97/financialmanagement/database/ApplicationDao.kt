@@ -117,13 +117,12 @@ interface ApplicationDao {
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, " +
-                "b.*, STRFTIME('%Y-%m-%d', b.date,'unixepoch') as movDate, category.* FROM movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " JOIN category ON b.category = category.name WHERE :beforeDateInclusiveInclusive >= b.date AND :beforeDateInclusiveInclusive >= a.date GROUP BY b.movementId ORDER BY groupDate DESC, b.date DESC"
     )
-    fun getMovementsGroupByWeek( // TODO forse una delle due condizioni del where si può togliere (es togliere :beforeDateInclusiveInclusive >= a.date)
+    fun getMovementsGroupByWeek(
         weekStartOffset: Int,
         beforeDateInclusiveInclusive: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>

@@ -13,7 +13,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     private val logTag = "AppViewModel"
 
-    val defaultProfileId = 0
+    private val defaultProfileId = 0
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
     val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
 

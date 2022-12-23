@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -240,6 +241,11 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                 binding.editTextMovementDate,
                 R.string.error_no_date,
                 BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
             ).show()
             return
         }
@@ -249,6 +255,11 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                 binding.editTextMovementDate,
                 R.string.error_null_or_negative_amount,
                 BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
             ).show()
             return
         }
@@ -258,6 +269,11 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                 binding.editTextMovementDate,
                 R.string.error_no_category,
                 BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
             ).show()
             return
         }
@@ -267,6 +283,11 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                 binding.editTextMovementDate,
                 R.string.error_no_title,
                 BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
             ).show()
             return
         }
@@ -287,6 +308,16 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         )
 
         appViewModel.insert(movement)
+        Snackbar.make(
+            binding.fabConfirmEdit,
+            R.string.success_edit_movement,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
+            )
+        ).show()
         updateAssets(previousAmount, newAmount)
         UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
         disableEditing()

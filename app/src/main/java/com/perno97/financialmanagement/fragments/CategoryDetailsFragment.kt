@@ -95,10 +95,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
         val expChart = binding.expensesLineChart
         val gainsChart = binding.incomesLineChart
-        expChart.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_30))
         expChart.setExtraOffsets(10f, 0f, 10f, 30f)
         expChart.description.isEnabled = false
-        gainsChart.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_30))
         gainsChart.setExtraOffsets(10f, 0f, 10f, 30f)
         gainsChart.description.isEnabled = false
 

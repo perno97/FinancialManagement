@@ -326,7 +326,7 @@
             android:layout_margin="15dp"
             app:useCompatPadding="true"
             app:fabCustomSize="55dp"
-            app:backgroundTint="@color/info"
+            app:backgroundTint="@color/success"
             app:srcCompat="@drawable/ic_baseline_check_24" />
     </LinearLayout>
 

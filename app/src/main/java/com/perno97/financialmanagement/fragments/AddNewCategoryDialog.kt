@@ -6,9 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.viewmodels.AppViewModel
@@ -62,6 +65,16 @@ class AddNewCategoryDialog : DialogFragment() {
                 budget = budget
             )
         )
+        Snackbar.make(
+            binding.btnConfirmNewCategory,
+            R.string.success_add_category,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
+            )
+        ).show()
         dismiss()
     }
 

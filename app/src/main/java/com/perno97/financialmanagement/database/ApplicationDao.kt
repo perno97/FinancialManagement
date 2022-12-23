@@ -147,7 +147,10 @@ interface ApplicationDao {
                 " JOIN movement ON name = movement.category WHERE name IN (:categories) AND :beforeDateInclusive >= movement.date" +
                 " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch') LIMIT 12"
     )
-    fun getCategoriesExpensesMonth(categories: List<String>, beforeDateInclusive: LocalDate): Flow<Map<Category, List<AmountWithDate>>>
+    fun getCategoriesExpensesMonth(
+        categories: List<String>,
+        beforeDateInclusive: LocalDate
+    ): Flow<Map<Category, List<AmountWithDate>>>
 
     @Query(
         "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +

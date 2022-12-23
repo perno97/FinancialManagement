@@ -1,7 +1,5 @@
 package com.perno97.financialmanagement.database
 
-import java.time.LocalDate
-
 data class GroupInfo(
     /*
     Using string because when grouping I want the group date to be the start of the group period

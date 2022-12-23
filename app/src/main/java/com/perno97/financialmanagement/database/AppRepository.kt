@@ -21,7 +21,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
         Log.e(logTag, "Getting categories with movements")
         val toreturn = applicationDao.getCategoryWithMovements()
-        Log.e(logTag, "Returning ${toreturn} value")
+        Log.e(logTag, "Returning $toreturn value")
         return toreturn
     }
 
@@ -86,7 +86,10 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategoriesExpensesMonth(categories: List<String>, beforeDateInclusive: LocalDate): Flow<Map<Category, List<AmountWithDate>>> {
+    fun getCategoriesExpensesMonth(
+        categories: List<String>,
+        beforeDateInclusive: LocalDate
+    ): Flow<Map<Category, List<AmountWithDate>>> {
         return applicationDao.getCategoriesExpensesMonth(categories, beforeDateInclusive)
     }
 

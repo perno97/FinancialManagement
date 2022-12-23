@@ -87,7 +87,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getCategoryExpensesProgress(dateFrom, dateTo, categoryName).asLiveData()
     }
 
-    fun getCategoriesExpensesMonth(categories: List<String>, beforeDateInclusive: LocalDate): LiveData<Map<Category, List<AmountWithDate>>> {
+    fun getCategoriesExpensesMonth(
+        categories: List<String>,
+        beforeDateInclusive: LocalDate
+    ): LiveData<Map<Category, List<AmountWithDate>>> {
         return repository.getCategoriesExpensesMonth(categories, beforeDateInclusive).asLiveData()
     }
 

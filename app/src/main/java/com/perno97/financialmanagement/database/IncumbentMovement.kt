@@ -1,10 +1,8 @@
 package com.perno97.financialmanagement.database
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
-import java.util.*
 
 //ignoredColumns = ["movementId","date","amount","category"]
 @Entity(tableName = "incumbent_movement")
@@ -17,4 +15,4 @@ data class IncumbentMovement(
     override val title: String,
     override val notes: String,
     override val notify: Boolean
-) :Movement(movementId, date, amount, category, title, notes, notify)
+) : Movement(movementId, date, amount, category, title, notes, notify)

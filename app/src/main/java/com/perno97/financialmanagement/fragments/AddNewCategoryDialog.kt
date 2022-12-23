@@ -9,17 +9,16 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.viewmodels.AppViewModel
-import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentAddNewCategoryDialogBinding
 import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 
 class AddNewCategoryDialog : DialogFragment() {
 

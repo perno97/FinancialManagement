@@ -5,8 +5,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import java.time.LocalDate
 import java.time.format.TextStyle
-import java.util.Locale
-import kotlin.math.roundToInt
+import java.util.*
 
 class MonthValueFormatter(private val values: ArrayList<LocalDate>) : ValueFormatter() {
     override fun getPointLabel(entry: Entry?): String {

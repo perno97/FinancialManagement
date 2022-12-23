@@ -2,21 +2,24 @@ package com.perno97.financialmanagement.fragments
 
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
@@ -38,7 +41,6 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.absoluteValue
-import kotlin.math.log
 import kotlin.math.roundToInt
 
 class CategoryDetailsFragment(private val categoryName: String) :

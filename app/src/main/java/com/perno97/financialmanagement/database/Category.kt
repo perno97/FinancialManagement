@@ -9,5 +9,4 @@ data class Category(
     @PrimaryKey val name: String,
     val color: String,
     @ColumnInfo(name = "daily_budget") val budget: Float
-) {
-}
+)

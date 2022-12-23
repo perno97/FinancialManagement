@@ -103,7 +103,7 @@ class AddFinancialMovementFragment : Fragment() {
                     val category = categoryList.find { cat -> name == cat.name }
                     if (category != null) {
                         binding.categoryEditMovColor.backgroundTintList =
-                            ColorStateList.valueOf(Color.parseColor(category!!.color))
+                            ColorStateList.valueOf(Color.parseColor(category.color))
                     } else {
                         Log.e(
                             logTag,

@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -15,8 +14,8 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -151,7 +150,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                     val category = categoryList.find { cat -> name == cat.name }
                     if (category != null) {
                         binding.categoryEditMovColor.backgroundTintList =
-                            ColorStateList.valueOf(Color.parseColor(category!!.color))
+                            ColorStateList.valueOf(Color.parseColor(category.color))
                     } else {
                         Log.e(
                             logTag,

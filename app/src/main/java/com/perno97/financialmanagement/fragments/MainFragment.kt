@@ -14,7 +14,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -23,7 +26,9 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.*
+import com.perno97.financialmanagement.database.Category
+import com.perno97.financialmanagement.database.Expense
+import com.perno97.financialmanagement.database.Profile
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
@@ -31,7 +36,6 @@ import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters

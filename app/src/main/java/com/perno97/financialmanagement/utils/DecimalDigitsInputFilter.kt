@@ -23,11 +23,11 @@ class DecimalDigitsInputFilter(private val view: EditText) : InputFilter {
             if (string.isNotEmpty()) {
                 val matcher = mPattern.matcher(string)
                 if (!matcher.matches()) {
-                    if (string.toFloatOrNull() == null)
-                        return ""
+                    return if (string.toFloatOrNull() == null)
+                        ""
                     else {
                         view.setText(String.format("%.2f", string.toFloat()))
-                        return ""
+                        ""
                     }
                 }
                 return null

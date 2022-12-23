@@ -28,4 +28,5 @@
     <string name="success_add_movement">Added financial movement</string>
     <string name="success_add_category">Created new category</string>
     <string name="success_edit_category">Applied changes to the category</string>
+    <string name="error_no_data_in_period">Can\'t find any movement in the selected period</string>
 </resources>

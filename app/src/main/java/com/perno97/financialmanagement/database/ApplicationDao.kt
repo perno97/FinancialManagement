@@ -114,6 +114,8 @@ interface ApplicationDao {
     )
     fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>>
 
+
+    // move to sunday then move to the first day of the week, if they're equal the events are in the same week
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
@@ -126,7 +128,7 @@ interface ApplicationDao {
         weekStartOffset: Int,
         beforeDateInclusiveInclusive: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
-    // move to sunday then move to the first day of the week, if they're equal the events are in the same week
+
 
     @Query(
         "SELECT '' AS groupDate," +
@@ -140,6 +142,40 @@ interface ApplicationDao {
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+
+    @Query(
+        "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch', 'start of month') AS groupDate," +
+                " SUM(CASE WHEN movement.amount > 0 THEN movement.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS negative FROM movement" +
+                " WHERE :beforeDateInclusive >= movement.date GROUP BY groupDate ORDER BY groupDate DESC"
+    )
+    fun getMovementsSumGroupByMonth(beforeDateInclusive: LocalDate): Flow<List<GroupInfo>>
+
+
+    // move to sunday then move to the first day of the week, if they're equal the events are in the same week
+    @Query(
+        "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
+                " SUM(CASE WHEN movement.amount > 0 THEN movement.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS negative FROM movement" +
+                " WHERE :beforeDateInclusive >= movement.date GROUP BY groupDate ORDER BY groupDate DESC"
+    )
+    fun getMovementsSumGroupByWeek(
+        weekStartOffset: Int,
+        beforeDateInclusive: LocalDate
+    ): Flow<List<GroupInfo>>
+
+
+    @Query(
+        "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch') AS groupDate, " +
+                "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive, " +
+                "SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative" +
+                " FROM movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY groupDate ORDER BY date DESC"
+    )
+    fun getMovementsSumInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<List<GroupInfo>>
+
 
     @Query(
         "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
@@ -166,9 +202,9 @@ interface ApplicationDao {
     @Query(
         "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
                 "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
-                " JOIN movement ON name = movement.category WHERE name IN (:categories)" +
+                " LEFT JOIN movement ON name = movement.category WHERE name IN (:categories)" +
                 " AND movement.date >= :dateFrom AND movement.date <= :dateTo" +
-                " GROUP BY movement.date LIMIT 12"
+                " GROUP BY movement.date"
     )
     fun getCategoriesExpensesPeriod(
         categories: List<String>,

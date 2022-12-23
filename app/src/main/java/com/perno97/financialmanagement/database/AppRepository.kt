@@ -123,6 +123,27 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         return applicationDao.getExpectedSum(dateFrom, dateTo)
     }
 
+    @WorkerThread
+    fun getMovementsSumGroupByMonth(beforeDateInclusive: LocalDate): Flow<List<GroupInfo>> {
+        return applicationDao.getMovementsSumGroupByMonth(beforeDateInclusive)
+    }
+
+    @WorkerThread
+    fun getMovementsSumGroupByWeek(
+        weekStartOffset: Int,
+        beforeDateInclusive: LocalDate
+    ): Flow<List<GroupInfo>> {
+        return applicationDao.getMovementsSumGroupByWeek(
+            weekStartOffset,
+            beforeDateInclusive
+        )
+    }
+
+    @WorkerThread
+    fun getMovementsSumInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<List<GroupInfo>> {
+        return applicationDao.getMovementsSumInPeriod(dateFrom, dateTo)
+    }
+
 
     /*
     Insert

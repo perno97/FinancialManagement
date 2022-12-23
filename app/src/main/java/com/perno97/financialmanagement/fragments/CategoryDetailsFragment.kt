@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -22,6 +23,8 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AmountWithDate
@@ -74,10 +77,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private lateinit var category: Category
     private var expense = 0f
     private var categoriesExpenses: Map<Category, PositiveNegativeSums>? = null
-    private val weekStartOffset = ChronoUnit.DAYS.between(
-        LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)),
-        LocalDate.now().with(TemporalAdjusters.previous(firstDayOfWeek))
-    ).toInt().absoluteValue
+    private var weekStartOffset = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,6 +85,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
     ): View {
         Log.e(logTag, "Called onCreateView")
         _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
+
+        val f = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val t = f.with(TemporalAdjusters.previous(firstDayOfWeek))
+        // Count days from the next sunday to the previous firstDayOfWeek
+        // Workaround for having custom first day of week in SQLite
+        weekStartOffset = ChronoUnit.DAYS.between(f, t).toInt().absoluteValue
 
         appViewModel.getCategory(categoryName).observe(viewLifecycleOwner) {
             if (it != null) {
@@ -95,6 +101,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
             }
         }
 
+        initGraphs()
+
+        return binding.root
+    }
+
+    private fun initGraphs() {
         val expChart = binding.expensesLineChart
         val gainsChart = binding.incomesLineChart
         expChart.setExtraOffsets(10f, 0f, 10f, 30f)
@@ -123,8 +135,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
         rightAxisExp.isEnabled = false
         val rightAxisGain = gainsChart.axisRight
         rightAxisGain.isEnabled = false
-
-        return binding.root
     }
 
     private fun loadGraphsData() {
@@ -261,7 +271,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
     ) {
         Log.i(logTag, "Called updateLineGraphsMonth()")
         if (data.isEmpty()) {
-            Log.e(logTag, "No category movements to show in line graphs")
+            binding.expensesSectionCatDetails.visibility = View.GONE
+            binding.incomesSectionCatDetails.visibility = View.GONE
+            Snackbar.make(
+                binding.expensesLineChart,
+                R.string.error_no_data_in_period,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
+            ).show()
         } else {
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
@@ -375,6 +396,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
                 lineChartGain.invalidate()
             }
+            if (!expensesFound && !gainsFound) {
+                Snackbar.make(
+                    binding.expensesLineChart,
+                    R.string.error_no_data_in_period,
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.warning
+                    )
+                ).show()
+            }
         }
     }
 
@@ -383,7 +416,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
     ) {
         Log.i(logTag, "Called updateLineGraphsWeek()")
         if (data.isEmpty()) {
-            Log.e(logTag, "No category movements to show in line graphs")
+            binding.expensesSectionCatDetails.visibility = View.GONE
+            binding.incomesSectionCatDetails.visibility = View.GONE
+            Snackbar.make(
+                binding.expensesLineChart,
+                R.string.error_no_data_in_period,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
+            ).show()
         } else {
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
@@ -490,6 +534,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
 
                 lineChartGain.invalidate()
             }
+            if (!expensesFound && !gainsFound) {
+                Snackbar.make(
+                    binding.expensesLineChart,
+                    R.string.error_no_data_in_period,
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.warning
+                    )
+                ).show()
+            }
         }
     }
 
@@ -498,7 +554,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
     ) {
         Log.i(logTag, "Called updateLineGraphsPeriod()")
         if (data.isEmpty()) {
-            Log.e(logTag, "No category movements to show in line graphs")
+            binding.expensesSectionCatDetails.visibility = View.GONE
+            binding.incomesSectionCatDetails.visibility = View.GONE
+            Snackbar.make(
+                binding.expensesLineChart,
+                R.string.error_no_data_in_period,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
+            ).show()
         } else {
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
@@ -600,6 +667,18 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGain.data = lineChartGainData
 
                 lineChartGain.invalidate()
+            }
+            if (!expensesFound && !gainsFound) {
+                Snackbar.make(
+                    binding.expensesLineChart,
+                    R.string.error_no_data_in_period,
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.warning
+                    )
+                ).show()
             }
         }
     }
@@ -763,6 +842,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
             )
         }
         binding.fabAddFilterCat.setOnClickListener {
+            appViewModel.setCatDetailsPeriod(dateFrom, dateTo, state, datePickerSelection)
+            appViewModel.setCategoryFilters(categoryFilters)
             parentFragmentManager.commit {
                 setCustomAnimations(
                     R.anim.slide_in_bottom,

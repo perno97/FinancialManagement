@@ -85,7 +85,9 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="17dp">
 
                 <TextView
                     android:id="@+id/txtAssets"
@@ -93,26 +95,137 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:layout_marginTop="15dp"
                     android:text="ASSETS TREND"
                     android:textColor="@color/dark"
                     android:textSize="12sp"/>
             </LinearLayout>
 
-            <androidx.constraintlayout.utils.widget.MockView
-                android:id="@+id/mockView3"
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/assetsLineChart"
                 android:layout_width="match_parent"
-                android:layout_height="500dp" />
+                android:layout_height="250dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:background="@drawable/all_rounded_20_style"
+                android:backgroundTint="@color/dark_30"/>
 
-            <androidx.constraintlayout.utils.widget.MockView
-                android:id="@+id/mockView4"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="1"
+                    android:orientation="vertical">
 
-            <androidx.constraintlayout.utils.widget.MockView
-                android:id="@+id/mockView6"
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressBarAssetsIncomes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="0"
+                        app:trackThickness="20dp"
+                        app:trackCornerRadius="30dp"
+                        app:trackColor="@color/dark_30"
+                        android:layout_weight=".7" />
+
+                    <TextView
+                        android:id="@+id/txtAssetsIcomes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".3"
+                        android:layout_marginStart="15dp"
+                        android:gravity="end"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
+                        app:layout_constraintTop_toBottomOf="@+id/txtCategoryName" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressBarAssetsOutcomes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="0"
+                        app:trackThickness="20dp"
+                        app:trackCornerRadius="30dp"
+                        app:trackColor="@color/dark_30"
+                        android:layout_weight=".7" />
+
+                    <TextView
+                        android:id="@+id/txtAssetsOutcomes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".3"
+                        android:layout_marginStart="15dp"
+                        android:gravity="end"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/categoryColorLabel"
+                        app:layout_constraintTop_toBottomOf="@+id/txtCategoryName" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="500dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:gravity="center">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:gravity="center|center_vertical">
+
+                    <TextView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:backgroundTint="@color/success"
+                        android:background="@drawable/all_rounded_10_style" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Income"
+                        android:layout_marginStart="15dp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:gravity="center|center_vertical">
+
+                    <TextView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:backgroundTint="@color/warning"
+                        android:background="@drawable/all_rounded_10_style" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Outcome"
+                        android:layout_marginStart="15dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/assetsBarChart"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:background="@drawable/all_rounded_20_style"
+                android:backgroundTint="@color/dark_30"/>
+
             <Space android:layout_width="match_parent"
                 android:layout_height="100dp" />
         </LinearLayout>

@@ -49,16 +49,19 @@ class RegisteredMovementsFragment : Fragment() {
     private var firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
     private var datePickerSelection: Pair<Long, Long>? = null
     private var state = PeriodState.MONTH
-    private val weekStartOffset = ChronoUnit.DAYS.between(
-        LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)),
-        LocalDate.now().with(TemporalAdjusters.previous(firstDayOfWeek))
-    ).toInt().absoluteValue
+    private var weekStartOffset = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisteredMovementsBinding.inflate(inflater, container, false)
+
+        val f = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val t = f.with(TemporalAdjusters.previous(firstDayOfWeek))
+        // Count days from the next sunday to the previous firstDayOfWeek
+        // Workaround for having custom first day of week in SQLite
+        weekStartOffset = ChronoUnit.DAYS.between(f, t).toInt().absoluteValue
 
         // Load UI data
         viewLifecycleOwner.lifecycleScope.launch {

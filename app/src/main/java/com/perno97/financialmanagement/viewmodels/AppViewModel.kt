@@ -120,6 +120,22 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getExpectedSum(dateFrom, dateTo).asLiveData()
     }
 
+    fun getMovementsSumGroupByMonth(beforeDateInclusive: LocalDate): LiveData<List<GroupInfo>> {
+        return repository.getMovementsSumGroupByMonth(beforeDateInclusive).asLiveData()
+    }
+
+    fun getMovementsSumGroupByWeek(
+        weekStartOffset: Int,
+        beforeDateInclusive: LocalDate
+    ): LiveData<List<GroupInfo>> {
+        return repository.getMovementsSumGroupByWeek(weekStartOffset, beforeDateInclusive)
+            .asLiveData()
+    }
+
+    fun getMovementsSumInPeriod(dateFrom: LocalDate, dateTo: LocalDate): LiveData<List<GroupInfo>> {
+        return repository.getMovementsSumInPeriod(dateFrom, dateTo).asLiveData()
+    }
+
 
     /*
     UI state related

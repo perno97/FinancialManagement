@@ -136,6 +136,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getMovementsSumInPeriod(dateFrom, dateTo).asLiveData()
     }
 
+    fun getGainsAndExpensesInPeriod(dateFrom: LocalDate, dateTo: LocalDate): LiveData<GroupInfo> {
+        return repository.getGainsAndExpensesInPeriod(dateFrom, dateTo).asLiveData()
+    }
+
 
     /*
     UI state related

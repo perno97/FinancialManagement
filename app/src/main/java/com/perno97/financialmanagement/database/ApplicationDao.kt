@@ -232,4 +232,12 @@ interface ApplicationDao {
         "SELECT SUM(movement.amount) AS value FROM movement WHERE movement.date >= :dateFrom AND movement.date <= :dateTo"
     )
     fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): Flow<Float>
+
+    @Query(
+        "SELECT '' AS groupDate," +
+        " SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
+        " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative" +
+        " FROM movement WHERE :dateTo >= movement.date AND movement.date >= :dateFrom"
+    )
+    fun getGainsAndExpensesInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<GroupInfo>
 }

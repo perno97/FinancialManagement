@@ -378,7 +378,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 xAxisExp.labelCount = numberOfColumnsInGraphs
                 xAxisExp.granularity = 1f
 
-                lineChartExp.xAxis.valueFormatter = valueFormatter
+                xAxisExp.valueFormatter = valueFormatter
                 lineChartExp.data = lineChartExpData
 
                 lineChartExp.invalidate()
@@ -391,7 +391,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 xAxisGain.labelCount = numberOfColumnsInGraphs
                 xAxisGain.granularity = 1f
 
-                lineChartGain.xAxis.valueFormatter = valueFormatter
+                xAxisGain.valueFormatter = valueFormatter
                 lineChartGain.data = lineChartGainData
 
                 lineChartGain.invalidate()
@@ -516,7 +516,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 xAxisExp.labelCount = numberOfColumnsInGraphs
                 xAxisExp.granularity = 1f
 
-                lineChartExp.xAxis.valueFormatter = valueFormatter
+                xAxisExp.valueFormatter = valueFormatter
                 lineChartExp.data = lineChartExpData
 
                 lineChartExp.invalidate()
@@ -529,7 +529,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 xAxisGain.labelCount = numberOfColumnsInGraphs
                 xAxisGain.granularity = 1f
 
-                lineChartGain.xAxis.valueFormatter = valueFormatter
+                xAxisGain.valueFormatter = valueFormatter
                 lineChartGain.data = lineChartGainData
 
                 lineChartGain.invalidate()
@@ -650,7 +650,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 xAxisExp.labelCount = numberOfDays
                 xAxisExp.granularity = 1f
 
-                lineChartExp.xAxis.valueFormatter = valueFormatter
+                xAxisExp.valueFormatter = valueFormatter
                 lineChartExp.data = lineChartExpData
 
                 lineChartExp.invalidate()
@@ -663,7 +663,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 xAxisGain.labelCount = numberOfDays
                 xAxisGain.granularity = 1f
 
-                lineChartGain.xAxis.valueFormatter = valueFormatter
+                xAxisGain.valueFormatter = valueFormatter
                 lineChartGain.data = lineChartGainData
 
                 lineChartGain.invalidate()

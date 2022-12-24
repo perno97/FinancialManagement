@@ -144,6 +144,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         return applicationDao.getMovementsSumInPeriod(dateFrom, dateTo)
     }
 
+    @WorkerThread
+    fun getGainsAndExpensesInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<GroupInfo> {
+        return applicationDao.getGainsAndExpensesInPeriod(dateFrom, dateTo)
+    }
+
 
     /*
     Insert

@@ -4,12 +4,15 @@ import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.ValueFormatter
 
-class WeekValueFormatter : ValueFormatter() {
-    override fun getPointLabel(entry: Entry?): String {
-        return super.getPointLabel(entry)
-    }
+class WeekValueFormatter(private val firstColumn: String?) : ValueFormatter() {
 
     override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-        return if (value != 0f) String.format("-%d weeks", value.toInt()) else "Current"
+        val index = if (firstColumn != null) value - 1 else value
+        return if (index < 0f)
+            firstColumn!!
+        else if (index == 0f)
+            "Current"
+        else
+            String.format("-%d weeks", value.toInt())
     }
 }

@@ -16,25 +16,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.GroupInfo
 import com.perno97.financialmanagement.database.Profile
 import com.perno97.financialmanagement.databinding.FragmentAssetsGraphsBinding
-import com.perno97.financialmanagement.utils.MonthValueFormatter
-import com.perno97.financialmanagement.utils.PeriodState
-import com.perno97.financialmanagement.utils.PeriodValueFormatter
-import com.perno97.financialmanagement.utils.WeekValueFormatter
+import com.perno97.financialmanagement.utils.*
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
@@ -46,7 +43,7 @@ import kotlin.math.roundToInt
 class AssetsGraphsFragment : Fragment() {
 
     private val logTag = "AssetsGraphFragment"
-    private val numberOfColumnsInGraphs = 12
+    private val numberOfColumnsInGraphs = 8
 
     private var _binding: FragmentAssetsGraphsBinding? = null
 
@@ -122,18 +119,27 @@ class AssetsGraphsFragment : Fragment() {
         val barChart = binding.assetsBarChart
         lineChart.setExtraOffsets(10f, 0f, 10f, 30f)
         lineChart.description.isEnabled = false
+        barChart.description.isEnabled = false
 
-        val xAxisExp = lineChart.xAxis
-        xAxisExp.setDrawGridLines(false)
-        xAxisExp.setDrawAxisLine(false)
-        xAxisExp.position = XAxis.XAxisPosition.BOTTOM
-        xAxisExp.labelRotationAngle = -90f
+        val xAxisLine = lineChart.xAxis
+        xAxisLine.setDrawGridLines(false)
+        xAxisLine.setDrawAxisLine(false)
+        xAxisLine.position = XAxis.XAxisPosition.BOTTOM
+        xAxisLine.labelRotationAngle = -90f
 
-        val leftAxisExp = lineChart.axisLeft
-        leftAxisExp.isEnabled = false
+        val xAxisBar = barChart.xAxis
+        xAxisBar.setCenterAxisLabels(true)
+        xAxisBar.position = XAxis.XAxisPosition.BOTTOM
+
+        val leftAxisLine = lineChart.axisLeft
+        leftAxisLine.isEnabled = false
+        val leftAxisBar = barChart.axisLeft
+        leftAxisBar.isEnabled = false // TODO ottimizzare assegnamenti
 
         val rightAxisExp = lineChart.axisRight
         rightAxisExp.isEnabled = false
+        val rightAxisBar = lineChart.axisRight
+        rightAxisBar.isEnabled = false
     }
 
     private fun loadData() {
@@ -150,8 +156,8 @@ class AssetsGraphsFragment : Fragment() {
                     updateLineAndBarCharts(data)
                 }
                 appViewModel.getGainsAndExpensesInPeriod(
-                    LocalDate.now(),
-                    LocalDate.now().minusDays(7 * numberOfColumnsInGraphs.toLong())
+                    LocalDate.now().minusDays(7 * numberOfColumnsInGraphs.toLong()),
+                    LocalDate.now()
                 ).observe(viewLifecycleOwner) { data ->
                     updateHorizontalGraph(data)
                 }
@@ -163,8 +169,8 @@ class AssetsGraphsFragment : Fragment() {
                         updateLineAndBarCharts(data)
                     }
                 appViewModel.getGainsAndExpensesInPeriod(
-                    LocalDate.now(),
-                    LocalDate.now().minusMonths(numberOfColumnsInGraphs.toLong())
+                    LocalDate.now().minusMonths(numberOfColumnsInGraphs.toLong()),
+                    LocalDate.now()
                 ).observe(viewLifecycleOwner) { data ->
                     updateHorizontalGraph(data)
                 }
@@ -190,9 +196,9 @@ class AssetsGraphsFragment : Fragment() {
         val txtViewExp = binding.txtAssetsOutcomes
         val txtViewGain = binding.txtAssetsIcomes
         if (data != null) {
-            val max = max(data.negative, data.positive)
-            val exp = data.negative
+            val exp = data.negative.absoluteValue
             val gain = data.positive
+            val max = max(exp, gain)
             expProgressBar.progress = exp.roundToInt()
             expProgressBar.max = max.roundToInt()
             txtViewExp.text = getString(R.string.current_on_max_budget, exp, max)
@@ -208,10 +214,21 @@ class AssetsGraphsFragment : Fragment() {
         var columnDate = LocalDate.now()
         val lineChart = binding.assetsLineChart
         val barChart = binding.assetsBarChart
-        val labels = arrayListOf<LocalDate>()
+        val lineLabels = arrayListOf<String>()
+        val labels = arrayListOf<String>()
         val lineEntries = arrayListOf<Entry>()
         val barEntriesExp = arrayListOf<BarEntry>()
         val barEntriesGain = arrayListOf<BarEntry>()
+        var columnValue = defaultProfile.assets
+
+        // First column of line graph is current assets
+        lineEntries.add(
+            Entry(
+                0f,
+                columnValue
+            )
+        )
+        lineLabels.add(getString(R.string.graph_label_now))
 
         when (state) {
             // ----------------- DAY -----------------
@@ -237,8 +254,8 @@ class AssetsGraphsFragment : Fragment() {
             }
             // ----------------------------------------
         }
+
         while (columnCount < columnsToShow) {
-            var columnValue = defaultProfile.assets
             when (state) {
                 // ----------------- DAY -----------------
                 PeriodState.DAY -> {
@@ -250,109 +267,121 @@ class AssetsGraphsFragment : Fragment() {
                 }
                 // ----------------- WEEK ----------------
                 PeriodState.WEEK -> {
-                    if (columnCount == 0) {
-                        columnValue = defaultProfile.assets
-                    } else {
-                        val item = data.find { item ->
-                            LocalDate.parse(item.groupDate)
-                                .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
-                                .isEqual(columnDate)
-                        }
-                        // Check if there is item for this week
-                        if (item != null) {
-                            columnValue += item.positive + item.negative
-                        }
+                    val item = data.find { item ->
+                        LocalDate.parse(item.groupDate)
+                            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+                            .isEqual(columnDate)
                     }
-                    lineEntries.add(
-                        Entry(
-                            columnCount.toFloat(),
-                            columnValue
+                    val l = if (columnCount == 0)
+                        getString(R.string.graph_label_current)
+                    else
+                        getString(R.string.graph_label_week, columnCount)
+
+                    // Check if there is item for this week
+                    if (item != null) {
+                        columnValue += item.positive + item.negative
+                    }
+                    if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
+                        lineEntries.add(
+                            Entry(
+                                columnCount.toFloat() + 1, // +1 because the first column is current assets
+                                columnValue
+                            )
                         )
-                    )
+                        lineLabels.add(l)
+                    }
                     barEntriesExp.add(
                         BarEntry(
                             columnCount.toFloat(),
-                            columnValue
+                            item?.positive ?: 0f
                         )
                     )
                     barEntriesGain.add(
                         BarEntry(
                             columnCount.toFloat(),
-                            columnValue
+                            item?.negative?.absoluteValue ?: 0f
                         )
                     )
+
+                    labels.add(l)
+
 
                     columnDate = columnDate.minusDays(7)
                 }
                 // ---------------- MONTH ----------------
                 PeriodState.MONTH -> {
-                    if (columnCount == 0) {
-                        columnValue = defaultProfile.assets
-                    } else {
-                        val item = data.find { item ->
-                            LocalDate.parse(item.groupDate)
-                                .withDayOfMonth(1)
-                                .isEqual(columnDate)
-                        }
-                        // Check if there is item for this week
-                        if (item != null) {
-                            columnValue += item.positive + item.negative
-                        }
+                    val item = data.find { item ->
+                        LocalDate.parse(item.groupDate)
+                            .withDayOfMonth(1)
+                            .isEqual(columnDate)
                     }
-                    lineEntries.add(
-                        Entry(
-                            columnCount.toFloat(),
-                            columnValue
+                    val l = columnDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+
+                    // Check if there is item for this week
+                    if (item != null) {
+                        columnValue += item.positive + item.negative
+                    }
+                    if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
+                        lineEntries.add(
+                            Entry(
+                                columnCount.toFloat() + 1, // +1 because the first column is current assets
+                                columnValue
+                            )
                         )
-                    )
+                        lineLabels.add(l)
+                    }
+
                     barEntriesExp.add(
                         BarEntry(
                             columnCount.toFloat(),
-                            columnValue
+                            item?.positive ?: 0f
                         )
                     )
                     barEntriesGain.add(
                         BarEntry(
                             columnCount.toFloat(),
-                            columnValue
+                            item?.negative?.absoluteValue ?: 0f
                         )
                     )
-                    labels.add(columnDate)
+
+                    labels.add(l)
 
                     columnDate = columnDate.minusMonths(1)
                 }
                 // ---------------- PERIOD ----------------
                 PeriodState.PERIOD -> {
-                    if (columnCount == 0) {
-                        columnValue = defaultProfile.assets
-                    } else {
-                        val item = data.find { item ->
-                            LocalDate.parse(item.groupDate).isEqual(columnDate)
-                        }
-                        // Check if there is item for this week
-                        if (item != null) {
-                            columnValue += item.positive + item.negative
-                        }
+                    val item = data.find { item ->
+                        LocalDate.parse(item.groupDate).isEqual(columnDate)
                     }
-                    lineEntries.add(
-                        Entry(
-                            columnCount.toFloat(),
-                            columnValue
+                    val l = "${columnDate.dayOfMonth}/${columnDate.monthValue}/${columnDate.year}"
+
+                    // Check if there is item for this week
+                    if (item != null) {
+                        columnValue += item.positive + item.negative
+                    }
+                    if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
+                        lineEntries.add(
+                            Entry(
+                                columnCount.toFloat() + 1, // +1 because the first column is current assets
+                                columnValue
+                            )
                         )
-                    )
+                        lineLabels.add(l)
+                    }
                     barEntriesExp.add(
                         BarEntry(
                             columnCount.toFloat(),
-                            columnValue
+                            item?.positive ?: 0f
                         )
                     )
                     barEntriesGain.add(
                         BarEntry(
                             columnCount.toFloat(),
-                            columnValue
+                            item?.negative?.absoluteValue ?: 0f
                         )
                     )
-                    labels.add(columnDate)
+
+                    labels.add(l)
 
                     columnDate = columnDate.minusDays(1)
                 }
@@ -361,7 +390,9 @@ class AssetsGraphsFragment : Fragment() {
             columnCount++
         }
 
-        val valueFormatter = when (state) {
+        /*var lineGraphValueFormatter: ValueFormatter? = null
+        var barGraphValueFormatter: ValueFormatter? = null
+        when (state) {
             PeriodState.DAY -> {
                 Log.e(
                     logTag,
@@ -369,10 +400,23 @@ class AssetsGraphsFragment : Fragment() {
                 )
                 return
             }
-            PeriodState.WEEK -> WeekValueFormatter()
-            PeriodState.MONTH -> MonthValueFormatter(labels)
-            PeriodState.PERIOD -> PeriodValueFormatter(labels)
-        }
+            PeriodState.WEEK -> {
+                lineGraphValueFormatter =
+                    WeekValueFormatter(firstColumn = getString(R.string.graph_label_now))
+                barGraphValueFormatter = WeekValueFormatter(firstColumn = null)
+            }
+            PeriodState.MONTH -> {
+                lineGraphValueFormatter = MonthValueFormatter(
+                    firstColumn = getString(R.string.graph_label_now),
+                    labels = labels.dropLast(1) as ArrayList<LocalDate>
+                )
+                barGraphValueFormatter = MonthValueFormatter(firstColumn = null, labels = labels)
+            }
+            PeriodState.PERIOD -> {
+                lineGraphValueFormatter = PeriodValueFormatter(labels)
+                barGraphValueFormatter = PeriodValueFormatter(labels)
+            }
+        }*/
 
         val lineDataSet = LineDataSet(lineEntries, getString(R.string.assets))
         // TODO set linedataset color
@@ -380,7 +424,7 @@ class AssetsGraphsFragment : Fragment() {
         val xAxisLine = lineChart.xAxis
         xAxisLine.labelCount = columnsToShow
         xAxisLine.granularity = 1f
-        xAxisLine.valueFormatter = valueFormatter
+        xAxisLine.valueFormatter = IndexAxisValueFormatter(lineLabels)
         lineChart.data = lineChartData
         lineChart.invalidate()
 
@@ -394,12 +438,14 @@ class AssetsGraphsFragment : Fragment() {
             requireContext(),
             R.color.success
         )
-        val barChartData = BarData(barDataSetExp, barDataSetGain)
+        val barChartData = BarData(barDataSetGain, barDataSetExp)
+        barChartData.barWidth = 0.4f
         val xAxisBar = barChart.xAxis
         xAxisBar.labelCount = columnsToShow
         xAxisBar.granularity = 1f
-        xAxisBar.valueFormatter = valueFormatter
+        xAxisBar.valueFormatter = IndexAxisValueFormatter(labels)
         barChart.data = barChartData
+        barChart.groupBars(0f, 0.06f, 0.02f)
         barChart.invalidate()
     }
 

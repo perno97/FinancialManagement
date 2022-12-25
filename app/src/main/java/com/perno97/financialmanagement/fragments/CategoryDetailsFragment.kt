@@ -17,10 +17,12 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.room.Index
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -39,6 +41,7 @@ import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.launch
 import java.time.*
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
@@ -288,7 +291,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGain = binding.incomesLineChart
             val lineChartExpData = LineData()
             val lineChartGainData = LineData()
-            val labels = arrayListOf<LocalDate>()
+            val labels = arrayListOf<String>()
             var labelsLoaded = false
             var expensesFound = false
             var gainsFound = false
@@ -358,7 +361,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     )
                     // Adding date for formatter (to have x labels) only at first cycle
                     if (!labelsLoaded)
-                        labels.add(dateToCheckAfter)
+                        labels.add(dateToCheckAfter.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
                     columnCount++
                 }
                 val expensesDataSet = LineDataSet(expEntries, category.name)
@@ -369,7 +372,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGainData.addDataSet(incomesDataSet)
                 labelsLoaded = true
             }
-            val valueFormatter = MonthValueFormatter(labels)
+            val valueFormatter = IndexAxisValueFormatter(labels)
             if (!expensesFound)
                 binding.expensesSectionCatDetails.visibility = View.GONE
             else {
@@ -433,6 +436,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGain = binding.incomesLineChart
             val lineChartExpData = LineData()
             val lineChartGainData = LineData()
+            val labels = arrayListOf<String>()
+            var labelsLoaded = false
             var expensesFound = false
             var gainsFound = false
             for (category in data.keys) {
@@ -497,6 +502,14 @@ class CategoryDetailsFragment(private val categoryName: String) :
                             gain
                         )
                     )
+
+                    if (!labelsLoaded) {
+                        val l = if (columnCount == 0)
+                            getString(R.string.graph_label_current)
+                        else
+                            getString(R.string.graph_label_week, columnCount)
+                        labels.add(l)
+                    }
                     columnCount++
                 }
                 val expensesDataSet = LineDataSet(expEntries, category.name)
@@ -505,9 +518,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 incomesDataSet.color = Color.parseColor(category.color)
                 lineChartExpData.addDataSet(expensesDataSet)
                 lineChartGainData.addDataSet(incomesDataSet)
+                labelsLoaded = true
             }
 
-            val valueFormatter = WeekValueFormatter()
+            val valueFormatter = IndexAxisValueFormatter(labels)
             if (!expensesFound)
                 binding.expensesSectionCatDetails.visibility = View.GONE
             else {
@@ -571,7 +585,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
             val lineChartGain = binding.incomesLineChart
             val lineChartExpData = LineData()
             val lineChartGainData = LineData()
-            val labels = arrayListOf<LocalDate>()
+            val labels = arrayListOf<String>()
             var labelsLoaded = false
             var expensesFound = false
             var gainsFound = false
@@ -627,7 +641,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     )
                     // Adding date for formatter (to have x labels) only at first cycle
                     if (!labelsLoaded)
-                        labels.add(currentColumnDate)
+                        labels.add("${currentColumnDate.dayOfMonth}/${currentColumnDate.monthValue}/${currentColumnDate.year}")
                     columnCount++
                     currentColumnDate = currentColumnDate.minusDays(1)
                 }
@@ -640,7 +654,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 labelsLoaded = true
             }
 
-            val valueFormatter = PeriodValueFormatter(labels)
+            val valueFormatter = IndexAxisValueFormatter(labels)
             val numberOfDays = ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() + 1
             if (!expensesFound)
                 binding.expensesSectionCatDetails.visibility = View.GONE

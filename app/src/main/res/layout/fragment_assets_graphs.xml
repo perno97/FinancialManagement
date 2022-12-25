@@ -131,6 +131,7 @@
                         app:trackThickness="20dp"
                         app:trackCornerRadius="30dp"
                         app:trackColor="@color/dark_30"
+                        app:indicatorColor="@color/success"
                         android:layout_weight=".7" />
 
                     <TextView
@@ -158,6 +159,7 @@
                         app:trackThickness="20dp"
                         app:trackCornerRadius="30dp"
                         app:trackColor="@color/dark_30"
+                        app:indicatorColor="@color/warning"
                         android:layout_weight=".7" />
 
                     <TextView

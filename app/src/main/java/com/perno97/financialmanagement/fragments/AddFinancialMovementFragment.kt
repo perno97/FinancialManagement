@@ -70,6 +70,7 @@ class AddFinancialMovementFragment : Fragment() {
             binding.spinnerCategory.adapter = spinnerAdapter
         }
 
+        binding.checkNotify.isEnabled = false // Can't notify if date is not after today
         binding.editTextMovAmount.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
 
@@ -134,6 +135,8 @@ class AddFinancialMovementFragment : Fragment() {
                     val date = Instant.ofEpochMilli(value)
                         .atZone(ZoneId.systemDefault()).toLocalDate()
                     binding.editTextMovementDate.setText(date.toString())
+                    binding.checkNotify.isEnabled =
+                        date.isAfter(LocalDate.now()) // Can't notify if date is not after today
                 }
                 datePicker.show(parentFragmentManager, "rangeDatePickerDialog")
             }
@@ -159,6 +162,10 @@ class AddFinancialMovementFragment : Fragment() {
             binding.btnIncome.isEnabled = true
             binding.btnOutcome.isEnabled = false
             income = false
+        }
+        binding.checkPeriodic.setOnClickListener {
+            binding.layoutPeriodic.visibility =
+                if (binding.checkPeriodic.isChecked) View.VISIBLE else View.GONE
         }
     }
 

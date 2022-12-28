@@ -119,7 +119,9 @@ class AssetsGraphsFragment : Fragment() {
         val barChart = binding.assetsBarChart
         lineChart.setExtraOffsets(10f, 0f, 10f, 30f)
         lineChart.description.isEnabled = false
+        barChart.setExtraOffsets(10f, 0f, 10f, 30f)
         barChart.description.isEnabled = false
+        barChart.legend.isEnabled = false
 
         val xAxisLine = lineChart.xAxis
         xAxisLine.setDrawGridLines(false)
@@ -129,16 +131,21 @@ class AssetsGraphsFragment : Fragment() {
 
         val xAxisBar = barChart.xAxis
         xAxisBar.setCenterAxisLabels(true)
+        xAxisBar.setDrawGridLines(false)
+        xAxisBar.setDrawAxisLine(false)
         xAxisBar.position = XAxis.XAxisPosition.BOTTOM
+        xAxisBar.labelRotationAngle = -90f
+        xAxisBar.axisMinimum = 0f
 
         val leftAxisLine = lineChart.axisLeft
         leftAxisLine.isEnabled = false
         val leftAxisBar = barChart.axisLeft
-        leftAxisBar.isEnabled = false // TODO ottimizzare assegnamenti
+        leftAxisBar.isEnabled = false
+        leftAxisBar.axisMinimum = 0f// TODO ottimizzare assegnamenti
 
         val rightAxisExp = lineChart.axisRight
         rightAxisExp.isEnabled = false
-        val rightAxisBar = lineChart.axisRight
+        val rightAxisBar = barChart.axisRight
         rightAxisBar.isEnabled = false
     }
 
@@ -221,14 +228,16 @@ class AssetsGraphsFragment : Fragment() {
         val barEntriesGain = arrayListOf<BarEntry>()
         var columnValue = defaultProfile.assets
 
-        // First column of line graph is current assets
-        lineEntries.add(
-            Entry(
-                0f,
-                columnValue
+        // First column of line graph is current assets if not period
+        if (state != PeriodState.PERIOD) {
+            lineEntries.add(
+                Entry(
+                    0f,
+                    columnValue
+                )
             )
-        )
-        lineLabels.add(getString(R.string.graph_label_now))
+            lineLabels.add(getString(R.string.graph_label_now))
+        }
 
         when (state) {
             // ----------------- DAY -----------------
@@ -290,13 +299,13 @@ class AssetsGraphsFragment : Fragment() {
                         )
                         lineLabels.add(l)
                     }
-                    barEntriesExp.add(
+                    barEntriesGain.add(
                         BarEntry(
                             columnCount.toFloat(),
                             item?.positive ?: 0f
                         )
                     )
-                    barEntriesGain.add(
+                    barEntriesExp.add(
                         BarEntry(
                             columnCount.toFloat(),
                             item?.negative?.absoluteValue ?: 0f
@@ -331,13 +340,13 @@ class AssetsGraphsFragment : Fragment() {
                         lineLabels.add(l)
                     }
 
-                    barEntriesExp.add(
+                    barEntriesGain.add(
                         BarEntry(
                             columnCount.toFloat(),
                             item?.positive ?: 0f
                         )
                     )
-                    barEntriesGain.add(
+                    barEntriesExp.add(
                         BarEntry(
                             columnCount.toFloat(),
                             item?.negative?.absoluteValue ?: 0f
@@ -359,22 +368,22 @@ class AssetsGraphsFragment : Fragment() {
                     if (item != null) {
                         columnValue += item.positive + item.negative
                     }
-                    if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
-                        lineEntries.add(
-                            Entry(
-                                columnCount.toFloat() + 1, // +1 because the first column is current assets
-                                columnValue
-                            )
+
+                    lineEntries.add(
+                        Entry(
+                            columnCount.toFloat() + 1,
+                            columnValue
                         )
-                        lineLabels.add(l)
-                    }
-                    barEntriesExp.add(
+                    )
+                    lineLabels.add(l)
+
+                    barEntriesGain.add(
                         BarEntry(
                             columnCount.toFloat(),
                             item?.positive ?: 0f
                         )
                     )
-                    barEntriesGain.add(
+                    barEntriesExp.add(
                         BarEntry(
                             columnCount.toFloat(),
                             item?.negative?.absoluteValue ?: 0f
@@ -390,34 +399,6 @@ class AssetsGraphsFragment : Fragment() {
             columnCount++
         }
 
-        /*var lineGraphValueFormatter: ValueFormatter? = null
-        var barGraphValueFormatter: ValueFormatter? = null
-        when (state) {
-            PeriodState.DAY -> {
-                Log.e(
-                    logTag,
-                    "Period day not defined in this screen, after columns loaded"
-                )
-                return
-            }
-            PeriodState.WEEK -> {
-                lineGraphValueFormatter =
-                    WeekValueFormatter(firstColumn = getString(R.string.graph_label_now))
-                barGraphValueFormatter = WeekValueFormatter(firstColumn = null)
-            }
-            PeriodState.MONTH -> {
-                lineGraphValueFormatter = MonthValueFormatter(
-                    firstColumn = getString(R.string.graph_label_now),
-                    labels = labels.dropLast(1) as ArrayList<LocalDate>
-                )
-                barGraphValueFormatter = MonthValueFormatter(firstColumn = null, labels = labels)
-            }
-            PeriodState.PERIOD -> {
-                lineGraphValueFormatter = PeriodValueFormatter(labels)
-                barGraphValueFormatter = PeriodValueFormatter(labels)
-            }
-        }*/
-
         val lineDataSet = LineDataSet(lineEntries, getString(R.string.assets))
         // TODO set linedataset color
         val lineChartData = LineData(lineDataSet)
@@ -428,12 +409,12 @@ class AssetsGraphsFragment : Fragment() {
         lineChart.data = lineChartData
         lineChart.invalidate()
 
-        val barDataSetExp = BarDataSet(barEntriesExp, getString(R.string.incomes))
+        val barDataSetExp = BarDataSet(barEntriesExp, getString(R.string.outcomes))
         barDataSetExp.color = ContextCompat.getColor(
             requireContext(),
             R.color.warning
         )
-        val barDataSetGain = BarDataSet(barEntriesGain, getString(R.string.outcomes))
+        val barDataSetGain = BarDataSet(barEntriesGain, getString(R.string.incomes))
         barDataSetGain.color = ContextCompat.getColor(
             requireContext(),
             R.color.success
@@ -443,9 +424,10 @@ class AssetsGraphsFragment : Fragment() {
         val xAxisBar = barChart.xAxis
         xAxisBar.labelCount = columnsToShow
         xAxisBar.granularity = 1f
+        xAxisBar.axisMaximum = columnsToShow.toFloat()
         xAxisBar.valueFormatter = IndexAxisValueFormatter(labels)
         barChart.data = barChartData
-        barChart.groupBars(0f, 0.06f, 0.02f)
+        barChart.groupBars(0f, 0.1f, 0.05f)
         barChart.invalidate()
     }
 

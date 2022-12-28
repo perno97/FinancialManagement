@@ -28,8 +28,10 @@ import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.Expense
+import com.perno97.financialmanagement.database.PeriodicMovement
 import com.perno97.financialmanagement.database.Profile
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
+import com.perno97.financialmanagement.utils.CalculatedMovement
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -122,6 +124,16 @@ class MainFragment : Fragment() {
         chart.setDrawCenterText(true)
         chart.setTouchEnabled(false)
         return binding.root
+    }
+
+    private fun getMovementsFromPeriodicMovement(
+        periodicMovement: PeriodicMovement,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): List<CalculatedMovement> {
+        val movements = arrayListOf<CalculatedMovement>()
+        // TODO check forward, check backward, check weekly
+        return movements
     }
 
     private fun updateExpectedAssets(prev: Float, new: Float) {

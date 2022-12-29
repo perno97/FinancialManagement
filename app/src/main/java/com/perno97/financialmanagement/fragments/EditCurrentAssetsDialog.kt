@@ -63,7 +63,7 @@ class EditCurrentAssetsDialog : DialogFragment() {
     }
 
     private fun confirmAction() {
-        appViewModel.insertNewAssets(
+        appViewModel.updateAssets(
             binding.editTextCurrentAssets.text.toString().toFloat()
         )
         dismiss()

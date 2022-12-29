@@ -3,7 +3,10 @@ package com.perno97.financialmanagement.database
 import android.content.Context
 import androidx.room.*
 
-@Database(entities = [Movement::class, Category::class, Profile::class], version = 1)
+@Database(
+    entities = [Movement::class, Category::class, Profile::class, PeriodicMovement::class, IncumbentMovement::class],
+    version = 1
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 

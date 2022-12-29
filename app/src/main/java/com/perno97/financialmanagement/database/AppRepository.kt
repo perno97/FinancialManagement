@@ -18,11 +18,26 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     val movementAndCategory: Flow<List<MovementAndCategory>> =
         applicationDao.getMovementAndCategory()
 
+    @WorkerThread
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
         Log.e(logTag, "Getting categories with movements")
         val toreturn = applicationDao.getCategoryWithMovements()
         Log.e(logTag, "Returning $toreturn value")
         return toreturn
+    }
+
+    @WorkerThread
+    suspend fun getAllPeriodicMovements(): List<PeriodicMovement> {
+        return applicationDao.getAllPeriodicMovements()
+    }
+
+    @WorkerThread
+    suspend fun getLatestPeriodicMovement(
+        periodicMovementId: Int,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Movement? {
+        return applicationDao.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
     }
 
 
@@ -164,8 +179,47 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
+    suspend fun insert(periodicMovement: PeriodicMovement) {
+        applicationDao.insertPeriodicMovements(periodicMovement)
+    }
+
+    @WorkerThread
+    suspend fun insert(incumbentMovement: IncumbentMovement) {
+        applicationDao.insertIncumbentMovements(incumbentMovement)
+    }
+
+    @WorkerThread
     suspend fun insert(profile: Profile) {
         applicationDao.insertProfiles(profile)
+    }
+
+
+    /*
+    Update
+     */
+    @WorkerThread
+    suspend fun update(movement: Movement) {
+        applicationDao.updateMovements(movement)
+    }
+
+    @WorkerThread
+    suspend fun update(category: Category) {
+        applicationDao.updateCategories(category)
+    }
+
+    @WorkerThread
+    suspend fun update(incumbentMovement: IncumbentMovement) {
+        applicationDao.updateIncumbentMovements(incumbentMovement)
+    }
+
+    @WorkerThread
+    suspend fun update(periodicMovement: PeriodicMovement) {
+        applicationDao.updatePeriodicMovements(periodicMovement)
+    }
+
+    @WorkerThread
+    suspend fun update(profile: Profile) {
+        applicationDao.updateProfiles(profile)
     }
 
 

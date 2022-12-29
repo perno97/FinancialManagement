@@ -21,11 +21,9 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.Category
+import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
-import com.perno97.financialmanagement.database.Movement
-import com.perno97.financialmanagement.database.UnusedCategoriesChecker
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import kotlinx.coroutines.launch
@@ -170,8 +168,8 @@ class AddFinancialMovementFragment : Fragment() {
     }
 
     private fun addMovementToDatabase() {
-        val date = binding.editTextMovementDate.text
-        if (date.isEmpty()) {
+        val d = binding.editTextMovementDate.text
+        if (d.isEmpty()) {
             Snackbar.make(
                 binding.editTextMovementDate,
                 R.string.error_no_date,
@@ -184,6 +182,7 @@ class AddFinancialMovementFragment : Fragment() {
             ).show()
             return
         }
+        val date = LocalDate.parse(d)
         val amount: Float = binding.editTextMovAmount.text.toString().toFloat()
         if (amount <= 0) {
             Snackbar.make(
@@ -228,29 +227,85 @@ class AddFinancialMovementFragment : Fragment() {
         }
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
+        val periodic = binding.checkPeriodic.isChecked
         val newAmount = if (income) amount else -amount
-        val movement = Movement(
-            date = LocalDate.parse(date),
-            amount = newAmount,
-            category = category,
-            title = title,
-            notes = notes,
-            notify = notify
-        )
 
-        appViewModel.insert(movement)
-        Snackbar.make(
-            binding.editTextMovementDate,
-            R.string.success_add_movement,
-            BaseTransientBottomBar.LENGTH_LONG
-        ).setBackgroundTint(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.success
+        if (periodic) {
+            var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
+            val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
+            var monday = binding.checkMonday.isChecked
+            var tuesday = binding.checkTuesday.isChecked
+            var wednesday = binding.checkWednesday.isChecked
+            var thursday = binding.checkThursday.isChecked
+            var friday = binding.checkFriday.isChecked
+            var saturday = binding.checkSaturday.isChecked
+            var sunday = binding.checkSunday.isChecked
+            if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
+                days = 1
+                monday = false
+                tuesday = false
+                wednesday = false
+                thursday = false
+                friday = false
+                saturday = false
+                sunday = false
+            }
+            val periodicMovement = PeriodicMovement(
+                days = days,
+                months = months,
+                monday = monday,
+                tuesday = tuesday,
+                wednesday = wednesday,
+                thursday = thursday,
+                friday = friday,
+                saturday = saturday,
+                sunday = sunday,
+                date = date,
+                amount = newAmount,
+                category = category,
+                title = title,
+                notes = notes,
+                notify = notify
             )
-        ).show()
+            appViewModel.insert(periodicMovement)
+            PeriodicMovementsChecker.check(appViewModel, appViewModel.viewModelScope, null)
+        } else {
+            if (date.isAfter(LocalDate.now())) {
+                val incumbentMovement = IncumbentMovement(
+                    date = date,
+                    amount = amount,
+                    category = category,
+                    title = title,
+                    notes = notes,
+                    notify = notify
+                )
+                appViewModel.insert(incumbentMovement)
+            } else {
+                val movement = Movement(
+                    date = date,
+                    amount = newAmount,
+                    category = category,
+                    title = title,
+                    notes = notes,
+                    periodicMovementId = null
+                )
+
+                appViewModel.insert(movement)
+                Snackbar.make(
+                    binding.editTextMovementDate,
+                    R.string.success_add_movement,
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.success
+                    )
+                ).show()
+                updateAssets(newAmount)
+            }
+        }
+
         UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
-        updateAssets(newAmount)
         parentFragmentManager.popBackStack()
     }
 

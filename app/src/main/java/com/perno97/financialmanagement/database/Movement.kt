@@ -14,5 +14,5 @@ data class Movement(
     val category: String,
     val title: String,
     val notes: String,
-    val notify: Boolean
+    @ColumnInfo(name = "periodic_movement_id") val periodicMovementId: Int?
 )

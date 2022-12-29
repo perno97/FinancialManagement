@@ -18,13 +18,19 @@ interface ApplicationDao {
     /*
     Insert
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertCategories(vararg categories: Category)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertMovements(vararg movements: Movement)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
+    suspend fun insertPeriodicMovements(vararg periodicMovements: PeriodicMovement)
+
+    @Insert
+    suspend fun insertIncumbentMovements(vararg incumbentMovements: IncumbentMovement)
+
+    @Insert
     suspend fun insertProfiles(vararg profiles: Profile)
 
 
@@ -33,6 +39,18 @@ interface ApplicationDao {
      */
     @Update
     suspend fun updateProfiles(vararg profiles: Profile)
+
+    @Update
+    suspend fun updateCategories(vararg categories: Category)
+
+    @Update
+    suspend fun updateMovements(vararg movements: Movement)
+
+    @Update
+    suspend fun updatePeriodicMovements(vararg periodicMovements: PeriodicMovement)
+
+    @Update
+    suspend fun updateIncumbentMovements(vararg incumbentMovements: IncumbentMovement)
 
 
     /*
@@ -50,6 +68,9 @@ interface ApplicationDao {
 
     @Query("SELECT * FROM movement")
     fun getAllMovements(): Flow<List<Movement>>
+
+    @Query("SELECT * FROM periodic_movement")
+    suspend fun getAllPeriodicMovements(): List<PeriodicMovement>
 
     @Query("SELECT SUM(daily_budget) as budget FROM category")
     fun getAvailableDailyBudget(): Flow<Float>
@@ -235,9 +256,18 @@ interface ApplicationDao {
 
     @Query(
         "SELECT '' AS groupDate," +
-        " SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
-        " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative" +
-        " FROM movement WHERE :dateTo >= movement.date AND movement.date >= :dateFrom"
+                " SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
+                " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative" +
+                " FROM movement WHERE :dateTo >= movement.date AND movement.date >= :dateFrom"
     )
     fun getGainsAndExpensesInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<GroupInfo>
+
+    @Query(
+        "SELECT * FROM movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date <= :dateFrom LIMIT 1"
+    )
+    suspend fun getLatestPeriodicMovement(
+        periodicMovementId: Int,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Movement?
 }

@@ -293,6 +293,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
 
+        // TODO copiare da addfinancialmovement
         val previousAmount = movAndCategory.movement.amount
         val newAmount = if (income) amount else -amount
 
@@ -303,10 +304,10 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
             category = category,
             title = title,
             notes = notes,
-            notify = notify
+            periodicMovementId = null
         )
 
-        appViewModel.insert(movement)
+        appViewModel.update(movement)
         Snackbar.make(
             binding.fabConfirmEdit,
             R.string.success_edit_movement,

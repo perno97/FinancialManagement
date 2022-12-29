@@ -62,7 +62,7 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
         val name = binding.editTextNewCatName.text.toString()
         val color = binding.spinnerColor.selectedItem.toString()
         val budget = binding.editTextNewCatBudget.text.toString().toFloat()
-        appViewModel.insert(
+        appViewModel.update(
             Category(
                 name = name,
                 color = color,

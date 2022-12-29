@@ -8,9 +8,9 @@ import java.time.LocalDate
 import androidx.core.util.Pair
 import com.perno97.financialmanagement.database.*
 import kotlinx.coroutines.flow.*
+import java.time.Period
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
-
     private val logTag = "AppViewModel"
 
     private val defaultProfileId = 0
@@ -32,14 +32,26 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
-        Log.e(logTag, "Getting categories with movements")
+        Log.i(logTag, "Getting categories with movements")
         val toreturn = repository.getCategoryWithMovements()
-        Log.e(logTag, "Returning $toreturn value")
+        Log.i(logTag, "Returning $toreturn value")
         return toreturn
     }
 
     suspend fun getCurrentAssetDefault(): Float {
         return repository.getCurrentAsset(defaultProfileId)
+    }
+
+    suspend fun getAllPeriodicMovements(): List<PeriodicMovement> {
+        return repository.getAllPeriodicMovements()
+    }
+
+    suspend fun getLatestPeriodicMovement(
+        periodicMovementId: Int,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Movement? {
+        return repository.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
     }
 
 
@@ -196,8 +208,40 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(movement)
     }
 
+    fun insert(periodicMovement: PeriodicMovement) = viewModelScope.launch {
+        repository.insert(periodicMovement)
+    }
+
+    fun insert(incumbentMovement: IncumbentMovement) = viewModelScope.launch {
+        repository.insert(incumbentMovement)
+    }
+
     fun insertNewAssets(assetValue: Float) = viewModelScope.launch {
         repository.insert(Profile(defaultProfileId, assetValue))
+    }
+
+
+    /*
+    Update
+     */
+    fun update(movement: Movement) = viewModelScope.launch {
+        repository.update(movement)
+    }
+
+    fun update(category: Category) = viewModelScope.launch {
+        repository.update(category)
+    }
+
+    fun update(incumbentMovement: IncumbentMovement) = viewModelScope.launch {
+        repository.update(incumbentMovement)
+    }
+
+    fun update(periodicMovement: PeriodicMovement) = viewModelScope.launch {
+        repository.update(periodicMovement)
+    }
+
+    fun updateAssets(assetsValue: Float) = viewModelScope.launch {
+        repository.update(Profile(defaultProfileId, assetsValue))
     }
 
 

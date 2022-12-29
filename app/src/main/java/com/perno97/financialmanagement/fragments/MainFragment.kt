@@ -19,6 +19,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
@@ -26,16 +27,14 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.Category
-import com.perno97.financialmanagement.database.Expense
-import com.perno97.financialmanagement.database.PeriodicMovement
-import com.perno97.financialmanagement.database.Profile
+import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
 import com.perno97.financialmanagement.utils.CalculatedMovement
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -76,6 +75,7 @@ class MainFragment : Fragment() {
     private var availableDailyBudget: Float? = null
     private var categoriesExpenses: Map<Category, Expense>? = null
     private var isAllDataLoaded = false
+    private var uiLoaded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,27 +93,9 @@ class MainFragment : Fragment() {
             } else {
                 createNewDefaultProfile()
             }
-
         }
 
-        // Load UI data
-        viewLifecycleOwner.lifecycleScope.launch {
-            Log.i(logTag, "Launched Coroutine")
-            appViewModel.uiState.collect {
-                Log.i(logTag, "Collecting UI data")
-                dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
-                dateTo = it.dateToMain ?: LocalDate.now()
-                state = it.stateMain ?: PeriodState.MONTH
-                datePickerSelection = it.datePickerSelectionMain
-                isAllDataLoaded = false
-                when (state) {
-                    PeriodState.DAY -> setDay()
-                    PeriodState.WEEK -> setWeek()
-                    PeriodState.MONTH -> setMonth()
-                    PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
-                }
-            }
-        }
+        loadUiData()
 
         // Setup chart styling
         val chart = binding.pieChartMain
@@ -126,18 +108,26 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    private fun getMovementsFromPeriodicMovement(
-        periodicMovement: PeriodicMovement,
-        dateFrom: LocalDate,
-        dateTo: LocalDate
-    ): List<CalculatedMovement> {
-        val movements = arrayListOf<CalculatedMovement>()
-        // TODO check forward, check backward, check weekly
-        return movements
+    private fun loadUiData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            Log.i(logTag, "Launched Coroutine")
+            appViewModel.uiState.collect {
+                Log.i(logTag, "Collecting UI data")
+                uiLoaded = true
+                dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
+                dateTo = it.dateToMain ?: LocalDate.now()
+                state = it.stateMain ?: PeriodState.MONTH
+                datePickerSelection = it.datePickerSelectionMain
+                //isAllDataLoaded = false
+                PeriodicMovementsChecker.check(
+                    appViewModel,
+                    appViewModel.viewModelScope,
+                    fun() { initReady() })
+            }
+        }
     }
 
     private fun updateExpectedAssets(prev: Float, new: Float) {
-
         binding.txtExpectedValue.text =
             getString(R.string.euro_value, new)
         if (new > prev)
@@ -159,39 +149,37 @@ class MainFragment : Fragment() {
     }
 
     private fun computeExpectedAssets() {
-        val currentAssets = defaultProfile.assets
-        when (state) {
-            // ----------------- DAY -----------------
-            PeriodState.DAY -> appViewModel.getExpectedSum(LocalDate.now(), LocalDate.now())
-                .observe(viewLifecycleOwner) { movementsSum ->
-                    updateExpectedAssets(currentAssets, currentAssets + movementsSum)
-                }
-            // ----------------- WEEK ----------------
-            PeriodState.WEEK -> appViewModel.getExpectedSum(
-                LocalDate.now(),
-                LocalDate.now().with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
-            ).observe(viewLifecycleOwner) { movementsSum ->
-                updateExpectedAssets(currentAssets, currentAssets + movementsSum)
-            }
-            // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getExpectedSum(
-                LocalDate.now(),
-                LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
-            ).observe(viewLifecycleOwner) { movementsSum ->
-                updateExpectedAssets(currentAssets, currentAssets + movementsSum)
-            }
-            // ---------------- PERIOD ----------------
-            PeriodState.PERIOD -> {
-                val from = if (dateFrom.isBefore(LocalDate.now())) LocalDate.now() else dateFrom
-                val to = if (dateTo.isBefore(from)) from else dateTo
-                appViewModel.getExpectedSum(
-                    from,
-                    to
+        lifecycleScope.launch {
+            val currentAssets = appViewModel.getCurrentAssetDefault()
+            val tomorrow = LocalDate.now().plusDays(1)
+            when (state) {
+                // ----------------- DAY -----------------
+                PeriodState.DAY -> updateExpectedAssets(currentAssets, currentAssets)
+                // ----------------- WEEK ----------------
+                PeriodState.WEEK -> appViewModel.getExpectedSum(
+                    tomorrow,
+                    LocalDate.now().with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
                 ).observe(viewLifecycleOwner) { movementsSum ->
                     updateExpectedAssets(currentAssets, currentAssets + movementsSum)
                 }
+                // ---------------- MONTH ----------------
+                PeriodState.MONTH -> appViewModel.getExpectedSum(
+                    tomorrow,
+                    LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
+                ).observe(viewLifecycleOwner) { movementsSum ->
+                    updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                }
+                // ---------------- PERIOD ----------------
+                PeriodState.PERIOD -> {
+                    val from = if (dateFrom.isBefore(tomorrow)) tomorrow else dateFrom
+                    val to = if (dateTo.isBefore(from)) from else dateTo
+                    appViewModel.getExpectedSum(from, to)
+                        .observe(viewLifecycleOwner) { movementsSum ->
+                            updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                        }
+                }
+                // ----------------------------------------
             }
-            // ----------------------------------------
         }
     }
 
@@ -216,29 +204,36 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
-    private fun updateData() {
-        Log.i(logTag, "Called updateData()")
+    private fun updateCategoriesExpenses() {
+        Log.i(logTag, "Called updateCategoriesExpenses()")
         appViewModel.getCategoryExpensesProgresses(dateFrom, dateTo)
             .observe(viewLifecycleOwner) { list ->
                 Log.i(logTag, "Observed getCategoryExpensesProgress")
                 categoriesExpenses = list
-                dataLoaded()
+                updateAvailableBudget()
             }
+
+    }
+
+    private fun updateAvailableBudget() {
+        Log.i(logTag, "Called updateAvailableBudget()")
         appViewModel.availableDailyBudget.observe(viewLifecycleOwner) { budget ->
             Log.i(logTag, "Observed availableDailyBudget")
             availableDailyBudget = budget
-            dataLoaded()
+            updateUI(
+                categoriesExpenses!!,
+                availableDailyBudget
+            )
         }
     }
 
-    private fun dataLoaded() {
-        Log.i(logTag, "Called dataLoaded with isAllDataLoaded = $isAllDataLoaded")
-        if (isAllDataLoaded) updateUI(
-            categoriesExpenses!!,
-            availableDailyBudget
-        )
-        else {
-            isAllDataLoaded = true
+    private fun initReady() {
+        Log.i(logTag, "Called initReady()")
+        when (state) {
+            PeriodState.DAY -> setDay()
+            PeriodState.WEEK -> setWeek()
+            PeriodState.MONTH -> setMonth()
+            PeriodState.PERIOD -> setPeriod(dateFrom, dateTo)
         }
     }
 
@@ -251,7 +246,7 @@ class MainFragment : Fragment() {
         dateFrom = dateTo
         state = PeriodState.DAY
         setTitle("${dateTo.dayOfMonth} ${dateTo.month} ${dateTo.year}")
-        updateData()
+        updateCategoriesExpenses()
     }
 
     private fun setWeek() {
@@ -267,7 +262,7 @@ class MainFragment : Fragment() {
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
-        updateData()
+        updateCategoriesExpenses()
     }
 
     private fun setMonth() {
@@ -279,7 +274,7 @@ class MainFragment : Fragment() {
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
         state = PeriodState.MONTH
         setTitle("${dateTo.month} ${dateTo.year}")
-        updateData()
+        updateCategoriesExpenses()
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
@@ -294,7 +289,7 @@ class MainFragment : Fragment() {
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
-        updateData()
+        updateCategoriesExpenses()
     }
 
     private fun initListeners() {

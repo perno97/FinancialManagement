@@ -200,6 +200,14 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
+    fun setCategorySelected(name: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedCategory = name
+            )
+        }
+    }
+
 
     /*
     Insert

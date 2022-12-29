@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class FinancialManagementUiState(
     // MainFragment
     val dateFromMain: LocalDate? = LocalDate.of(LocalDate.now().year, LocalDate.now().month, 1),
-    val dateToMain: LocalDate? = LocalDate.now(),
+    val dateToMain: LocalDate? = LocalDate.now(), // TODO forse non dev'essere null, cioè senza ?
     val stateMain: PeriodState? = PeriodState.MONTH,
     val datePickerSelectionMain: Pair<Long, Long>? = null,
 
@@ -21,5 +21,8 @@ data class FinancialManagementUiState(
     val dateToCatDetails: LocalDate? = LocalDate.now(),
     val stateCatDetails: PeriodState? = PeriodState.MONTH,
     val datePickerSelectionCatDetails: Pair<Long, Long>? = null,
-    val categoryFilters: List<Category> = listOf()
+    val categoryFilters: List<Category> = listOf(),
+
+    //AddFinancialMovementFragment
+    val selectedCategory: String = ""
 )

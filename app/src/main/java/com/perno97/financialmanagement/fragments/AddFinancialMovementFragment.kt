@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -26,6 +27,7 @@ import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -44,6 +46,7 @@ class AddFinancialMovementFragment : Fragment() {
     }
 
     private lateinit var categoryList: List<Category>
+    private lateinit var selectedCategory: String
 
     // Outcome is default
     private var income = false
@@ -58,6 +61,27 @@ class AddFinancialMovementFragment : Fragment() {
 
         //UnusedCategoriesChecker.check(appViewModel, lifecycleScope)
 
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            appViewModel.uiState.collect {
+                selectedCategory = it.selectedCategory
+                loadCategories()
+            }
+        }
+
+
+
+        binding.checkNotify.isEnabled = false // Can't notify if date is not after today
+        binding.editTextMovAmount.filters =
+            arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
+
+        // Outcome is default
+        binding.btnOutcome.isEnabled = false
+
+        return binding.root
+    }
+
+    private fun loadCategories() {
         appViewModel.allCategories.observe(viewLifecycleOwner) {
             val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
             appViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
@@ -68,16 +92,8 @@ class AddFinancialMovementFragment : Fragment() {
                 }
             }
             binding.spinnerCategory.adapter = spinnerAdapter
+            binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(selectedCategory)) // TODO non trova la nuova categoria perché non è aggiornata la lista
         }
-
-        binding.checkNotify.isEnabled = false // Can't notify if date is not after today
-        binding.editTextMovAmount.filters =
-            arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
-
-        // Outcome is default
-        binding.btnOutcome.isEnabled = false
-
-        return binding.root
     }
 
     override fun onResume() {

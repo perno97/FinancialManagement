@@ -40,6 +40,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         return applicationDao.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
     }
 
+    @WorkerThread
+    suspend fun getPeriodicMovements(categoryName: String): List<PeriodicMovement> {
+        return applicationDao.getPeriodicMovements(categoryName)
+    }
+
 
     /*
     Getters with parameters

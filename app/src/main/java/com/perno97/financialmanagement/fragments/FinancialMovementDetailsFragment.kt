@@ -328,7 +328,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         appViewModel.viewModelScope.launch {
             val current = appViewModel.getCurrentAssetDefault()
             val newAssets = current - previousAmount + newAmount
-            appViewModel.insertNewAssets(newAssets)
+            appViewModel.updateAssets(newAssets)
         }
     }
 

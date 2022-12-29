@@ -56,7 +56,7 @@ class AddNewCategoryDialog : DialogFragment() {
     private fun confirmAction() {
         val name = binding.editTextNewCatName.text.toString()
         val color = binding.spinnerColor.selectedItem.toString()
-        val budget = binding.editTextNewCatBudget.text.toString().toFloat()
+        val budget = binding.editTextNewCatBudget.text.toString().toFloatOrNull() ?: 0f
         appViewModel.insert(
             Category(
                 name = name,

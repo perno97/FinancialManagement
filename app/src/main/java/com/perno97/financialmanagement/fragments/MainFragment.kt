@@ -184,7 +184,7 @@ class MainFragment : Fragment() {
     }
 
     private fun createNewDefaultProfile() {
-        appViewModel.insertNewAssets(0f)
+        appViewModel.insertDefaultProfile(0f)
     }
 
     override fun onResume() {

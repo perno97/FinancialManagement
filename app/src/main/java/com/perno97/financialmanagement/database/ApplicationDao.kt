@@ -263,11 +263,16 @@ interface ApplicationDao {
     fun getGainsAndExpensesInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<GroupInfo>
 
     @Query(
-        "SELECT * FROM movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date <= :dateFrom LIMIT 1"
+        "SELECT * FROM movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date >= :dateFrom ORDER BY date DESC LIMIT 1"
     )
     suspend fun getLatestPeriodicMovement(
         periodicMovementId: Int,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Movement?
+
+    @Query(
+        "SELECT * FROM periodic_movement WHERE category = :categoryName"
+    )
+    suspend fun getPeriodicMovements(categoryName: String): List<PeriodicMovement>
 }

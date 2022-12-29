@@ -54,6 +54,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
     }
 
+    suspend fun getPeriodicMovements(categoryName: String): List<PeriodicMovement> {
+        return repository.getPeriodicMovements(categoryName)
+    }
+
 
     /*
     Getters with parameters
@@ -216,8 +220,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(incumbentMovement)
     }
 
-    fun insertNewAssets(assetValue: Float) = viewModelScope.launch {
-        repository.insert(Profile(defaultProfileId, assetValue))
+    fun insertDefaultProfile(assets: Float) = viewModelScope.launch {
+        repository.insert(Profile(defaultProfileId, assets))
     }
 
 

@@ -48,6 +48,8 @@ class AddFinancialMovementFragment : Fragment() {
     // Outcome is default
     private var income = false
 
+    private var dateOpen: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -121,6 +123,7 @@ class AddFinancialMovementFragment : Fragment() {
         }
 
         binding.editTextMovementDate.setOnTouchListener { _, event -> //TODO non si capisce che è cliccabile
+            dateOpen = true
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
@@ -135,6 +138,9 @@ class AddFinancialMovementFragment : Fragment() {
                     binding.editTextMovementDate.setText(date.toString())
                     binding.checkNotify.isEnabled =
                         date.isAfter(LocalDate.now()) // Can't notify if date is not after today
+                }
+                datePicker.addOnDismissListener {
+                    dateOpen = false
                 }
                 datePicker.show(parentFragmentManager, "rangeDatePickerDialog")
             }
@@ -183,7 +189,7 @@ class AddFinancialMovementFragment : Fragment() {
             return
         }
         val date = LocalDate.parse(d)
-        val amount: Float = binding.editTextMovAmount.text.toString().toFloat()
+        val amount: Float = binding.editTextMovAmount.text.toString().toFloatOrNull() ?: 0f
         if (amount <= 0) {
             Snackbar.make(
                 binding.editTextMovementDate,
@@ -311,7 +317,7 @@ class AddFinancialMovementFragment : Fragment() {
 
     private fun updateAssets(newAmount: Float) {
         appViewModel.viewModelScope.launch {
-            appViewModel.insertNewAssets(appViewModel.getCurrentAssetDefault() + newAmount)
+            appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() + newAmount)
         }
     }
 

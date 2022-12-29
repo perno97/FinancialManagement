@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
+import kotlin.math.log
 
 object PeriodicMovementsChecker {
     private const val logTag = "PeriodicMovementsChecker"
@@ -20,13 +21,14 @@ object PeriodicMovementsChecker {
     ) {
         Log.e(logTag, "Called check")
         scope.launch {
-            val list = appViewModel.getAllPeriodicMovements()
+            val list = appViewModel.getAllPeriodicMovements()// TODO ogni volta vengono inseriti movements anche se sono già presenti
             for (periodicMovement in list) {
                 val movement = appViewModel.getLatestPeriodicMovement(
                     periodicMovementId = periodicMovement.periodicMovementId,
                     dateTo = LocalDate.now(),
                     dateFrom = periodicMovement.date
                 )
+                Log.e(logTag, "Movement $movement")
                 val calculatedMovements = if (movement != null) {
                     getMovementsFromPeriodicMovement(
                         periodicMovement,
@@ -57,7 +59,7 @@ object PeriodicMovementsChecker {
                     amountsSum += amount
                 }
                 if (amountsSum != 0f)
-                    appViewModel.insertNewAssets(appViewModel.getCurrentAssetDefault() + amountsSum)
+                    appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() + amountsSum)
             }
             if (callback != null) {
                 callback()
@@ -169,7 +171,7 @@ object PeriodicMovementsChecker {
                 // The next day to check is the next in weekDays array
                 // Return to first if reached the end of weekDays array
                 k = (k + 1) % n
-                currentDate.with(TemporalAdjusters.previousOrSame(weekDays[k]))
+                currentDate = currentDate.with(TemporalAdjusters.previousOrSame(weekDays[k]))
             }
         }
         return movements

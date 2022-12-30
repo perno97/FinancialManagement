@@ -414,7 +414,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             ).show()
         } else {
             if (date.isAfter(LocalDate.now())) {
-                val incumbentMovement = IncumbentMovement(
+                val incomingMovement = IncomingMovement(
                     date = date,
                     amount = amount,
                     category = category,
@@ -422,12 +422,12 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     notes = notes,
                     notify = notify
                 )
-                if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incumbent movement
-                    appViewModel.insert(incumbentMovement)
+                if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incoming movement
+                    appViewModel.insert(incomingMovement)
                     appViewModel.deleteMovement(movementDetailsData.movementId)
                     Snackbar.make(
                         binding.editTextMovementDate,
-                        R.string.success_movement_to_incumbent,
+                        R.string.success_movement_to_incoming,
                         BaseTransientBottomBar.LENGTH_LONG
                     ).setBackgroundTint(
                         ContextCompat.getColor(
@@ -435,8 +435,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                             R.color.success
                         )
                     ).show()
-                } else { // If it was an incumbent movement
-                    appViewModel.update(incumbentMovement)
+                } else { // If it was an incoming movement
+                    appViewModel.update(incomingMovement)
                     Snackbar.make(
                         binding.editTextMovementDate,
                         R.string.success_movement_update,
@@ -458,12 +458,12 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     periodicMovementId = null
                 )
 
-                if (movementDetailsData.incumbentMovementId != null) { // If it was an incumbent movement and now it's a movement
+                if (movementDetailsData.incomingMovementId != null) { // If it was an incoming movement and now it's a movement
                     appViewModel.insert(movement)
-                    appViewModel.deleteMovement(movementDetailsData.incumbentMovementId)
+                    appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId)
                     Snackbar.make(
                         binding.editTextMovementDate,
-                        R.string.success_incumbent_to_movement,
+                        R.string.success_incoming_to_movement,
                         BaseTransientBottomBar.LENGTH_LONG
                     ).setBackgroundTint(
                         ContextCompat.getColor(

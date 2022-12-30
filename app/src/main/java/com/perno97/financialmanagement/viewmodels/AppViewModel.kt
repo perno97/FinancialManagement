@@ -68,12 +68,27 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getMovementsGroupByWeek(weekStartOffset, beforeDateInclusive).asLiveData()
     }
 
+    fun getIncomingMovementsGroupByWeek(
+        weekStartOffset: Int,
+        beforeDateInclusive: LocalDate
+    ): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return repository.getIncomingMovementsGroupByWeek(weekStartOffset, beforeDateInclusive).asLiveData()
+    }
+
     fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
         return repository.getMovementsGroupByDay(beforeDateInclusive).asLiveData()
     }
 
-    fun movementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
+    fun getIncomingMovementsGroupByDay(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return repository.getIncomingMovementsGroupByDay(beforeDateInclusive).asLiveData()
+    }
+
+    fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
         return repository.getMovementsGroupByMonth(beforeDateInclusive).asLiveData()
+    }
+
+    fun getIncomingMovementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return repository.getIncomingMovementsGroupByMonth(beforeDateInclusive).asLiveData()
     }
 
     fun getMovementsInPeriod(
@@ -81,6 +96,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         dateTo: LocalDate
     ): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
         return repository.getMovementsInPeriod(dateFrom, dateTo).asLiveData()
+    }
+
+    fun getIncomingMovementsInPeriod(dateFrom: LocalDate, dateTo: LocalDate): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return repository.getIncomingMovementsInPeriod(dateFrom, dateTo).asLiveData()
     }
 
     fun getCategory(categoryName: String): LiveData<Category> {
@@ -207,6 +226,22 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
+    fun setIncomingPeriod(
+        from: LocalDate,
+        to: LocalDate,
+        state: PeriodState,
+        datePickerSelection: Pair<Long, Long>?
+    ) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                dateFromIncoming = from,
+                dateToIncoming = to,
+                stateIncoming = state,
+                datePickerSelectionIncoming = datePickerSelection
+            )
+        }
+    }
+
     fun setCategoryFilters(filters: List<Category>) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -239,8 +274,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(periodicMovement)
     }
 
-    fun insert(incumbentMovement: IncumbentMovement) = viewModelScope.launch {
-        repository.insert(incumbentMovement)
+    fun insert(incomingMovement: IncomingMovement) = viewModelScope.launch {
+        repository.insert(incomingMovement)
     }
 
     fun insertDefaultProfile(assets: Float) = viewModelScope.launch {
@@ -259,8 +294,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.update(category)
     }
 
-    fun update(incumbentMovement: IncumbentMovement) = viewModelScope.launch {
-        repository.update(incumbentMovement)
+    fun update(incomingMovement: IncomingMovement) = viewModelScope.launch {
+        repository.update(incomingMovement)
     }
 
     fun update(periodicMovement: PeriodicMovement) = viewModelScope.launch {
@@ -283,7 +318,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.deleteMovementFromId(movementId)
     }
 
-    fun deleteIncumbentMovement(incumbentMovementId: Int) = viewModelScope.launch {
-        repository.deleteIncumbentMovementFromId(incumbentMovementId)
+    fun deleteIncomingMovement(incomingMovementId: Int) = viewModelScope.launch {
+        repository.deleteIncomingMovementFromId(incomingMovementId)
     }
 }

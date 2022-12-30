@@ -16,5 +16,5 @@ data class MovementDetailsData(
     val days: Int,
     val months: Int,
     val notify: Boolean,
-    val incumbentMovementId: Int?
+    val incomingMovementId: Int?
 )

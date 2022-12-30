@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.*
 
 @Database(
-    entities = [Movement::class, Category::class, Profile::class, PeriodicMovement::class, IncumbentMovement::class],
+    entities = [Movement::class, Category::class, Profile::class, PeriodicMovement::class, IncomingMovement::class],
     version = 1
 )
 @TypeConverters(Converters::class)

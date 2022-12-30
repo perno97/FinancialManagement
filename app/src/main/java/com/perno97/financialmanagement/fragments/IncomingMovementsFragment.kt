@@ -16,7 +16,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
-import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
+import com.perno97.financialmanagement.databinding.FragmentIncomingMovementsBinding
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -32,11 +32,11 @@ import java.util.*
 import kotlin.math.absoluteValue
 
 
-class RegisteredMovementsFragment : Fragment() {
+class IncomingMovementsFragment : Fragment() {
 
-    private val logTag = "RegMovementsFragment"
+    private val logTag = "IncomingMovementsFragment"
 
-    private var _binding: FragmentRegisteredMovementsBinding? = null
+    private var _binding: FragmentIncomingMovementsBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -55,7 +55,7 @@ class RegisteredMovementsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRegisteredMovementsBinding.inflate(inflater, container, false)
+        _binding = FragmentIncomingMovementsBinding.inflate(inflater, container, false)
 
         val f = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
         val t = f.with(TemporalAdjusters.previous(firstDayOfWeek))
@@ -68,10 +68,10 @@ class RegisteredMovementsFragment : Fragment() {
             Log.i(logTag, "Launched Coroutine")
             appViewModel.uiState.collect {
                 Log.i(logTag, "Collecting UI data")
-                dateFrom = it.dateFromMain
-                dateTo = it.dateToMain
-                state = it.stateMain
-                datePickerSelection = it.datePickerSelectionMain
+                dateFrom = it.dateFromIncoming
+                dateTo = it.dateToIncoming
+                state = it.stateIncoming
+                datePickerSelection = it.datePickerSelectionIncoming
                 when (state) {
                     PeriodState.DAY -> setDay()
                     PeriodState.WEEK -> setWeek()
@@ -90,30 +90,35 @@ class RegisteredMovementsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        appViewModel.setMainPeriod(dateFrom, dateTo, state, datePickerSelection) // Saving UI state
+        appViewModel.setIncomingPeriod(
+            dateFrom,
+            dateTo,
+            state,
+            datePickerSelection
+        ) // Saving UI state
     }
 
     private fun loadData() {
         when (state) {
             // ----------------- DAY -----------------
-            PeriodState.DAY -> appViewModel.getMovementsGroupByDay(LocalDate.now())
+            PeriodState.DAY -> appViewModel.getIncomingMovementsGroupByDay(LocalDate.now())
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
-            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
+            PeriodState.WEEK -> appViewModel.getIncomingMovementsGroupByWeek(
                 weekStartOffset,
                 LocalDate.now()
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
             // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getMovementsGroupByMonth(LocalDate.now())
+            PeriodState.MONTH -> appViewModel.getIncomingMovementsGroupByMonth(LocalDate.now())
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ---------------- PERIOD ----------------
-            PeriodState.PERIOD -> appViewModel.getMovementsInPeriod(dateFrom, dateTo)
+            PeriodState.PERIOD -> appViewModel.getIncomingMovementsInPeriod(dateFrom, dateTo)
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
@@ -122,7 +127,7 @@ class RegisteredMovementsFragment : Fragment() {
 
     }
 
-    private fun movementsLoaded(movements: Map<GroupInfo, List<MovementAndCategory>>) {
+    private fun movementsLoaded(movements: Map<GroupInfo, List<IncomingMovementAndCategory>>) {
         binding.movementCardsContainer.removeAllViews()
         if (movements.isEmpty()) {
             return
@@ -172,9 +177,9 @@ class RegisteredMovementsFragment : Fragment() {
                         .backgroundTintList =
                         ColorStateList.valueOf(Color.parseColor(mov.category.color))
                     cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
-                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
+                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.incomingMovement.title
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
-                        getString(R.string.euro_value, mov.movement.amount)
+                        getString(R.string.euro_value, mov.incomingMovement.amount)
                     cardLine.findViewById<LinearLayout>(R.id.movementCategory).setOnClickListener {
                         parentFragmentManager.commit {
                             replace(
@@ -191,19 +196,19 @@ class RegisteredMovementsFragment : Fragment() {
                                     R.id.fragment_container_view,//mov
                                     FinancialMovementDetailsFragment(
                                         MovementDetailsData(
-                                            movementId = mov.movement.movementId,
-                                            date = mov.movement.date,
-                                            amount = mov.movement.amount,
-                                            category = mov.movement.category,
+                                            movementId = null,
+                                            date = mov.incomingMovement.date,
+                                            amount = mov.incomingMovement.amount,
+                                            category = mov.incomingMovement.category,
                                             color = mov.category.color,
-                                            title = mov.movement.title,
-                                            notes = mov.movement.notes,
+                                            title = mov.incomingMovement.title,
+                                            notes = mov.incomingMovement.notes,
                                             periodicMovementId = null,
                                             weekDays = null,
                                             days = 0,
                                             months = 0,
-                                            notify = false,
-                                            incomingMovementId = null
+                                            notify = mov.incomingMovement.notify,
+                                            incomingMovementId = mov.incomingMovement.incomingMovementId
                                         )
                                     )
                                 )
@@ -316,7 +321,7 @@ class RegisteredMovementsFragment : Fragment() {
     }
 
     private fun setTitle(title: String) {
-        binding.txtTitle.text = title
+        binding.txtSubtitle.text = title
     }
 
     override fun onDestroyView() {

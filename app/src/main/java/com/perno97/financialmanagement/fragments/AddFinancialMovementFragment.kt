@@ -300,7 +300,7 @@ class AddFinancialMovementFragment : Fragment() {
             ).show()
         } else {
             if (date.isAfter(LocalDate.now())) {
-                val incumbentMovement = IncumbentMovement(
+                val incomingMovement = IncomingMovement(
                     date = date,
                     amount = amount,
                     category = category,
@@ -308,10 +308,10 @@ class AddFinancialMovementFragment : Fragment() {
                     notes = notes,
                     notify = notify
                 )
-                appViewModel.insert(incumbentMovement)
+                appViewModel.insert(incomingMovement)
                 Snackbar.make(
                     binding.editTextMovementDate,
-                    R.string.success_create_incumbent,
+                    R.string.success_create_incoming,
                     BaseTransientBottomBar.LENGTH_LONG
                 ).setBackgroundTint(
                     ContextCompat.getColor(

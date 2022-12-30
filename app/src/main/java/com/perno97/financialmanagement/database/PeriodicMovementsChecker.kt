@@ -11,7 +11,7 @@ import java.time.temporal.TemporalAdjusters
 object PeriodicMovementsChecker {
     private const val logTag = "PeriodicMovementsChecker"
 
-    fun check( // TODO creare incumbent nelle prossime x settimane
+    fun check( // TODO creare incoming nelle prossime x settimane
         appViewModel: AppViewModel,
         scope: CoroutineScope,
         callback: (() -> Unit)?

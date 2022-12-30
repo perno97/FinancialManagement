@@ -35,10 +35,12 @@
     <string name="graph_label_now">Now</string>
     <string name="graph_label_current">Current</string>
     <string name="graph_label_week">-%d weeks</string>
-    <string name="success_incumbent_to_movement">Created movement with new date</string>
-    <string name="success_movement_to_incumbent">Created new movement in the future</string>
+    <string name="success_incoming_to_movement">Created movement with new date</string>
+    <string name="success_movement_to_incoming">Created new movement in the future</string>
     <string name="success_update_periodic">Updated periodic movement</string>
     <string name="success_create_periodic">Created periodic movement</string>
-    <string name="success_create_incumbent">Created movement in the future</string>
+    <string name="success_create_incoming">Created movement in the future</string>
     <string name="success_create_movement">Created movement</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

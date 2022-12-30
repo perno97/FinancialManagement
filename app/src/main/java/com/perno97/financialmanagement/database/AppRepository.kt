@@ -58,12 +58,25 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
+    fun getIncomingMovementsGroupByWeek(weekStartOffset: Int, beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return applicationDao.getIncomingMovementsGroupByWeek(weekStartOffset, beforeDateInclusive)
+    }
+
+    @WorkerThread
     fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByDay(beforeDateInclusive)
 
     @WorkerThread
+    fun getIncomingMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> =
+        applicationDao.getIncomingMovementsGroupByDay(beforeDateInclusive)
+
+    @WorkerThread
     fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByMonth(beforeDateInclusive)
+
+    @WorkerThread
+    fun getIncomingMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> =
+        applicationDao.getIncomingMovementsGroupByMonth(beforeDateInclusive)
 
     @WorkerThread
     fun getMovementsInPeriod(
@@ -71,6 +84,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         dateTo: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>> {
         return applicationDao.getMovementsInPeriod(dateFrom, dateTo)
+    }
+
+    @WorkerThread
+    fun getIncomingMovementsInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return applicationDao.getIncomingMovementsInPeriod(dateFrom, dateTo)
     }
 
     @WorkerThread
@@ -189,8 +207,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun insert(incumbentMovement: IncumbentMovement) {
-        applicationDao.insertIncumbentMovements(incumbentMovement)
+    suspend fun insert(incomingMovement: IncomingMovement) {
+        applicationDao.insertIncumbentMovements(incomingMovement)
     }
 
     @WorkerThread
@@ -213,8 +231,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun update(incumbentMovement: IncumbentMovement) {
-        applicationDao.updateIncumbentMovements(incumbentMovement)
+    suspend fun update(incomingMovement: IncomingMovement) {
+        applicationDao.updateIncumbentMovements(incomingMovement)
     }
 
     @WorkerThread
@@ -242,7 +260,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun deleteIncumbentMovementFromId(incumbentMovementId: Int) {
-        applicationDao.deleteIncumbentMovementFromId(incumbentMovementId)
+    suspend fun deleteIncomingMovementFromId(incomingMovementId: Int) {
+        applicationDao.deleteIncumbentMovementFromId(incomingMovementId)
     }
 }

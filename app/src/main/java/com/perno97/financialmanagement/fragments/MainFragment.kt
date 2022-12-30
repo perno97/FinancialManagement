@@ -372,6 +372,13 @@ class MainFragment : Fragment() {
                 addToBackStack(null)
             }
         }
+        binding.fabIncomingMovements.setOnClickListener {
+            Log.i(logTag, "Clicked incoming movements")
+            parentFragmentManager.commit {
+                replace(R.id.fragment_container_view, IncomingMovementsFragment())
+                addToBackStack(null)
+            }
+        }
     }
 
     private fun setTitle(title: String) {

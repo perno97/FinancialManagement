@@ -22,7 +22,7 @@ interface ApplicationDao {
     suspend fun insertPeriodicMovements(vararg periodicMovements: PeriodicMovement)
 
     @Insert
-    suspend fun insertIncumbentMovements(vararg incumbentMovements: IncumbentMovement)
+    suspend fun insertIncumbentMovements(vararg incomingMovements: IncomingMovement)
 
     @Insert
     suspend fun insertProfiles(vararg profiles: Profile)
@@ -44,7 +44,7 @@ interface ApplicationDao {
     suspend fun updatePeriodicMovements(vararg periodicMovements: PeriodicMovement)
 
     @Update
-    suspend fun updateIncumbentMovements(vararg incumbentMovements: IncumbentMovement)
+    suspend fun updateIncumbentMovements(vararg incomingMovements: IncomingMovement)
 
 
     /*
@@ -59,9 +59,9 @@ interface ApplicationDao {
     suspend fun deleteMovementFromId(movementId: Int)
 
     @Query(
-        "DELETE FROM incumbent_movement WHERE incumbent_movement_id = :incumbentMovementId"
+        "DELETE FROM incoming_movement WHERE incoming_movement_id = :incomingMovementId"
     )
-    suspend fun deleteIncumbentMovementFromId(incumbentMovementId: Int)
+    suspend fun deleteIncumbentMovementFromId(incomingMovementId: Int)
 
 
     /*
@@ -131,6 +131,16 @@ interface ApplicationDao {
 
     @Transaction
     @Query(
+        "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'start of month') AS groupDate," +
+                " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM incoming_movement a" +
+                " JOIN incoming_movement b ON STRFTIME('%Y-%m', a.date,'unixepoch') = STRFTIME('%Y-%m', b.date,'unixepoch')" +
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.incoming_movement_id ORDER BY groupDate DESC, b.date DESC"
+    )
+    fun getIncomingMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
+
+    @Transaction
+    @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
@@ -140,6 +150,17 @@ interface ApplicationDao {
     fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>>
 
 
+    @Transaction
+    @Query(
+        "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch') AS groupDate," +
+                " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM incoming_movement a" +
+                " JOIN incoming_movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch') = STRFTIME('%Y-%m-%d', b.date,'unixepoch')" +
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.incoming_movement_id ORDER BY groupDate DESC, b.date DESC"
+    )
+    fun getIncomingMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
+
+
     // move to sunday then move to the first day of the week, if they're equal the events are in the same week
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
@@ -147,12 +168,24 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusiveInclusive >= b.date AND :beforeDateInclusiveInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
     )
     fun getMovementsGroupByWeek(
         weekStartOffset: Int,
-        beforeDateInclusiveInclusive: LocalDate
+        beforeDateInclusive: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+
+
+    // move to sunday then move to the first day of the week, if they're equal the events are in the same week
+    @Query(
+        "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
+                " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM incoming_movement a" +
+                " JOIN incoming_movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
+                " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.incoming_movement_id ORDER BY groupDate DESC, b.date DESC"
+    )
+    fun getIncomingMovementsGroupByWeek(weekStartOffset: Int, beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
 
 
     @Query(
@@ -167,6 +200,17 @@ interface ApplicationDao {
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
+
+
+    @Query(
+        "SELECT '' AS groupDate," +
+                " (SELECT SUM(CASE WHEN amount > 0 THEN amount else 0 END) FROM  movement WHERE date >= :dateFrom AND date <= :dateTo) AS positive," +
+                " (SELECT SUM(CASE WHEN amount < 0 THEN amount else 0 END) FROM movement WHERE date >= :dateFrom AND date <= :dateTo) AS negative," +
+                " incoming_movement.*, category.* FROM incoming_movement " +
+                " JOIN category ON category = name" +
+                " WHERE date >= :dateFrom AND date <= :dateTo ORDER BY date DESC"
+    )
+    fun getIncomingMovementsInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
 
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch', 'start of month') AS groupDate," +

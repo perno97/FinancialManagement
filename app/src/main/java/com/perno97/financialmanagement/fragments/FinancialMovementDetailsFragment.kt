@@ -16,27 +16,26 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.Category
-import com.perno97.financialmanagement.database.Movement
-import com.perno97.financialmanagement.database.MovementAndCategory
-import com.perno97.financialmanagement.database.UnusedCategoriesChecker
+import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.math.absoluteValue
 
-class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCategory) :
+class FinancialMovementDetailsFragment(private val movementDetailsData: MovementDetailsData) :
     Fragment() {
     private val logTag = "FinancialMovementDetailsFragment"
     private var _binding: FragmentFinancialMovementDetailsBinding? = null
@@ -49,9 +48,14 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
     }
 
     private lateinit var categoryList: List<Category>
+    private lateinit var selectedCategory: String
 
     private var editingEnabled = false
+
+    // Outcome is default
     private var income = false
+    private var dateOpen: Boolean = false
+    private var periodic = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +65,17 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
 
         //UnusedCategoriesChecker.check(appViewModel, lifecycleScope)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            appViewModel.uiState.collect {
+                selectedCategory = it.selectedCategory
+            }
+        }
+
         loadMovementData()
+
+        binding.editTextMovAmount.filters =
+            arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
+
         return binding.root
     }
 
@@ -71,10 +85,9 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
     }
 
     private fun loadMovementData() {
-        val movement = movAndCategory.movement
-        val category = movAndCategory.category
-        binding.editTextMovAmount.setText(movement.amount.absoluteValue.toString())
-        if (movement.amount >= 0) {
+        val amount = movementDetailsData.amount
+        binding.editTextMovAmount.setText(amount.absoluteValue.toString())
+        if (amount >= 0) {
             incomeSelected()
         } else {
             outcomeSelected()
@@ -90,19 +103,43 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                 spinnerAdapter.add(c.name)
             }
             binding.spinnerCategory.adapter = spinnerAdapter
-            binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(movement.category))
+            val selected = selectedCategory.ifEmpty { movementDetailsData.category }
+            binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(selected))
         }
 
         binding.editTextMovementDate.isEnabled = false
         binding.categoryEditMovColor.backgroundTintList =
-            ColorStateList.valueOf(Color.parseColor(category.color))
-        binding.editTextMovementDate.setText(movement.date.toString())
+            ColorStateList.valueOf(Color.parseColor(movementDetailsData.color))
+        binding.editTextMovementDate.setText(movementDetailsData.date.toString())
         binding.btnAddNewCategory.visibility = View.GONE
-        binding.editTextTitle.setText(movement.title)
-        binding.editTextNotes.setText(movement.notes)
+        binding.editTextTitle.setText(movementDetailsData.title)
+        binding.editTextNotes.setText(movementDetailsData.notes)
         binding.editTextMovementDate.inputType = InputType.TYPE_NULL
         binding.editTextMovAmount.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
+        if (movementDetailsData.periodicMovementId != null) {
+            binding.checkPeriodic.isChecked = true
+            periodic = true
+            binding.layoutPeriodic.visibility = View.VISIBLE
+            for (day in movementDetailsData.weekDays!!) {
+                when (day) {
+                    DayOfWeek.MONDAY -> binding.checkMonday.isChecked = true
+                    DayOfWeek.TUESDAY -> binding.checkTuesday.isChecked = true
+                    DayOfWeek.WEDNESDAY -> binding.checkWednesday.isChecked = true
+                    DayOfWeek.THURSDAY -> binding.checkThursday.isChecked = true
+                    DayOfWeek.FRIDAY -> binding.checkFriday.isChecked = true
+                    DayOfWeek.SATURDAY -> binding.checkSaturday.isChecked = true
+                    DayOfWeek.SUNDAY -> binding.checkSunday.isChecked = true
+                }
+            }
+            binding.editTextDaysRepeat.setText(movementDetailsData.days)
+            binding.editTextMonthsRepeat.setText(movementDetailsData.months)
+        } else {
+            binding.checkPeriodic.isChecked = false
+            binding.checkPeriodic.isEnabled = true
+            periodic = false
+            binding.layoutPeriodic.visibility = View.GONE
+        }
     }
 
     private fun outcomeSelected() {
@@ -120,6 +157,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
     @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
         binding.editTextMovementDate.setOnTouchListener { _, event -> //TODO non si capisce che è cliccabile
+            dateOpen = true
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
@@ -132,6 +170,9 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
                     val date = Instant.ofEpochMilli(value)
                         .atZone(ZoneId.systemDefault()).toLocalDate()
                     binding.editTextMovementDate.setText(date.toString())
+                }
+                datePicker.addOnDismissListener {
+                    dateOpen = false
                 }
                 datePicker.show(parentFragmentManager, "rangeDatePickerDialog")
             }
@@ -207,11 +248,24 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         // Disable inputs
         editingEnabled = false
         binding.editTextMovementDate.isEnabled = false
+        binding.editTextMonthsRepeat.isEnabled = false
+        binding.editTextDaysRepeat.isEnabled = false
         binding.spinnerCategory.isEnabled = false
         binding.editTextMovAmount.isEnabled = false
         binding.editTextTitle.isEnabled = false
         binding.editTextNotes.isEnabled = false
         binding.checkNotify.isEnabled = false
+
+        binding.checkMonday.isEnabled = false
+        binding.checkTuesday.isEnabled = false
+        binding.checkWednesday.isEnabled = false
+        binding.checkThursday.isEnabled = false
+        binding.checkFriday.isEnabled = false
+        binding.checkSaturday.isEnabled = false
+        binding.checkSunday.isEnabled = false
+
+        if (periodic)
+            binding.checkPeriodic.isEnabled = false
     }
 
     private fun enableEditing() {
@@ -225,17 +279,31 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         // Enable inputs
         editingEnabled = true
         binding.editTextMovementDate.isEnabled = true
+        binding.editTextMonthsRepeat.isEnabled = true
+        binding.editTextDaysRepeat.isEnabled = true
         binding.spinnerCategory.isEnabled = true
         binding.editTextMovAmount.isEnabled = true
         binding.editTextTitle.isEnabled = true
         binding.editTextNotes.isEnabled = true
         binding.checkNotify.isEnabled = true
 
+        binding.checkMonday.isEnabled = true
+        binding.checkTuesday.isEnabled = true
+        binding.checkWednesday.isEnabled = true
+        binding.checkThursday.isEnabled = true
+        binding.checkFriday.isEnabled = true
+        binding.checkSaturday.isEnabled = true
+        binding.checkSunday.isEnabled = true
+
+        if (periodic)
+            binding.checkPeriodic.isEnabled = true
+
     }
 
     private fun confirmEdit() {
-        val date = binding.editTextMovementDate.text
-        if (date.isEmpty()) {
+        disableEditing()
+        val d = binding.editTextMovementDate.text
+        if (d.isEmpty()) {
             Snackbar.make(
                 binding.editTextMovementDate,
                 R.string.error_no_date,
@@ -248,6 +316,7 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
             ).show()
             return
         }
+        val date = LocalDate.parse(d)
         val amount: Float = binding.editTextMovAmount.text.toString().toFloat()
         if (amount <= 0) {
             Snackbar.make(
@@ -292,35 +361,135 @@ class FinancialMovementDetailsFragment(private val movAndCategory: MovementAndCa
         }
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
-
-        // TODO copiare da addfinancialmovement
-        val previousAmount = movAndCategory.movement.amount
+        val previousAmount = movementDetailsData.amount
         val newAmount = if (income) amount else -amount
 
-        val movement = Movement(
-            movementId = movAndCategory.movement.movementId,
-            date = LocalDate.parse(date),
-            amount = newAmount,
-            category = category,
-            title = title,
-            notes = notes,
-            periodicMovementId = null
-        )
-
-        appViewModel.update(movement)
-        Snackbar.make(
-            binding.fabConfirmEdit,
-            R.string.success_edit_movement,
-            BaseTransientBottomBar.LENGTH_LONG
-        ).setBackgroundTint(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.success
+        if (periodic && binding.checkPeriodic.isChecked) {
+            var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
+            val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
+            var monday = binding.checkMonday.isChecked
+            var tuesday = binding.checkTuesday.isChecked
+            var wednesday = binding.checkWednesday.isChecked
+            var thursday = binding.checkThursday.isChecked
+            var friday = binding.checkFriday.isChecked
+            var saturday = binding.checkSaturday.isChecked
+            var sunday = binding.checkSunday.isChecked
+            if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
+                days = 1
+                monday = false
+                tuesday = false
+                wednesday = false
+                thursday = false
+                friday = false
+                saturday = false
+                sunday = false
+            }
+            val periodicMovement = PeriodicMovement(
+                days = days,
+                months = months,
+                monday = monday,
+                tuesday = tuesday,
+                wednesday = wednesday,
+                thursday = thursday,
+                friday = friday,
+                saturday = saturday,
+                sunday = sunday,
+                date = date,
+                amount = newAmount,
+                category = category,
+                title = title,
+                notes = notes,
+                notify = notify
             )
-        ).show()
-        updateAssets(previousAmount, newAmount)
+            appViewModel.update(periodicMovement)
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.success_update_periodic,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.success
+                )
+            ).show()
+        } else {
+            if (date.isAfter(LocalDate.now())) {
+                val incumbentMovement = IncumbentMovement(
+                    date = date,
+                    amount = amount,
+                    category = category,
+                    title = title,
+                    notes = notes,
+                    notify = notify
+                )
+                if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incumbent movement
+                    appViewModel.insert(incumbentMovement)
+                    appViewModel.deleteMovement(movementDetailsData.movementId)
+                    Snackbar.make(
+                        binding.editTextMovementDate,
+                        R.string.success_movement_to_incumbent,
+                        BaseTransientBottomBar.LENGTH_LONG
+                    ).setBackgroundTint(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.success
+                        )
+                    ).show()
+                } else { // If it was an incumbent movement
+                    appViewModel.update(incumbentMovement)
+                    Snackbar.make(
+                        binding.editTextMovementDate,
+                        R.string.success_movement_update,
+                        BaseTransientBottomBar.LENGTH_LONG
+                    ).setBackgroundTint(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.success
+                        )
+                    ).show()
+                }
+            } else {
+                val movement = Movement(
+                    date = date,
+                    amount = newAmount,
+                    category = category,
+                    title = title,
+                    notes = notes,
+                    periodicMovementId = null
+                )
+
+                if (movementDetailsData.incumbentMovementId != null) { // If it was an incumbent movement and now it's a movement
+                    appViewModel.insert(movement)
+                    appViewModel.deleteMovement(movementDetailsData.incumbentMovementId)
+                    Snackbar.make(
+                        binding.editTextMovementDate,
+                        R.string.success_incumbent_to_movement,
+                        BaseTransientBottomBar.LENGTH_LONG
+                    ).setBackgroundTint(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.success
+                        )
+                    ).show()
+                } else { // If it was a movement
+                    appViewModel.update(movement)
+                    Snackbar.make(
+                        binding.editTextMovementDate,
+                        R.string.success_movement_update,
+                        BaseTransientBottomBar.LENGTH_LONG
+                    ).setBackgroundTint(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.success
+                        )
+                    ).show()
+                }
+                updateAssets(previousAmount, newAmount)
+            }
+        }
+        PeriodicMovementsChecker.check(appViewModel, appViewModel.viewModelScope, null)
         UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
-        disableEditing()
+        appViewModel.setSelectedCategory("") // Reset selected category
         parentFragmentManager.popBackStack()
     }
 

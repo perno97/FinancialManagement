@@ -235,4 +235,14 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     suspend fun delete(category: Category) {
         applicationDao.deleteCategory(category)
     }
+
+    @WorkerThread
+    suspend fun deleteMovementFromId(movementId: Int) {
+        applicationDao.deleteMovementFromId(movementId)
+    }
+
+    @WorkerThread
+    suspend fun deleteIncumbentMovementFromId(incumbentMovementId: Int) {
+        applicationDao.deleteIncumbentMovementFromId(incumbentMovementId)
+    }
 }

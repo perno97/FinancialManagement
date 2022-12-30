@@ -27,14 +27,15 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.*
+import com.perno97.financialmanagement.database.Category
+import com.perno97.financialmanagement.database.Expense
+import com.perno97.financialmanagement.database.PeriodicMovementsChecker
+import com.perno97.financialmanagement.database.Profile
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
-import com.perno97.financialmanagement.utils.CalculatedMovement
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -114,9 +115,9 @@ class MainFragment : Fragment() {
             appViewModel.uiState.collect {
                 Log.i(logTag, "Collecting UI data")
                 uiLoaded = true
-                dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
-                dateTo = it.dateToMain ?: LocalDate.now()
-                state = it.stateMain ?: PeriodState.MONTH
+                dateFrom = it.dateFromMain
+                dateTo = it.dateToMain
+                state = it.stateMain
                 datePickerSelection = it.datePickerSelectionMain
                 //isAllDataLoaded = false
                 PeriodicMovementsChecker.check(

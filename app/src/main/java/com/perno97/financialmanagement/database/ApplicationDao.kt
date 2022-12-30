@@ -1,12 +1,6 @@
 package com.perno97.financialmanagement.database
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Update
+import androidx.room.*
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -58,6 +52,16 @@ interface ApplicationDao {
      */
     @Delete
     suspend fun deleteCategory(category: Category)
+
+    @Query(
+        "DELETE FROM movement WHERE movement_id = :movementId"
+    )
+    suspend fun deleteMovementFromId(movementId: Int)
+
+    @Query(
+        "DELETE FROM incumbent_movement WHERE incumbent_movement_id = :incumbentMovementId"
+    )
+    suspend fun deleteIncumbentMovementFromId(incumbentMovementId: Int)
 
 
     /*

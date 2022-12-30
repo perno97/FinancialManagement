@@ -74,7 +74,7 @@ class AddNewCategoryDialog : DialogFragment() {
                 R.color.success
             )
         ).show()
-        appViewModel.setCategorySelected(name)
+        appViewModel.setSelectedCategory(name)
         dismiss()
     }
 

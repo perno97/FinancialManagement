@@ -25,7 +25,7 @@
     <string name="open_add_new_category_to_comparison">Open add new category to comparison</string>
     <string name="loading_data">Loading data</string>
     <string name="success_edit_movement">Applied changes to the financial movement</string>
-    <string name="success_add_movement">Added financial movement</string>
+    <string name="success_movement_update">Updated movement</string>
     <string name="success_add_category">Created new category</string>
     <string name="success_edit_category">Applied changes to the category</string>
     <string name="error_no_data_in_period">Can\'t find any movement in the selected period</string>
@@ -35,4 +35,10 @@
     <string name="graph_label_now">Now</string>
     <string name="graph_label_current">Current</string>
     <string name="graph_label_week">-%d weeks</string>
+    <string name="success_incumbent_to_movement">Created movement with new date</string>
+    <string name="success_movement_to_incumbent">Created new movement in the future</string>
+    <string name="success_update_periodic">Updated periodic movement</string>
+    <string name="success_create_periodic">Created periodic movement</string>
+    <string name="success_create_incumbent">Created movement in the future</string>
+    <string name="success_create_movement">Created movement</string>
 </resources>

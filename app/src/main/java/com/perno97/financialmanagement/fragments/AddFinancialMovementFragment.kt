@@ -27,7 +27,6 @@ import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.databinding.FragmentAddFinancialMovementBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -50,7 +49,6 @@ class AddFinancialMovementFragment : Fragment() {
 
     // Outcome is default
     private var income = false
-
     private var dateOpen: Boolean = false
 
     override fun onCreateView(
@@ -65,9 +63,10 @@ class AddFinancialMovementFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             appViewModel.uiState.collect {
                 selectedCategory = it.selectedCategory
-                loadCategories()
             }
         }
+
+        loadCategories()
 
 
 
@@ -82,17 +81,15 @@ class AddFinancialMovementFragment : Fragment() {
     }
 
     private fun loadCategories() {
-        appViewModel.allCategories.observe(viewLifecycleOwner) {
+        appViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             val spinnerAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_row)
-            appViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
-                categoryList = categories
-                spinnerAdapter.clear()
-                for (c in categories) {
-                    spinnerAdapter.add(c.name)
-                }
+            categoryList = categories
+            spinnerAdapter.clear()
+            for (c in categories) {
+                spinnerAdapter.add(c.name)
             }
             binding.spinnerCategory.adapter = spinnerAdapter
-            binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(selectedCategory)) // TODO non trova la nuova categoria perché non è aggiornata la lista
+            binding.spinnerCategory.setSelection(spinnerAdapter.getPosition(selectedCategory))
         }
     }
 
@@ -171,6 +168,7 @@ class AddFinancialMovementFragment : Fragment() {
             addMovementToDatabase()
         }
         binding.fabAbortNew.setOnClickListener {
+            UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
             parentFragmentManager.popBackStack()
         }
         binding.btnIncome.setOnClickListener {
@@ -290,7 +288,16 @@ class AddFinancialMovementFragment : Fragment() {
                 notify = notify
             )
             appViewModel.insert(periodicMovement)
-            PeriodicMovementsChecker.check(appViewModel, appViewModel.viewModelScope, null)
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.success_create_periodic,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.success
+                )
+            ).show()
         } else {
             if (date.isAfter(LocalDate.now())) {
                 val incumbentMovement = IncumbentMovement(
@@ -302,6 +309,16 @@ class AddFinancialMovementFragment : Fragment() {
                     notify = notify
                 )
                 appViewModel.insert(incumbentMovement)
+                Snackbar.make(
+                    binding.editTextMovementDate,
+                    R.string.success_create_incumbent,
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.success
+                    )
+                ).show()
             } else {
                 val movement = Movement(
                     date = date,
@@ -315,7 +332,7 @@ class AddFinancialMovementFragment : Fragment() {
                 appViewModel.insert(movement)
                 Snackbar.make(
                     binding.editTextMovementDate,
-                    R.string.success_add_movement,
+                    R.string.success_create_movement,
                     BaseTransientBottomBar.LENGTH_LONG
                 ).setBackgroundTint(
                     ContextCompat.getColor(
@@ -327,7 +344,9 @@ class AddFinancialMovementFragment : Fragment() {
             }
         }
 
+        PeriodicMovementsChecker.check(appViewModel, appViewModel.viewModelScope, null)
         UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
+        appViewModel.setSelectedCategory("") // Reset selected category
         parentFragmentManager.popBackStack()
     }
 

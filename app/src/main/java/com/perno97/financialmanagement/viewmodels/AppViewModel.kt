@@ -8,7 +8,6 @@ import java.time.LocalDate
 import androidx.core.util.Pair
 import com.perno97.financialmanagement.database.*
 import kotlinx.coroutines.flow.*
-import java.time.Period
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
     private val logTag = "AppViewModel"
@@ -176,6 +175,22 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
+    fun setAssetsPeriod(
+        from: LocalDate,
+        to: LocalDate,
+        state: PeriodState,
+        datePickerSelection: Pair<Long, Long>?
+    ) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                dateFromAssets = from,
+                dateToAssets = to,
+                stateAssets = state,
+                datePickerSelectionAssets = datePickerSelection
+            )
+        }
+    }
+
     fun setCatDetailsPeriod(
         from: LocalDate,
         to: LocalDate,
@@ -200,7 +215,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
-    fun setCategorySelected(name: String) {
+    fun setSelectedCategory(name: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 selectedCategory = name
@@ -262,5 +277,13 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
      */
     fun deleteCategory(category: Category) = viewModelScope.launch {
         repository.delete(category)
+    }
+
+    fun deleteMovement(movementId: Int) = viewModelScope.launch {
+        repository.deleteMovementFromId(movementId)
+    }
+
+    fun deleteIncumbentMovement(incumbentMovementId: Int) = viewModelScope.launch {
+        repository.deleteIncumbentMovementFromId(incumbentMovementId)
     }
 }

@@ -1,15 +1,12 @@
 package com.perno97.financialmanagement.database
 
 import android.util.Log
-import androidx.lifecycle.LifecycleOwner
-import com.perno97.financialmanagement.utils.CalculatedMovement
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
-import kotlin.math.log
 
 object PeriodicMovementsChecker {
     private const val logTag = "PeriodicMovementsChecker"
@@ -21,7 +18,7 @@ object PeriodicMovementsChecker {
     ) {
         Log.e(logTag, "Called check")
         scope.launch {
-            val list = appViewModel.getAllPeriodicMovements()// TODO ogni volta vengono inseriti movements anche se sono già presenti
+            val list = appViewModel.getAllPeriodicMovements()
             for (periodicMovement in list) {
                 val movement = appViewModel.getLatestPeriodicMovement(
                     periodicMovementId = periodicMovement.periodicMovementId,
@@ -38,7 +35,7 @@ object PeriodicMovementsChecker {
                 } else {
                     getMovementsFromPeriodicMovement(
                         periodicMovement,
-                        periodicMovement.date.plusDays(1),
+                        periodicMovement.date,
                         LocalDate.now()
                     )
                 }
@@ -75,7 +72,6 @@ object PeriodicMovementsChecker {
         val movements = HashMap<String, PeriodicMovement>()
         val days = periodicMovement.days.toLong()
         val months = periodicMovement.months.toLong()
-        // TODO check forward, check backward, check weekly
         // ----------------- DAYS -----------------
         if (days != 0L) {
             var currentDate = periodicMovement.date

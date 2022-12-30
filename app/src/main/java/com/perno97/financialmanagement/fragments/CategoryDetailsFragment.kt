@@ -17,7 +17,6 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.room.Index
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -32,10 +31,7 @@ import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AmountWithDate
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
-import com.perno97.financialmanagement.utils.MonthValueFormatter
 import com.perno97.financialmanagement.utils.PeriodState
-import com.perno97.financialmanagement.utils.PeriodValueFormatter
-import com.perno97.financialmanagement.utils.WeekValueFormatter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
@@ -361,7 +357,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     )
                     // Adding date for formatter (to have x labels) only at first cycle
                     if (!labelsLoaded)
-                        labels.add(dateToCheckAfter.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+                        labels.add(
+                            dateToCheckAfter.month.getDisplayName(
+                                TextStyle.SHORT,
+                                Locale.getDefault()
+                            )
+                        )
                     columnCount++
                 }
                 val expensesDataSet = LineDataSet(expEntries, category.name)
@@ -703,9 +704,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 appViewModel.uiState.collect {
                     Log.e(logTag, "Collected UI data")
-                    dateTo = it.dateToCatDetails ?: LocalDate.now()
-                    dateFrom = it.dateFromCatDetails ?: LocalDate.of(dateTo.year, dateTo.month, 1)
-                    state = it.stateCatDetails ?: PeriodState.MONTH
+                    dateTo = it.dateToCatDetails
+                    dateFrom = it.dateFromCatDetails
+                    state = it.stateCatDetails
                     datePickerSelection = it.datePickerSelectionCatDetails
                     categoryFilters = it.categoryFilters
                     updateFiltersList()

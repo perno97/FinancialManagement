@@ -90,15 +90,14 @@ class AssetsGraphsFragment : Fragment() {
 
     private fun loadUiData() {
         Log.i(logTag, "Called loadUiData()")
-        // TODO caricare UI data dal main o creare variabili specifiche per questo fragment?
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 appViewModel.uiState.collect {
                     Log.e(logTag, "Collected UI data")
-                    dateTo = it.dateToCatDetails ?: LocalDate.now()
-                    dateFrom = it.dateFromCatDetails ?: LocalDate.of(dateTo.year, dateTo.month, 1)
-                    state = it.stateCatDetails ?: PeriodState.MONTH
-                    datePickerSelection = it.datePickerSelectionCatDetails
+                    dateTo = it.dateToAssets
+                    dateFrom = it.dateFromAssets
+                    state = it.stateAssets
+                    datePickerSelection = it.datePickerSelectionAssets
                     //loadCategoryExpenses()
                     when (state) {
                         PeriodState.WEEK -> setWeek()
@@ -258,7 +257,7 @@ class AssetsGraphsFragment : Fragment() {
             // ---------------- PERIOD ----------------
             PeriodState.PERIOD -> {
                 columnsToShow =
-                    ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() // TODO controllare
+                    ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() + 1
                 columnDate = dateTo
             }
             // ----------------------------------------
@@ -371,7 +370,7 @@ class AssetsGraphsFragment : Fragment() {
 
                     lineEntries.add(
                         Entry(
-                            columnCount.toFloat() + 1,
+                            columnCount.toFloat(),
                             columnValue
                         )
                     )
@@ -482,7 +481,7 @@ class AssetsGraphsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        // TODO save UI data
+        appViewModel.setAssetsPeriod(dateFrom, dateTo, state, datePickerSelection)
     }
 
     private fun initListeners() {

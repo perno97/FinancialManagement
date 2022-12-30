@@ -68,9 +68,9 @@ class RegisteredMovementsFragment : Fragment() {
             Log.i(logTag, "Launched Coroutine")
             appViewModel.uiState.collect {
                 Log.i(logTag, "Collecting UI data")
-                dateFrom = it.dateFromMain ?: LocalDate.now().minusDays(1)
-                dateTo = it.dateToMain ?: LocalDate.now()
-                state = it.stateMain ?: PeriodState.MONTH
+                dateFrom = it.dateFromMain
+                dateTo = it.dateToMain
+                state = it.stateMain
                 datePickerSelection = it.datePickerSelectionMain
                 when (state) {
                     PeriodState.DAY -> setDay()
@@ -188,8 +188,24 @@ class RegisteredMovementsFragment : Fragment() {
                         .setOnClickListener {
                             parentFragmentManager.commit {
                                 replace(
-                                    R.id.fragment_container_view,
-                                    FinancialMovementDetailsFragment(mov)
+                                    R.id.fragment_container_view,//mov
+                                    FinancialMovementDetailsFragment(
+                                        MovementDetailsData(
+                                            movementId = mov.movement.movementId,
+                                            date = mov.movement.date,
+                                            amount = mov.movement.amount,
+                                            category = mov.movement.category,
+                                            color = mov.category.color,
+                                            title = mov.movement.title,
+                                            notes = mov.movement.notes,
+                                            periodicMovementId = null,
+                                            weekDays = null,
+                                            days = 0,
+                                            months = 0,
+                                            notify = false,
+                                            incumbentMovementId = null
+                                        )
+                                    )
                                 )
                                 addToBackStack(null)
                             }

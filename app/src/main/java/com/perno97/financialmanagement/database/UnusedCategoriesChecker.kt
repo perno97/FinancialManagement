@@ -20,7 +20,10 @@ object UnusedCategoriesChecker {
                     "Checking category ${item.category.name} with ${item.movements.size} movements"
                 )
                 if (item.movements.isEmpty()) {
-                    if (appViewModel.getPeriodicMovements(item.category.name).isEmpty()) {
+                    if (appViewModel.getPeriodicMovements(item.category.name)
+                            .isEmpty() && appViewModel.getIncomingMovements(item.category.name)
+                            .isEmpty()
+                    ) {
                         Log.e(logTag, "Category ${item.category.name} has no related movement")
                         appViewModel.deleteCategory(item.category)
                     }

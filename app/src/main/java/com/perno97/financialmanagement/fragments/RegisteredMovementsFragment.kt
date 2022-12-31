@@ -279,7 +279,7 @@ class RegisteredMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
         state = PeriodState.DAY
-        setTitle("GROUP BY DAY")
+        setTitle(getString(R.string.group_by_day))
         loadData()
     }
 
@@ -289,7 +289,7 @@ class RegisteredMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
         state = PeriodState.WEEK
-        setTitle("GROUP BY WEEK")
+        setTitle(getString(R.string.group_by_week))
         loadData()
     }
 
@@ -299,7 +299,8 @@ class RegisteredMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
         state = PeriodState.MONTH
-        setTitle("${dateTo.month} ${dateTo.year}")
+        val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+        setTitle(getString(R.string.month_year, month, dateTo.year.toString()))
         loadData()
     }
 
@@ -311,7 +312,7 @@ class RegisteredMovementsFragment : Fragment() {
         dateTo = to
         dateFrom = from
         state = PeriodState.PERIOD
-        setTitle("SELECTED PERIOD")
+        setTitle(getString(R.string.selected_period))
         loadData()
     }
 

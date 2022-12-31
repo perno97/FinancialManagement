@@ -57,6 +57,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getPeriodicMovements(categoryName)
     }
 
+    suspend fun getIncomingMovements(categoryName: String): List<IncomingMovement> {
+        return repository.getIncomingMovements(categoryName)
+    }
+
 
     /*
     Getters with parameters
@@ -69,26 +73,25 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     fun getIncomingMovementsGroupByWeek(
-        weekStartOffset: Int,
-        beforeDateInclusive: LocalDate
+        weekStartOffset: Int
     ): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
-        return repository.getIncomingMovementsGroupByWeek(weekStartOffset, beforeDateInclusive).asLiveData()
+        return repository.getIncomingMovementsGroupByWeek(weekStartOffset).asLiveData()
     }
 
     fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
         return repository.getMovementsGroupByDay(beforeDateInclusive).asLiveData()
     }
 
-    fun getIncomingMovementsGroupByDay(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
-        return repository.getIncomingMovementsGroupByDay(beforeDateInclusive).asLiveData()
+    fun getIncomingMovementsGroupByDay(): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return repository.getIncomingMovementsGroupByDay().asLiveData()
     }
 
     fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
         return repository.getMovementsGroupByMonth(beforeDateInclusive).asLiveData()
     }
 
-    fun getIncomingMovementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
-        return repository.getIncomingMovementsGroupByMonth(beforeDateInclusive).asLiveData()
+    fun getIncomingMovementsGroupByMonth(): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return repository.getIncomingMovementsGroupByMonth().asLiveData()
     }
 
     fun getMovementsInPeriod(

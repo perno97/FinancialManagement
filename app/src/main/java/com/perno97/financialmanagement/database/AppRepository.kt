@@ -45,6 +45,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         return applicationDao.getPeriodicMovements(categoryName)
     }
 
+    @WorkerThread
+    suspend fun getIncomingMovements(categoryName: String): List<IncomingMovement> {
+        return applicationDao.getIncomingMovements(categoryName)
+    }
+
 
     /*
     Getters with parameters
@@ -58,8 +63,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getIncomingMovementsGroupByWeek(weekStartOffset: Int, beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
-        return applicationDao.getIncomingMovementsGroupByWeek(weekStartOffset, beforeDateInclusive)
+    fun getIncomingMovementsGroupByWeek(weekStartOffset: Int): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+        return applicationDao.getIncomingMovementsGroupByWeek(weekStartOffset)
     }
 
     @WorkerThread
@@ -67,16 +72,16 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         applicationDao.getMovementsGroupByDay(beforeDateInclusive)
 
     @WorkerThread
-    fun getIncomingMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> =
-        applicationDao.getIncomingMovementsGroupByDay(beforeDateInclusive)
+    fun getIncomingMovementsGroupByDay(): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> =
+        applicationDao.getIncomingMovementsGroupByDay()
 
     @WorkerThread
     fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByMonth(beforeDateInclusive)
 
     @WorkerThread
-    fun getIncomingMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> =
-        applicationDao.getIncomingMovementsGroupByMonth(beforeDateInclusive)
+    fun getIncomingMovementsGroupByMonth(): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> =
+        applicationDao.getIncomingMovementsGroupByMonth()
 
     @WorkerThread
     fun getMovementsInPeriod(

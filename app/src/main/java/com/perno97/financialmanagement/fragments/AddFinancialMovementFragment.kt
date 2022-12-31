@@ -302,7 +302,7 @@ class AddFinancialMovementFragment : Fragment() {
             if (date.isAfter(LocalDate.now())) {
                 val incomingMovement = IncomingMovement(
                     date = date,
-                    amount = amount,
+                    amount = newAmount,
                     category = category,
                     title = title,
                     notes = notes,

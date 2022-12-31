@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.util.Pair
@@ -101,19 +103,18 @@ class IncomingMovementsFragment : Fragment() {
     private fun loadData() {
         when (state) {
             // ----------------- DAY -----------------
-            PeriodState.DAY -> appViewModel.getIncomingMovementsGroupByDay(LocalDate.now())
+            PeriodState.DAY -> appViewModel.getIncomingMovementsGroupByDay()
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getIncomingMovementsGroupByWeek(
-                weekStartOffset,
-                LocalDate.now()
+                weekStartOffset
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
             // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getIncomingMovementsGroupByMonth(LocalDate.now())
+            PeriodState.MONTH -> appViewModel.getIncomingMovementsGroupByMonth()
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
@@ -172,12 +173,13 @@ class IncomingMovementsFragment : Fragment() {
                 for (mov in movements[group]!!) {
                     val lineContainer = card.findViewById<LinearLayout>(R.id.movementLinesContainer)
                     val cardLine = LayoutInflater.from(requireContext())
-                        .inflate(R.layout.movement_line, lineContainer, false)
+                        .inflate(R.layout.movement_line_incoming, lineContainer, false)
                     cardLine.findViewById<TextView>(R.id.txtCatLineColor)
                         .backgroundTintList =
                         ColorStateList.valueOf(Color.parseColor(mov.category.color))
                     cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
-                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.incomingMovement.title
+                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text =
+                        mov.incomingMovement.title
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
                         getString(R.string.euro_value, mov.incomingMovement.amount)
                     cardLine.findViewById<LinearLayout>(R.id.movementCategory).setOnClickListener {
@@ -189,7 +191,13 @@ class IncomingMovementsFragment : Fragment() {
                             addToBackStack(null)
                         }
                     }
-                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle)
+                    cardLine.findViewById<Button>(R.id.btnDelete).setOnClickListener {
+                        deleteIncomingMovement(mov.incomingMovement)
+                    }
+                    cardLine.findViewById<Button>(R.id.btnConfirm).setOnClickListener {
+                        confirmIncomingMovement(mov.incomingMovement)
+                    }
+                    cardLine.findViewById<ImageButton>(R.id.imgBtnEdit)
                         .setOnClickListener {
                             parentFragmentManager.commit {
                                 replace(
@@ -220,6 +228,24 @@ class IncomingMovementsFragment : Fragment() {
                 binding.movementCardsContainer.addView(card)
             }
         }
+    }
+
+    private fun confirmIncomingMovement(incomingMovement: IncomingMovement) { // TODO chiedere due volte
+        appViewModel.insert(
+            Movement(
+                date = incomingMovement.date,
+                amount = incomingMovement.amount,
+                title = incomingMovement.title,
+                notes = incomingMovement.notes,
+                category = incomingMovement.category,
+                periodicMovementId = null
+            )
+        )
+        appViewModel.deleteIncomingMovement(incomingMovementId = incomingMovement.incomingMovementId)
+    }
+
+    private fun deleteIncomingMovement(incomingMovement: IncomingMovement) { // TODO chiedere due volte
+        appViewModel.deleteIncomingMovement(incomingMovementId = incomingMovement.incomingMovementId)
     }
 
     private fun initListeners() {
@@ -284,7 +310,7 @@ class IncomingMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
         state = PeriodState.DAY
-        setTitle("GROUP BY DAY")
+        setTitle(getString(R.string.group_by_day))
         loadData()
     }
 
@@ -294,7 +320,7 @@ class IncomingMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
         state = PeriodState.WEEK
-        setTitle("GROUP BY WEEK")
+        setTitle(getString(R.string.group_by_week))
         loadData()
     }
 
@@ -304,7 +330,8 @@ class IncomingMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
         state = PeriodState.MONTH
-        setTitle("${dateTo.month} ${dateTo.year}")
+        val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+        setTitle(getString(R.string.month_year, month, dateTo.year.toString()))
         loadData()
     }
 
@@ -316,7 +343,7 @@ class IncomingMovementsFragment : Fragment() {
         dateTo = to
         dateFrom = from
         state = PeriodState.PERIOD
-        setTitle("SELECTED PERIOD")
+        setTitle(getString(R.string.selected_period))
         loadData()
     }
 

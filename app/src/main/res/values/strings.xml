@@ -43,4 +43,8 @@
     <string name="success_create_movement">Created movement</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="group_by_day">Group by day</string>
+    <string name="group_by_week">Group by week</string>
+    <string name="month_year">%s %s</string>
+    <string name="selected_period">Selected period</string>
 </resources>

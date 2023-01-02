@@ -153,7 +153,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getCategoryProgresses(dateFrom, dateTo).asLiveData()
     }
 
-    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): LiveData<Float> {
+    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): LiveData<Float?> {
         return repository.getExpectedSum(dateFrom, dateTo).asLiveData()
     }
 
@@ -323,5 +323,9 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun deleteIncomingMovement(incomingMovementId: Int) = viewModelScope.launch {
         repository.deleteIncomingMovementFromId(incomingMovementId)
+    }
+
+    fun deletePeriodicMovement(periodicMovementId: Int) = viewModelScope.launch {
+        repository.deletePeriodicMovement(periodicMovementId)
     }
 }

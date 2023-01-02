@@ -63,6 +63,11 @@ interface ApplicationDao {
     )
     suspend fun deleteIncumbentMovementFromId(incomingMovementId: Int)
 
+    @Query(
+        "DELETE FROM periodic_movement WHERE periodic_movement_id = :periodicMovementId"
+    )
+    suspend fun deletePeriodicMovementFromId(periodicMovementId: Int)
+
 
     /*
     Basic getters
@@ -298,9 +303,13 @@ interface ApplicationDao {
     ): Flow<Map<Category, PositiveNegativeSums>>
 
     @Query(
-        "SELECT SUM(movement.amount) AS value FROM movement WHERE movement.date >= :dateFrom AND movement.date <= :dateTo"
+        "SELECT SUM(partialSum) AS value FROM (" +
+                "SELECT SUM(movement.amount) AS partialSum FROM movement WHERE movement.date >= :dateFrom AND movement.date <= :dateTo" +
+                " UNION ALL " +
+                "SELECT SUM(incoming_movement.amount) AS partialSum FROM incoming_movement WHERE incoming_movement.date >= :dateFrom AND :dateTo >= incoming_movement.date" +
+                ")"
     )
-    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): Flow<Float>
+    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): Flow<Float?>
 
     @Query(
         "SELECT '' AS groupDate," +

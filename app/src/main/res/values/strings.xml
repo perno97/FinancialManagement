@@ -41,10 +41,18 @@
     <string name="success_create_periodic">Created periodic movement</string>
     <string name="success_create_incoming">Created movement in the future</string>
     <string name="success_create_movement">Created movement</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="group_by_day">Group by day</string>
     <string name="group_by_week">Group by week</string>
     <string name="month_year">%s %s</string>
     <string name="selected_period">Selected period</string>
+    <string name="delete_movement_confirmation_message">Are you sure you wanna delete%s movement with date %s and title: %s ?</string>
+    <string name="periodic">periodic</string>
+    <string name="success_delete_movement">Deleted movement</string>
+    <string name="success_delete_periodic">Deleted periodic movement</string>
+    <string name="confirm_incoming_confirmation_message">Are you sure you wanna confirm movement on date %s with title: %s ?</string>
+    <string name="success_confirmed_incoming">Movement confirmed</string>
+    <string name="channel_name">Incoming movements</string>
+    <string name="channel_description">Movements for which the user has requested a reminder and need to be confirmed</string>
+    <string name="notification_title">%s - %s - %s</string>
+    <string name="notification_new_incoming">New movement to confirm</string>
 </resources>

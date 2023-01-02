@@ -11,7 +11,7 @@ import java.time.temporal.TemporalAdjusters
 object PeriodicMovementsChecker {
     private const val logTag = "PeriodicMovementsChecker"
 
-    fun check( // TODO creare incoming nelle prossime x settimane
+    fun check(
         appViewModel: AppViewModel,
         scope: CoroutineScope,
         callback: (() -> Unit)?
@@ -30,30 +30,45 @@ object PeriodicMovementsChecker {
                     getMovementsFromPeriodicMovement(
                         periodicMovement,
                         movement.date.plusDays(1),
-                        LocalDate.now()
+                        LocalDate.now().plusWeeks(2) // Generating incoming movements up to 2 weeks
                     )
                 } else {
                     getMovementsFromPeriodicMovement(
                         periodicMovement,
                         periodicMovement.date,
-                        LocalDate.now()
+                        LocalDate.now().plusWeeks(2)
                     )
                 }
                 var amountsSum = 0f
                 for (date in calculatedMovements.keys) {
+                    val movDate = LocalDate.parse(date)
                     val mov: PeriodicMovement = calculatedMovements[date]!!
                     val amount = mov.amount
-                    appViewModel.insert(
-                        Movement(
-                            date = LocalDate.parse(date),
-                            amount = amount,
-                            category = mov.category,
-                            title = mov.title,
-                            notes = mov.notes,
-                            periodicMovementId = periodicMovement.periodicMovementId
+                    if (movDate.isAfter(LocalDate.now())) {
+                        appViewModel.insert(
+                            IncomingMovement(
+                                date = movDate,
+                                amount = amount,
+                                category = mov.category,
+                                title = mov.title,
+                                notes = mov.notes,
+                                notify = mov.notify,
+                                periodicMovementId = periodicMovement.periodicMovementId
+                            )
                         )
-                    )
-                    amountsSum += amount
+                    } else {
+                        appViewModel.insert(
+                            Movement(
+                                date = movDate,
+                                amount = amount,
+                                category = mov.category,
+                                title = mov.title,
+                                notes = mov.notes,
+                                periodicMovementId = periodicMovement.periodicMovementId
+                            )
+                        )
+                        amountsSum += amount
+                    }
                 }
                 if (amountsSum != 0f)
                     appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() + amountsSum)

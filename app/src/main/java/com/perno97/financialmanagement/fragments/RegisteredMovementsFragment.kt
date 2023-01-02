@@ -317,7 +317,7 @@ class RegisteredMovementsFragment : Fragment() {
     }
 
     private fun setTitle(title: String) {
-        binding.txtTitle.text = title
+        binding.txtSubtitle.text = title
     }
 
     override fun onDestroyView() {

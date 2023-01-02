@@ -13,5 +13,6 @@ data class IncomingMovement(
     val category: String,
     val title: String,
     val notes: String,
-    val notify: Boolean
+    val notify: Boolean,
+    @ColumnInfo(name = "periodic_movement_id") val periodicMovementId: Int?
 )

@@ -11,10 +11,14 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
@@ -230,22 +234,27 @@ class IncomingMovementsFragment : Fragment() {
         }
     }
 
-    private fun confirmIncomingMovement(incomingMovement: IncomingMovement) { // TODO chiedere due volte
-        appViewModel.insert(
-            Movement(
-                date = incomingMovement.date,
-                amount = incomingMovement.amount,
-                title = incomingMovement.title,
-                notes = incomingMovement.notes,
-                category = incomingMovement.category,
-                periodicMovementId = null
-            )
+    private fun confirmIncomingMovement(incomingMovement: IncomingMovement) {
+        ConfirmIncomingMovementDialog(incomingMovement).show(
+            childFragmentManager, ConfirmIncomingMovementDialog.TAG
         )
-        appViewModel.deleteIncomingMovement(incomingMovementId = incomingMovement.incomingMovementId)
     }
 
-    private fun deleteIncomingMovement(incomingMovement: IncomingMovement) { // TODO chiedere due volte
-        appViewModel.deleteIncomingMovement(incomingMovementId = incomingMovement.incomingMovementId)
+    private fun deleteIncomingMovement(incomingMovement: IncomingMovement) {
+        ConfirmMovementDeleteDialog(
+            MovementDeletionData(
+                date = incomingMovement.date,
+                title = incomingMovement.title,
+                incomingMovementId = incomingMovement.incomingMovementId,
+                movementId = null,
+                periodicMovementId = null,
+                amount = incomingMovement.amount,
+                notify = incomingMovement.notify,
+                category = incomingMovement.category
+            )
+        ).show(
+            childFragmentManager, ConfirmMovementDeleteDialog.TAG
+        )
     }
 
     private fun initListeners() {

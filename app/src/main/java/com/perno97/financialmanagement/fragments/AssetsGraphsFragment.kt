@@ -17,6 +17,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
@@ -118,6 +120,7 @@ class AssetsGraphsFragment : Fragment() {
         val barChart = binding.assetsBarChart
         lineChart.setExtraOffsets(10f, 0f, 10f, 30f)
         lineChart.description.isEnabled = false
+        lineChart.legend.isEnabled = false
         barChart.setExtraOffsets(10f, 0f, 10f, 30f)
         barChart.description.isEnabled = false
         barChart.legend.isEnabled = false
@@ -136,16 +139,14 @@ class AssetsGraphsFragment : Fragment() {
         xAxisBar.labelRotationAngle = -90f
         xAxisBar.axisMinimum = 0f
 
-        val leftAxisLine = lineChart.axisLeft
-        leftAxisLine.isEnabled = false
+        lineChart.axisLeft.isEnabled = false
+
         val leftAxisBar = barChart.axisLeft
         leftAxisBar.isEnabled = false
-        leftAxisBar.axisMinimum = 0f// TODO ottimizzare assegnamenti
+        leftAxisBar.axisMinimum = 0f
 
-        val rightAxisExp = lineChart.axisRight
-        rightAxisExp.isEnabled = false
-        val rightAxisBar = barChart.axisRight
-        rightAxisBar.isEnabled = false
+        lineChart.axisRight.isEnabled = false
+        barChart.axisRight.isEnabled = false
     }
 
     private fun loadData() {
@@ -399,7 +400,7 @@ class AssetsGraphsFragment : Fragment() {
         }
 
         val lineDataSet = LineDataSet(lineEntries, getString(R.string.assets))
-        // TODO set linedataset color
+        lineDataSet.color = ContextCompat.getColor(requireContext(), R.color.dark)
         val lineChartData = LineData(lineDataSet)
         val xAxisLine = lineChart.xAxis
         xAxisLine.labelCount = columnsToShow
@@ -510,10 +511,13 @@ class AssetsGraphsFragment : Fragment() {
         binding.btnPeriod.setOnClickListener {
             binding.btnPeriod.isEnabled = false
 
+            val calendarConstraints =
+                CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now())
             // Build
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select period")
+                    .setCalendarConstraints(calendarConstraints.build())
                     .setSelection(
                         datePickerSelection ?: Pair(
                             MaterialDatePicker.thisMonthInUtcMilliseconds(),

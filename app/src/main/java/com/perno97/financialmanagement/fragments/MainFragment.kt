@@ -1,7 +1,13 @@
 package com.perno97.financialmanagement.fragments
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -12,7 +18,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -26,12 +35,14 @@ import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.MainActivity
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.Expense
 import com.perno97.financialmanagement.database.PeriodicMovementsChecker
 import com.perno97.financialmanagement.database.Profile
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
+import com.perno97.financialmanagement.notifications.AlarmReceiver
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -98,6 +109,27 @@ class MainFragment : Fragment() {
 
         loadUiData()
 
+
+        /*val i = Intent(requireContext(), MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            action = "ACTION_INCOMING_MOVEMENTS"
+        }
+        val notificationTitle = "Prova"
+
+        val pendingIntent: PendingIntent =
+            PendingIntent.getActivity(requireContext(), 0, i, PendingIntent.FLAG_IMMUTABLE)
+        val builder = NotificationCompat.Builder(requireContext(), "incoming_movements_channel")
+            .setSmallIcon(R.drawable.ic_baseline_attach_money_24)
+            .setContentTitle(notificationTitle)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        with(NotificationManagerCompat.from(requireContext())) {
+            // notificationId is a unique int for each notification that you must define
+            notify(0, builder.build())
+        }*/
+
         // Setup chart styling
         val chart = binding.pieChartMain
         chart.setNoDataText(getString(R.string.loading_data))
@@ -161,14 +193,16 @@ class MainFragment : Fragment() {
                     tomorrow,
                     LocalDate.now().with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
                 ).observe(viewLifecycleOwner) { movementsSum ->
-                    updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                    if (movementsSum != null)
+                        updateExpectedAssets(currentAssets, currentAssets + movementsSum)
                 }
                 // ---------------- MONTH ----------------
                 PeriodState.MONTH -> appViewModel.getExpectedSum(
                     tomorrow,
                     LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
                 ).observe(viewLifecycleOwner) { movementsSum ->
-                    updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                    if (movementsSum != null)
+                        updateExpectedAssets(currentAssets, currentAssets + movementsSum)
                 }
                 // ---------------- PERIOD ----------------
                 PeriodState.PERIOD -> {
@@ -176,7 +210,8 @@ class MainFragment : Fragment() {
                     val to = if (dateTo.isBefore(from)) from else dateTo
                     appViewModel.getExpectedSum(from, to)
                         .observe(viewLifecycleOwner) { movementsSum ->
-                            updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                            if (movementsSum != null)
+                                updateExpectedAssets(currentAssets, currentAssets + movementsSum)
                         }
                 }
                 // ----------------------------------------

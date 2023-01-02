@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="45dp"
+    android:paddingEnd="45dp"
+    android:paddingTop="35dp"
+    android:paddingBottom="40dp"
+    android:background="@drawable/all_rounded_20_style"
+    android:backgroundTint="@color/white"
+    tools:context=".fragments.AddNewCategoryDialog">
+
+    <TextView
+        android:id="@+id/txtConfirmDeletion"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="CONFIRM MOVEMENT DELETION"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/layoutConfirmDeletion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/txtConfirmDeletion"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/txtConfirmationMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="72dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutConfirmDeletion">
+        <Button
+            android:id="@+id/btnAbortDeletion"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:layout_marginEnd="3dp"
+            android:background="@drawable/all_rounded_10_style"
+            app:backgroundTint="@color/dark"
+            android:text="CANCEL"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmDeletion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnConfirmDeletion"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:layout_marginStart="3dp"
+            android:textColor="@color/white"
+            android:background="@drawable/all_rounded_10_style"
+            app:backgroundTint="@color/primary"
+            android:text="CONFIRM"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnAbortDeletion"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

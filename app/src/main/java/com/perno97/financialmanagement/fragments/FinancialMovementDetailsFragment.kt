@@ -1,6 +1,10 @@
 package com.perno97.financialmanagement.fragments
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -16,6 +20,7 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -25,6 +30,7 @@ import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
+import com.perno97.financialmanagement.notifications.AlarmReceiver
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -235,6 +241,22 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                 childFragmentManager, AddNewCategoryDialog.TAG
             )
         }
+        binding.btnDeleteMov.setOnClickListener {
+            ConfirmMovementDeleteDialog(
+                MovementDeletionData(
+                    date = movementDetailsData.date,
+                    title = movementDetailsData.title,
+                    movementId = movementDetailsData.movementId,
+                    incomingMovementId = movementDetailsData.incomingMovementId,
+                    periodicMovementId = movementDetailsData.periodicMovementId,
+                    amount = movementDetailsData.amount,
+                    category = movementDetailsData.category,
+                    notify = movementDetailsData.notify
+                )
+            ).show(
+                childFragmentManager, ConfirmMovementDeleteDialog.TAG
+            )
+        }
     }
 
     private fun disableEditing() {
@@ -413,18 +435,45 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                 )
             ).show()
         } else {
-            if (date.isAfter(LocalDate.now())) {
+            if (date.isAfter(LocalDate.now())) { // TODO controllare se effettivamente è incoming
                 val incomingMovement = IncomingMovement(
                     date = date,
                     amount = amount,
                     category = category,
                     title = title,
                     notes = notes,
-                    notify = notify
+                    notify = notify,
+                    periodicMovementId = null
                 )
+
                 if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incoming movement
                     appViewModel.insert(incomingMovement)
                     appViewModel.deleteMovement(movementDetailsData.movementId)
+
+                    if (notify) {
+                        val alarmManager =
+                            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                        val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
+                            action = "ACTION_INCOMING_MOVEMENT_ALARM"
+                            putExtra("incomingMovTitle", incomingMovement.title)
+                            putExtra("incomingMovCategory", incomingMovement.category)
+                            putExtra("incomingMovAmount", incomingMovement.amount)
+                        }
+                        val pendingIntent = PendingIntent.getBroadcast(
+                            requireContext(),
+                            incomingMovement.incomingMovementId,
+                            intent,
+                            PendingIntent.FLAG_IMMUTABLE
+                        )
+
+                        alarmManager.setWindow(
+                            AlarmManager.RTC_WAKEUP,
+                            date.atTime(12, 0).atZone(ZoneId.systemDefault()).toEpochSecond(),
+                            600000,
+                            pendingIntent
+                        )
+                    }
+
                     Snackbar.make(
                         binding.editTextMovementDate,
                         R.string.success_movement_to_incoming,
@@ -437,6 +486,48 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     ).show()
                 } else { // If it was an incoming movement
                     appViewModel.update(incomingMovement)
+
+                    if (movementDetailsData.notify) { // Cancel previous alarm
+                        val alarmManager =
+                            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                        val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
+                            action = "ACTION_INCOMING_MOVEMENT_ALARM"
+                            putExtra("incomingMovTitle", movementDetailsData.title)
+                            putExtra("incomingMovCategory", movementDetailsData.category)
+                            putExtra("incomingMovAmount", movementDetailsData.amount)
+                        }
+                        val pendingIntent = PendingIntent.getBroadcast(
+                            requireContext(),
+                            movementDetailsData.incomingMovementId!!,
+                            intent,
+                            PendingIntent.FLAG_IMMUTABLE
+                        )
+                        alarmManager.cancel(pendingIntent)
+                    }
+
+                    if (notify) {
+                        val alarmManager =
+                            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                        val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
+                            action = "ACTION_INCOMING_MOVEMENT_ALARM"
+                            putExtra("incomingMovTitle", incomingMovement.title)
+                            putExtra("incomingMovCategory", incomingMovement.category)
+                            putExtra("incomingMovAmount", incomingMovement.amount)
+                        }
+                        val pendingIntent = PendingIntent.getBroadcast(
+                            requireContext(),
+                            incomingMovement.incomingMovementId,
+                            intent,
+                            PendingIntent.FLAG_IMMUTABLE
+                        )
+
+                        alarmManager.setWindow(
+                            AlarmManager.RTC_WAKEUP,
+                            date.atTime(12, 0).atZone(ZoneId.systemDefault()).toEpochSecond(),
+                            600000,
+                            pendingIntent
+                        )
+                    }
                     Snackbar.make(
                         binding.editTextMovementDate,
                         R.string.success_movement_update,

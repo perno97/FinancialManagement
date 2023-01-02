@@ -162,7 +162,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): Flow<Float> {
+    fun getExpectedSum(dateFrom: LocalDate, dateTo: LocalDate): Flow<Float?> {
         return applicationDao.getExpectedSum(dateFrom, dateTo)
     }
 
@@ -267,5 +267,10 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun deleteIncomingMovementFromId(incomingMovementId: Int) {
         applicationDao.deleteIncumbentMovementFromId(incomingMovementId)
+    }
+
+    @WorkerThread
+    suspend fun deletePeriodicMovement(periodicMovementId: Int) {
+        applicationDao.deletePeriodicMovementFromId(periodicMovementId)
     }
 }

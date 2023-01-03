@@ -5,7 +5,8 @@ import androidx.room.*
 
 @Database(
     entities = [Movement::class, Category::class, Profile::class, PeriodicMovement::class, IncomingMovement::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

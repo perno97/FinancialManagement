@@ -145,7 +145,7 @@ interface ApplicationDao {
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'start of month') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m', a.date,'unixepoch') = STRFTIME('%Y-%m', b.date,'unixepoch')" +
                 " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
     )
@@ -155,7 +155,7 @@ interface ApplicationDao {
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'start of month') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM incoming_movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM incoming_movement a" +
                 " JOIN incoming_movement b ON STRFTIME('%Y-%m', a.date,'unixepoch') = STRFTIME('%Y-%m', b.date,'unixepoch')" +
                 " JOIN category ON b.category = category.name GROUP BY b.incoming_movement_id ORDER BY groupDate ASC, b.date ASC"
     )
@@ -165,7 +165,7 @@ interface ApplicationDao {
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch') = STRFTIME('%Y-%m-%d', b.date,'unixepoch')" +
                 " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
     )
@@ -176,7 +176,7 @@ interface ApplicationDao {
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM incoming_movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM incoming_movement a" +
                 " JOIN incoming_movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch') = STRFTIME('%Y-%m-%d', b.date,'unixepoch')" +
                 " JOIN category ON b.category = category.name GROUP BY b.incoming_movement_id ORDER BY groupDate ASC, b.date ASC"
     )
@@ -184,10 +184,11 @@ interface ApplicationDao {
 
 
     // move to sunday then move to the first day of the week, if they're equal the events are in the same week
+    @Transaction
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
@@ -199,10 +200,11 @@ interface ApplicationDao {
 
 
     // move to sunday then move to the first day of the week, if they're equal the events are in the same week
+    @Transaction
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
-                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*, category.* FROM incoming_movement a" +
+                " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM incoming_movement a" +
                 " JOIN incoming_movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " JOIN category ON b.category = category.name GROUP BY b.incoming_movement_id ORDER BY groupDate ASC, b.date ASC"
@@ -210,11 +212,12 @@ interface ApplicationDao {
     fun getIncomingMovementsGroupByWeek(weekStartOffset: Int): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
 
 
+    @Transaction
     @Query(
         "SELECT '' AS groupDate," +
                 " (SELECT SUM(CASE WHEN amount > 0 THEN amount else 0 END) FROM  movement WHERE date >= :dateFrom AND date <= :dateTo) AS positive," +
                 " (SELECT SUM(CASE WHEN amount < 0 THEN amount else 0 END) FROM movement WHERE date >= :dateFrom AND date <= :dateTo) AS negative," +
-                " movement.*, category.* FROM movement " +
+                " movement.* FROM movement " +
                 " JOIN category ON category = name" +
                 " WHERE date >= :dateFrom AND date <= :dateTo ORDER BY date DESC"
     )
@@ -224,11 +227,12 @@ interface ApplicationDao {
     ): Flow<Map<GroupInfo, List<MovementAndCategory>>>
 
 
+    @Transaction
     @Query(
         "SELECT '' AS groupDate," +
                 " (SELECT SUM(CASE WHEN amount > 0 THEN amount else 0 END) FROM  movement WHERE date >= :dateFrom AND date <= :dateTo) AS positive," +
                 " (SELECT SUM(CASE WHEN amount < 0 THEN amount else 0 END) FROM movement WHERE date >= :dateFrom AND date <= :dateTo) AS negative," +
-                " incoming_movement.*, category.* FROM incoming_movement " +
+                " incoming_movement.* FROM incoming_movement " +
                 " JOIN category ON category = name" +
                 " WHERE date >= :dateFrom AND date <= :dateTo ORDER BY date ASC"
     )

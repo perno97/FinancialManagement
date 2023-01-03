@@ -41,6 +41,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
+    suspend fun getLatestIncomingPeriodic(periodicMovementId: Int, dateFrom: LocalDate, dateTo: LocalDate): IncomingMovement? {
+        return applicationDao.getLatestIncomingPeriodic(periodicMovementId, dateFrom,dateTo)
+    }
+
+    @WorkerThread
     suspend fun getPeriodicMovements(categoryName: String): List<PeriodicMovement> {
         return applicationDao.getPeriodicMovements(categoryName)
     }
@@ -48,6 +53,16 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun getIncomingMovements(categoryName: String): List<IncomingMovement> {
         return applicationDao.getIncomingMovements(categoryName)
+    }
+
+    @WorkerThread
+    suspend fun getLastAccess(defaultProfileId: Int): LocalDate {
+        return applicationDao.getLastAccess(defaultProfileId)
+    }
+
+    @WorkerThread
+    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Int): List<IncomingMovement> {
+        return applicationDao.getAllIncomingFromPeriodic(periodicMovementId)
     }
 
 
@@ -99,6 +114,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     fun getProfile(profileId: Int): Flow<Profile> {
         return applicationDao.getProfile(profileId)
+    }
+
+    @WorkerThread
+    fun countIncoming(beforeDateInclusive: LocalDate): Flow<Int> {
+        return applicationDao.countIncoming(beforeDateInclusive)
     }
 
     @WorkerThread
@@ -212,8 +232,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun insert(incomingMovement: IncomingMovement) {
-        applicationDao.insertIncumbentMovements(incomingMovement)
+    suspend fun insert(incomingMovement: IncomingMovement): Long {
+        return applicationDao.insertIncumbentMovement(incomingMovement)
     }
 
     @WorkerThread
@@ -248,6 +268,16 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun update(profile: Profile) {
         applicationDao.updateProfiles(profile)
+    }
+
+    @WorkerThread
+    suspend fun insertLastAccess(profileId: Int, date: LocalDate) {
+        applicationDao.insertLastAccess(profileId, date)
+    }
+
+    @WorkerThread
+    suspend fun updateAssets(profileId: Int, assetsValue: Float) {
+        applicationDao.updateAssets(profileId, assetsValue)
     }
 
 

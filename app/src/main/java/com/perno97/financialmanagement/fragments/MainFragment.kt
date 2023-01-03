@@ -23,6 +23,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.util.Pair
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
@@ -101,6 +102,13 @@ class MainFragment : Fragment() {
             if (profile != null) {
                 defaultProfile = profile
                 binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
+                PeriodicMovementsChecker.check(
+                    requireContext(),
+                    appViewModel,
+                    appViewModel.viewModelScope,
+                    profile.lastAccess,
+                    ::initReady
+                )
                 computeExpectedAssets()
             } else {
                 createNewDefaultProfile()
@@ -108,27 +116,7 @@ class MainFragment : Fragment() {
         }
 
         loadUiData()
-
-
-        /*val i = Intent(requireContext(), MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            action = "ACTION_INCOMING_MOVEMENTS"
-        }
-        val notificationTitle = "Prova"
-
-        val pendingIntent: PendingIntent =
-            PendingIntent.getActivity(requireContext(), 0, i, PendingIntent.FLAG_IMMUTABLE)
-        val builder = NotificationCompat.Builder(requireContext(), "incoming_movements_channel")
-            .setSmallIcon(R.drawable.ic_baseline_attach_money_24)
-            .setContentTitle(notificationTitle)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(requireContext())) {
-            // notificationId is a unique int for each notification that you must define
-            notify(0, builder.build())
-        }*/
+        loadCountIncoming()
 
         // Setup chart styling
         val chart = binding.pieChartMain
@@ -139,6 +127,18 @@ class MainFragment : Fragment() {
         chart.setDrawCenterText(true)
         chart.setTouchEnabled(false)
         return binding.root
+    }
+
+    private fun loadCountIncoming() {
+        appViewModel.countIncoming(LocalDate.now()).observe(viewLifecycleOwner) { count ->
+            Log.i(logTag, "Count incoming --> $count")
+            if (count != null && count > 0) {
+                binding.txtCountIncoming.visibility = View.VISIBLE
+                binding.txtCountIncoming.text = count.toString()
+            } else {
+                binding.txtCountIncoming.visibility = View.GONE
+            }
+        }
     }
 
     private fun loadUiData() {
@@ -152,10 +152,10 @@ class MainFragment : Fragment() {
                 state = it.stateMain
                 datePickerSelection = it.datePickerSelectionMain
                 //isAllDataLoaded = false
-                PeriodicMovementsChecker.check(
+                /*PeriodicMovementsChecker.check(
                     appViewModel,
                     appViewModel.viewModelScope,
-                    fun() { initReady() })
+                    fun() { initReady() })*/
             }
         }
     }
@@ -220,7 +220,7 @@ class MainFragment : Fragment() {
     }
 
     private fun createNewDefaultProfile() {
-        appViewModel.insertDefaultProfile(0f)
+        appViewModel.insertDefaultProfile(0f, LocalDate.now())
     }
 
     override fun onResume() {

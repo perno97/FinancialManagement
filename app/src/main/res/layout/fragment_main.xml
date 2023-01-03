@@ -286,5 +286,22 @@
             app:tint="@color/dark"
             android:focusable="true"
             android:contentDescription="@string/open_incoming_movements_page" />
+        <TextView
+            android:id="@+id/txtCountIncoming"
+            android:visibility="gone"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="15sp"
+            android:elevation="8dp"
+            app:elevation="8dp"
+            android:text="5"
+            android:gravity="center"
+            android:background="@drawable/all_rounded_10_style"
+            android:backgroundTint="@color/warning"
+            android:textColor="@color/dark"
+            app:layout_constraintTop_toTopOf="@id/fabIncomingMovements"
+            app:layout_constraintStart_toStartOf="@id/fabIncomingMovements"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

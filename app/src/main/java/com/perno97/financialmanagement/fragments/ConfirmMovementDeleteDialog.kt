@@ -14,14 +14,17 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.databinding.FragmentConfirmMovementDeleteDialogBinding
 import com.perno97.financialmanagement.notifications.AlarmReceiver
+import com.perno97.financialmanagement.utils.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 
 class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDeletionData) :
@@ -89,25 +92,10 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
                 )
             ).show()
         } else if (movementDeletionData.incomingMovementId != null) {
-            appViewModel.deleteIncomingMovement(movementDeletionData.incomingMovementId)
-            if (movementDeletionData.notify) {
-                val alarmManager =
-                    requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
-                    action = "ACTION_INCOMING_MOVEMENT_ALARM"
-                    putExtra("incomingMovTitle", movementDeletionData.title)
-                    putExtra("incomingMovCategory", movementDeletionData.category)
-                    putExtra("incomingMovAmount", movementDeletionData.amount)
-                }
-                val pendingIntent = PendingIntent.getBroadcast(
-                    requireContext(),
-                    movementDeletionData.incomingMovementId,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-
-                alarmManager.cancel(pendingIntent)
-            }
+            deleteIncomingMovement(
+                movementDeletionData.incomingMovementId,
+                movementDeletionData.notify
+            )
             Snackbar.make(
                 binding.btnConfirmDeletion,
                 R.string.success_delete_movement,
@@ -120,6 +108,13 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
             ).show()
         } else if (movementDeletionData.periodicMovementId != null) {
             appViewModel.deletePeriodicMovement(movementDeletionData.periodicMovementId)
+            appViewModel.viewModelScope.launch {
+                val incomingMovements =
+                    appViewModel.getAllIncomingFromPeriodic(movementDeletionData.periodicMovementId)
+                for (mov in incomingMovements) {
+                    deleteIncomingMovement(mov.incomingMovementId, mov.notify)
+                }
+            }
             Snackbar.make(
                 binding.btnConfirmDeletion,
                 R.string.success_delete_periodic,
@@ -134,6 +129,19 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
             Log.e(logTag, "Error deleting movement $movementDeletionData")
         }
         dismiss()
+    }
+
+    private fun deleteIncomingMovement(incomingMovementId: Int, notify: Boolean) {
+        appViewModel.deleteIncomingMovement(incomingMovementId)
+        if (notify) {
+            NotifyManager.removeAlarm(
+                requireContext(),
+                incomingMovementId,
+                movementDeletionData.title,
+                movementDeletionData.category,
+                movementDeletionData.amount
+            )
+        }
     }
 
     override fun onDestroyView() {

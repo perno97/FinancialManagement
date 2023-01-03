@@ -178,6 +178,12 @@ class IncomingMovementsFragment : Fragment() {
                     val lineContainer = card.findViewById<LinearLayout>(R.id.movementLinesContainer)
                     val cardLine = LayoutInflater.from(requireContext())
                         .inflate(R.layout.movement_line_incoming, lineContainer, false)
+                    if (!mov.incomingMovement.date.isAfter(LocalDate.now())) {
+                        cardLine.findViewById<LinearLayout>(R.id.singleRegisteredMov)
+                            .setBackgroundColor(
+                                ContextCompat.getColor(requireContext(), R.color.warning)
+                            )
+                    }
                     cardLine.findViewById<TextView>(R.id.txtCatLineColor)
                         .backgroundTintList =
                         ColorStateList.valueOf(Color.parseColor(mov.category.color))

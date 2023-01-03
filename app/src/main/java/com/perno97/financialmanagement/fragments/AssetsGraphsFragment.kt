@@ -197,7 +197,7 @@ class AssetsGraphsFragment : Fragment() {
         }
     }
 
-    private fun updateHorizontalGraph(data: GroupInfo?) { // TODO i dati sono sbagliati?
+    private fun updateHorizontalGraph(data: GroupInfo?) {
         val expProgressBar = binding.progressBarAssetsOutcomes
         val gainProgressBar = binding.progressBarAssetsIncomes
         val txtViewExp = binding.txtAssetsOutcomes
@@ -288,7 +288,7 @@ class AssetsGraphsFragment : Fragment() {
 
                     // Check if there is item for this week
                     if (item != null) {
-                        columnValue += item.positive + item.negative
+                        columnValue -= item.positive + item.negative
                     }
                     if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
                         lineEntries.add(
@@ -328,7 +328,7 @@ class AssetsGraphsFragment : Fragment() {
 
                     // Check if there is item for this week
                     if (item != null) {
-                        columnValue += item.positive + item.negative
+                        columnValue -= item.positive + item.negative
                     }
                     if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
                         lineEntries.add(
@@ -366,7 +366,7 @@ class AssetsGraphsFragment : Fragment() {
 
                     // Check if there is item for this week
                     if (item != null) {
-                        columnValue += item.positive + item.negative
+                        columnValue -= item.positive + item.negative
                     }
 
                     lineEntries.add(

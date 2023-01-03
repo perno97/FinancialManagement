@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -32,6 +31,7 @@ import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 import com.perno97.financialmanagement.notifications.AlarmReceiver
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
+import com.perno97.financialmanagement.utils.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
@@ -114,6 +114,9 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         }
 
         binding.editTextMovementDate.isEnabled = false
+        binding.inputNotifyRow.visibility = View.VISIBLE
+        binding.checkNotify.isChecked = movementDetailsData.notify
+        binding.checkNotify.isEnabled = false
         binding.categoryEditMovColor.backgroundTintList =
             ColorStateList.valueOf(Color.parseColor(movementDetailsData.color))
         binding.editTextMovementDate.setText(movementDetailsData.date.toString())
@@ -123,7 +126,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         binding.editTextMovementDate.inputType = InputType.TYPE_NULL
         binding.editTextMovAmount.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
-        if (movementDetailsData.periodicMovementId != null) {
+        if (movementDetailsData.periodicMovementId != null && movementDetailsData.movementId == null && movementDetailsData.incomingMovementId == null) {
             binding.checkPeriodic.isChecked = true
             periodic = true
             binding.layoutPeriodic.visibility = View.VISIBLE
@@ -176,6 +179,14 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     val date = Instant.ofEpochMilli(value)
                         .atZone(ZoneId.systemDefault()).toLocalDate()
                     binding.editTextMovementDate.setText(date.toString())
+                    if (date.isAfter(LocalDate.now())) {
+                        // Can't notify if date is not after today
+                        binding.checkNotify.isEnabled = true
+                        binding.inputNotifyRow.visibility = View.VISIBLE
+                    } else {
+                        binding.checkNotify.isEnabled = false
+                        binding.inputNotifyRow.visibility = View.GONE
+                    }
                 }
                 datePicker.addOnDismissListener {
                     dateOpen = false
@@ -384,49 +395,161 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
         val previousAmount = movementDetailsData.amount
+        val checkPeriodic = binding.checkPeriodic.isChecked
         val newAmount = if (income) amount else -amount
 
-        if (periodic && binding.checkPeriodic.isChecked) {
-            var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
-            val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
-            var monday = binding.checkMonday.isChecked
-            var tuesday = binding.checkTuesday.isChecked
-            var wednesday = binding.checkWednesday.isChecked
-            var thursday = binding.checkThursday.isChecked
-            var friday = binding.checkFriday.isChecked
-            var saturday = binding.checkSaturday.isChecked
-            var sunday = binding.checkSunday.isChecked
-            if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
-                days = 1
-                monday = false
-                tuesday = false
-                wednesday = false
-                thursday = false
-                friday = false
-                saturday = false
-                sunday = false
+        if (periodic) { // If periodic, stays periodic
+            updatePeriodic(date, newAmount, category, title, notes, notify)
+        } else {
+            if (checkPeriodic) {
+                createPeriodic(date, newAmount, category, title, notes, notify)
+            } else {
+                if (date.isAfter(LocalDate.now())) {
+                    val incomingMovement = IncomingMovement(
+                        date = date,
+                        amount = amount,
+                        category = category,
+                        title = title,
+                        notes = notes,
+                        notify = notify,
+                        periodicMovementId = null
+                    )
+
+                    if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incoming movement
+                        createIncoming(incomingMovement, notify)
+                    } else { // If it was an incoming movement
+                        updateIncoming(incomingMovement, notify)
+                    }
+                } else {
+                    val movement = Movement(
+                        date = date,
+                        amount = newAmount,
+                        category = category,
+                        title = title,
+                        notes = notes,
+                        periodicMovementId = null
+                    )
+
+                    if (movementDetailsData.incomingMovementId != null) { // If it was an incoming movement and now it's a movement
+                        createMovement(movement)
+                    } else { // If it was a movement
+                        updateMovement(movement)
+                    }
+                    updateAssets(previousAmount, newAmount)
+                }
             }
-            val periodicMovement = PeriodicMovement(
-                days = days,
-                months = months,
-                monday = monday,
-                tuesday = tuesday,
-                wednesday = wednesday,
-                thursday = thursday,
-                friday = friday,
-                saturday = saturday,
-                sunday = sunday,
-                date = date,
-                amount = newAmount,
-                category = category,
-                title = title,
-                notes = notes,
-                notify = notify
+        }
+        PeriodicMovementsChecker.check(
+            requireContext(),
+            appViewModel,
+            appViewModel.viewModelScope,
+            null,
+            null
+        )
+        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
+        appViewModel.setSelectedCategory("") // Reset selected category
+        parentFragmentManager.popBackStack()
+    }
+
+    private fun updateMovement(movement: Movement) {
+        appViewModel.update(movement)
+        Snackbar.make(
+            binding.editTextMovementDate,
+            R.string.success_movement_update,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
             )
-            appViewModel.update(periodicMovement)
+        ).show()
+    }
+
+    private fun createMovement(movement: Movement) {
+        appViewModel.insert(movement)
+        appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId!!)
+
+        if (movementDetailsData.notify) { // Cancel previous alarm
+            NotifyManager.removeAlarm(
+                requireContext(),
+                movementDetailsData.incomingMovementId,
+                movementDetailsData.title,
+                movementDetailsData.category,
+                movementDetailsData.amount
+            )
+        }
+        Snackbar.make(
+            binding.editTextMovementDate,
+            R.string.success_incoming_to_movement,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
+            )
+        ).show()
+    }
+
+    private fun updateIncoming(
+        incomingMovement: IncomingMovement,
+        notify: Boolean
+    ) {
+        appViewModel.update(incomingMovement)
+
+        if (movementDetailsData.notify) { // Cancel previous alarm
+            NotifyManager.removeAlarm(
+                requireContext(),
+                movementDetailsData.incomingMovementId!!,
+                movementDetailsData.title,
+                movementDetailsData.category,
+                movementDetailsData.amount
+            )
+        }
+
+        if (notify) {
+            NotifyManager.setAlarm(
+                requireContext(),
+                incomingMovement.incomingMovementId,
+                incomingMovement.title,
+                incomingMovement.category,
+                incomingMovement.amount,
+                incomingMovement.date
+            )
+        }
+        Snackbar.make(
+            binding.editTextMovementDate,
+            R.string.success_movement_update,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
+            )
+        ).show()
+    }
+
+    private fun createIncoming(
+        incomingMovement: IncomingMovement,
+        notify: Boolean
+    ) {
+        appViewModel.viewModelScope.launch {
+            val movementId = appViewModel.insert(incomingMovement)
+            appViewModel.deleteMovement(movementDetailsData.movementId!!)
+
+            if (notify) {
+                NotifyManager.setAlarm(
+                    requireContext(),
+                    movementId.toInt(),
+                    incomingMovement.title,
+                    incomingMovement.category,
+                    incomingMovement.amount,
+                    incomingMovement.date
+                )
+            }
+
             Snackbar.make(
                 binding.editTextMovementDate,
-                R.string.success_update_periodic,
+                R.string.success_movement_to_incoming,
                 BaseTransientBottomBar.LENGTH_LONG
             ).setBackgroundTint(
                 ContextCompat.getColor(
@@ -434,154 +557,121 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     R.color.success
                 )
             ).show()
-        } else {
-            if (date.isAfter(LocalDate.now())) { // TODO controllare se effettivamente è incoming
-                val incomingMovement = IncomingMovement(
-                    date = date,
-                    amount = amount,
-                    category = category,
-                    title = title,
-                    notes = notes,
-                    notify = notify,
-                    periodicMovementId = null
-                )
-
-                if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incoming movement
-                    appViewModel.insert(incomingMovement)
-                    appViewModel.deleteMovement(movementDetailsData.movementId)
-
-                    if (notify) {
-                        val alarmManager =
-                            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                        val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
-                            action = "ACTION_INCOMING_MOVEMENT_ALARM"
-                            putExtra("incomingMovTitle", incomingMovement.title)
-                            putExtra("incomingMovCategory", incomingMovement.category)
-                            putExtra("incomingMovAmount", incomingMovement.amount)
-                        }
-                        val pendingIntent = PendingIntent.getBroadcast(
-                            requireContext(),
-                            incomingMovement.incomingMovementId,
-                            intent,
-                            PendingIntent.FLAG_IMMUTABLE
-                        )
-
-                        alarmManager.setWindow(
-                            AlarmManager.RTC_WAKEUP,
-                            date.atTime(12, 0).atZone(ZoneId.systemDefault()).toEpochSecond(),
-                            600000,
-                            pendingIntent
-                        )
-                    }
-
-                    Snackbar.make(
-                        binding.editTextMovementDate,
-                        R.string.success_movement_to_incoming,
-                        BaseTransientBottomBar.LENGTH_LONG
-                    ).setBackgroundTint(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.success
-                        )
-                    ).show()
-                } else { // If it was an incoming movement
-                    appViewModel.update(incomingMovement)
-
-                    if (movementDetailsData.notify) { // Cancel previous alarm
-                        val alarmManager =
-                            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                        val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
-                            action = "ACTION_INCOMING_MOVEMENT_ALARM"
-                            putExtra("incomingMovTitle", movementDetailsData.title)
-                            putExtra("incomingMovCategory", movementDetailsData.category)
-                            putExtra("incomingMovAmount", movementDetailsData.amount)
-                        }
-                        val pendingIntent = PendingIntent.getBroadcast(
-                            requireContext(),
-                            movementDetailsData.incomingMovementId!!,
-                            intent,
-                            PendingIntent.FLAG_IMMUTABLE
-                        )
-                        alarmManager.cancel(pendingIntent)
-                    }
-
-                    if (notify) {
-                        val alarmManager =
-                            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                        val intent = Intent(requireContext(), AlarmReceiver::class.java).apply {
-                            action = "ACTION_INCOMING_MOVEMENT_ALARM"
-                            putExtra("incomingMovTitle", incomingMovement.title)
-                            putExtra("incomingMovCategory", incomingMovement.category)
-                            putExtra("incomingMovAmount", incomingMovement.amount)
-                        }
-                        val pendingIntent = PendingIntent.getBroadcast(
-                            requireContext(),
-                            incomingMovement.incomingMovementId,
-                            intent,
-                            PendingIntent.FLAG_IMMUTABLE
-                        )
-
-                        alarmManager.setWindow(
-                            AlarmManager.RTC_WAKEUP,
-                            date.atTime(12, 0).atZone(ZoneId.systemDefault()).toEpochSecond(),
-                            600000,
-                            pendingIntent
-                        )
-                    }
-                    Snackbar.make(
-                        binding.editTextMovementDate,
-                        R.string.success_movement_update,
-                        BaseTransientBottomBar.LENGTH_LONG
-                    ).setBackgroundTint(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.success
-                        )
-                    ).show()
-                }
-            } else {
-                val movement = Movement(
-                    date = date,
-                    amount = newAmount,
-                    category = category,
-                    title = title,
-                    notes = notes,
-                    periodicMovementId = null
-                )
-
-                if (movementDetailsData.incomingMovementId != null) { // If it was an incoming movement and now it's a movement
-                    appViewModel.insert(movement)
-                    appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId)
-                    Snackbar.make(
-                        binding.editTextMovementDate,
-                        R.string.success_incoming_to_movement,
-                        BaseTransientBottomBar.LENGTH_LONG
-                    ).setBackgroundTint(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.success
-                        )
-                    ).show()
-                } else { // If it was a movement
-                    appViewModel.update(movement)
-                    Snackbar.make(
-                        binding.editTextMovementDate,
-                        R.string.success_movement_update,
-                        BaseTransientBottomBar.LENGTH_LONG
-                    ).setBackgroundTint(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.success
-                        )
-                    ).show()
-                }
-                updateAssets(previousAmount, newAmount)
-            }
         }
-        PeriodicMovementsChecker.check(appViewModel, appViewModel.viewModelScope, null)
-        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
-        appViewModel.setSelectedCategory("") // Reset selected category
-        parentFragmentManager.popBackStack()
+    }
+
+    private fun createPeriodic(
+        date: LocalDate,
+        newAmount: Float,
+        category: String,
+        title: String,
+        notes: String,
+        notify: Boolean
+    ) {
+        var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
+        val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
+        var monday = binding.checkMonday.isChecked
+        var tuesday = binding.checkTuesday.isChecked
+        var wednesday = binding.checkWednesday.isChecked
+        var thursday = binding.checkThursday.isChecked
+        var friday = binding.checkFriday.isChecked
+        var saturday = binding.checkSaturday.isChecked
+        var sunday = binding.checkSunday.isChecked
+        if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
+            days = 1
+            monday = false
+            tuesday = false
+            wednesday = false
+            thursday = false
+            friday = false
+            saturday = false
+            sunday = false
+        }
+        val periodicMovement = PeriodicMovement(
+            days = days,
+            months = months,
+            monday = monday,
+            tuesday = tuesday,
+            wednesday = wednesday,
+            thursday = thursday,
+            friday = friday,
+            saturday = saturday,
+            sunday = sunday,
+            date = date,
+            amount = newAmount,
+            category = category,
+            title = title,
+            notes = notes,
+            notify = notify
+        )
+        appViewModel.insert(periodicMovement)
+        Snackbar.make(
+            binding.editTextMovementDate,
+            R.string.success_update_periodic,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
+            )
+        ).show()
+    }
+
+    private fun updatePeriodic(
+        date: LocalDate,
+        newAmount: Float,
+        category: String,
+        title: String,
+        notes: String,
+        notify: Boolean
+    ) {
+        var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
+        val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
+        var monday = binding.checkMonday.isChecked
+        var tuesday = binding.checkTuesday.isChecked
+        var wednesday = binding.checkWednesday.isChecked
+        var thursday = binding.checkThursday.isChecked
+        var friday = binding.checkFriday.isChecked
+        var saturday = binding.checkSaturday.isChecked
+        var sunday = binding.checkSunday.isChecked
+        if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
+            days = 1
+            monday = false
+            tuesday = false
+            wednesday = false
+            thursday = false
+            friday = false
+            saturday = false
+            sunday = false
+        }
+        val periodicMovement = PeriodicMovement(
+            days = days,
+            months = months,
+            monday = monday,
+            tuesday = tuesday,
+            wednesday = wednesday,
+            thursday = thursday,
+            friday = friday,
+            saturday = saturday,
+            sunday = sunday,
+            date = date,
+            amount = newAmount,
+            category = category,
+            title = title,
+            notes = notes,
+            notify = notify
+        )
+        appViewModel.update(periodicMovement)
+        Snackbar.make(
+            binding.editTextMovementDate,
+            R.string.success_update_periodic,
+            BaseTransientBottomBar.LENGTH_LONG
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.success
+            )
+        ).show()
     }
 
     private fun updateAssets(previousAmount: Float, newAmount: Float) {

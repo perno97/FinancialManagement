@@ -61,7 +61,8 @@
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
         <Button
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
@@ -71,7 +72,7 @@
             android:padding="0dp"
             app:backgroundTint="@color/dark_10"
             android:textColor="@drawable/btn_colors"
-            android:background="@drawable/btn_round_left_style"
+            android:background="@drawable/all_rounded_20_style"
             app:layout_constraintEnd_toStartOf="@+id/btnWeek"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -84,7 +85,7 @@
             android:padding="0dp"
             app:backgroundTint="@color/dark_10"
             android:textColor="@drawable/btn_colors"
-            android:background="@drawable/btn_round_left_style"
+            android:background="@drawable/all_rounded_20_style"
             app:layout_constraintEnd_toStartOf="@+id/btnWeek"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

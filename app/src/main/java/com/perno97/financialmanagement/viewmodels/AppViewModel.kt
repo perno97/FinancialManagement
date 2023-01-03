@@ -30,6 +30,14 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getProfile(defaultProfileId).asLiveData()
     }
 
+    fun countIncoming(beforeDateInclusive: LocalDate): LiveData<Int> {
+        return repository.countIncoming(beforeDateInclusive).asLiveData()
+    }
+
+    suspend fun getLastAccess(): LocalDate {
+        return repository.getLastAccess(defaultProfileId)
+    }
+
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
         Log.i(logTag, "Getting categories with movements")
         val toreturn = repository.getCategoryWithMovements()
@@ -53,12 +61,20 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
     }
 
+    suspend fun getLatestIncomingPeriodic(periodicMovementId: Int, dateFrom: LocalDate, dateTo: LocalDate): IncomingMovement? {
+        return repository.getLatestIncomingPeriodic(periodicMovementId, dateFrom, dateTo)
+    }
+
     suspend fun getPeriodicMovements(categoryName: String): List<PeriodicMovement> {
         return repository.getPeriodicMovements(categoryName)
     }
 
     suspend fun getIncomingMovements(categoryName: String): List<IncomingMovement> {
         return repository.getIncomingMovements(categoryName)
+    }
+
+    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Int): List<IncomingMovement> {
+        return repository.getAllIncomingFromPeriodic(periodicMovementId)
     }
 
 
@@ -277,12 +293,16 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.insert(periodicMovement)
     }
 
-    fun insert(incomingMovement: IncomingMovement) = viewModelScope.launch {
-        repository.insert(incomingMovement)
+    suspend fun insert(incomingMovement: IncomingMovement): Long {
+        return repository.insert(incomingMovement)
     }
 
-    fun insertDefaultProfile(assets: Float) = viewModelScope.launch {
-        repository.insert(Profile(defaultProfileId, assets))
+    fun insertDefaultProfile(assets: Float, lastAccess: LocalDate) = viewModelScope.launch {
+        repository.insert(Profile(defaultProfileId, assets, lastAccess))
+    }
+
+    fun insertLastAccess(date: LocalDate) = viewModelScope.launch {
+        repository.insertLastAccess(defaultProfileId, date)
     }
 
 
@@ -306,7 +326,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     fun updateAssets(assetsValue: Float) = viewModelScope.launch {
-        repository.update(Profile(defaultProfileId, assetsValue))
+        repository.updateAssets(defaultProfileId, assetsValue)
     }
 
 

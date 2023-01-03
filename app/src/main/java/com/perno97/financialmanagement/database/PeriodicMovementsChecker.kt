@@ -1,6 +1,8 @@
 package com.perno97.financialmanagement.database
 
+import android.content.Context
 import android.util.Log
+import com.perno97.financialmanagement.utils.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -12,50 +14,95 @@ object PeriodicMovementsChecker {
     private const val logTag = "PeriodicMovementsChecker"
 
     fun check(
+        context: Context,
         appViewModel: AppViewModel,
         scope: CoroutineScope,
+        lastAccess: LocalDate?,
         callback: (() -> Unit)?
     ) {
         Log.e(logTag, "Called check")
         scope.launch {
-            val list = appViewModel.getAllPeriodicMovements()
+            val list =
+                appViewModel.getAllPeriodicMovements()
             for (periodicMovement in list) {
-                val movement = appViewModel.getLatestPeriodicMovement(
-                    periodicMovementId = periodicMovement.periodicMovementId,
-                    dateTo = LocalDate.now(),
-                    dateFrom = periodicMovement.date
-                )
-                Log.e(logTag, "Movement $movement")
-                val calculatedMovements = if (movement != null) {
-                    getMovementsFromPeriodicMovement(
-                        periodicMovement,
-                        movement.date.plusDays(1),
-                        LocalDate.now().plusWeeks(2) // Generating incoming movements up to 2 weeks
+                var movement: Movement? = null
+                var incomingMovement: IncomingMovement? = null
+                if (lastAccess != null) {
+                    // Search for last added movement of this periodic
+                    movement = appViewModel.getLatestPeriodicMovement(
+                        periodicMovementId = periodicMovement.periodicMovementId,
+                        dateTo = LocalDate.now(),
+                        dateFrom = lastAccess
                     )
-                } else {
-                    getMovementsFromPeriodicMovement(
-                        periodicMovement,
-                        periodicMovement.date,
-                        LocalDate.now().plusWeeks(2)
+                    // Search for last added incoming movement of this periodic
+                    incomingMovement = appViewModel.getLatestIncomingPeriodic(
+                        periodicMovementId = periodicMovement.periodicMovementId,
+                        dateTo = LocalDate.now().plusWeeks(2),
+                        dateFrom = lastAccess
                     )
                 }
+
+                val calculatedMovements =
+                    if (movement != null) {
+                        // Generate movements starting the day after the found one
+                        getMovementsFromPeriodicMovement(
+                            periodicMovement,
+                            movement.date.plusDays(1),
+                            LocalDate.now()
+                                .plusWeeks(2) // Generating incoming movements up to 2 weeks
+                        )
+                    } else {
+                        // No movements found before today and after last access or periodic movement's date
+                        getMovementsFromPeriodicMovement(
+                            periodicMovement,
+                            lastAccess ?: periodicMovement.date,
+                            LocalDate.now().plusWeeks(2)
+                        )
+                    }
                 var amountsSum = 0f
                 for (date in calculatedMovements.keys) {
                     val movDate = LocalDate.parse(date)
                     val mov: PeriodicMovement = calculatedMovements[date]!!
                     val amount = mov.amount
                     if (movDate.isAfter(LocalDate.now())) {
-                        appViewModel.insert(
-                            IncomingMovement(
-                                date = movDate,
-                                amount = amount,
-                                category = mov.category,
-                                title = mov.title,
-                                notes = mov.notes,
-                                notify = mov.notify,
-                                periodicMovementId = periodicMovement.periodicMovementId
+                        // Movement is an incoming movement
+                        if (incomingMovement != null && movDate.isAfter(incomingMovement.date)) {
+                            // Add it only if it's new
+                            val movementId = appViewModel.insert(
+                                IncomingMovement(
+                                    date = movDate,
+                                    amount = amount,
+                                    category = mov.category,
+                                    title = mov.title,
+                                    notes = mov.notes,
+                                    notify = mov.notify,
+                                    periodicMovementId = periodicMovement.periodicMovementId
+                                )
                             )
-                        )
+                            if (mov.notify) {
+                                NotifyManager.setAlarm(
+                                    context,
+                                    movementId.toInt(),
+                                    mov.title,
+                                    mov.category,
+                                    mov.amount,
+                                    movDate
+                                )
+                            }
+                        } else if (incomingMovement == null) {
+                            // Add it only if it's new
+                            appViewModel.insert(
+                                IncomingMovement(
+                                    date = movDate,
+                                    amount = amount,
+                                    category = mov.category,
+                                    title = mov.title,
+                                    notes = mov.notes,
+                                    notify = mov.notify,
+                                    periodicMovementId = periodicMovement.periodicMovementId
+                                )
+                            )
+                        }
                     } else {
                         appViewModel.insert(
                             Movement(
@@ -169,11 +216,13 @@ object PeriodicMovementsChecker {
             weekDays.add(DayOfWeek.SUNDAY)
         }
         if (weekDays.isNotEmpty()) {
+            Log.i(logTag, "Checking weekdays")
             var currentDate = dateTo
             // Move backward to the first weekday to repeat
             while (!weekDays.contains(currentDate.dayOfWeek)) {
                 currentDate = currentDate.minusDays(1)
             }
+
             var k = weekDays.indexOf(currentDate.dayOfWeek)
             val n = weekDays.size
             while (!currentDate.isBefore(dateFrom)) {
@@ -182,7 +231,7 @@ object PeriodicMovementsChecker {
                 // The next day to check is the next in weekDays array
                 // Return to first if reached the end of weekDays array
                 k = (k + 1) % n
-                currentDate = currentDate.with(TemporalAdjusters.previousOrSame(weekDays[k]))
+                currentDate = currentDate.with(TemporalAdjusters.previous(weekDays[k]))
             }
         }
         return movements

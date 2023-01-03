@@ -24,7 +24,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginTop="25dp"
-                    android:text="AUGUST 2022"
                     android:textSize="15sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -95,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="ASSETS TREND"
+                    android:text="@string/assets_trend_capital"
                     android:textColor="@color/dark"
                     android:textSize="12sp"/>
             </LinearLayout>
@@ -194,7 +193,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Income"
+                        android:text="@string/income"
                         android:layout_marginStart="15dp" />
                 </LinearLayout>
                 <LinearLayout
@@ -212,7 +211,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Outcome"
+                        android:text="@string/outcome"
                         android:layout_marginStart="15dp" />
                 </LinearLayout>
             </LinearLayout>

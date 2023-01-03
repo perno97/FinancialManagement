@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="wrap_content"
-        android:text="CONFIRM INCOMING MOVEMENT"
+        android:text="@string/confirm_incoming_movement_capital"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +55,7 @@
             android:layout_marginEnd="3dp"
             android:background="@drawable/all_rounded_10_style"
             app:backgroundTint="@color/dark"
-            android:text="CANCEL"
+            android:text="@string/cancel_capital"
             app:layout_constraintEnd_toStartOf="@+id/btnConfirmIncoming"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -70,7 +70,7 @@
             android:textColor="@color/white"
             android:background="@drawable/all_rounded_10_style"
             app:backgroundTint="@color/primary"
-            android:text="CONFIRM"
+            android:text="@string/confirm_capital"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnAbortIncoming"/>

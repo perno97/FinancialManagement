@@ -166,7 +166,7 @@
                     android:layout_marginTop="2dp"
                     android:textSize="20sp"
                     android:textColor="@color/dark"
-                    android:text="0.00€"
+                    android:text="@string/zero_euros"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txtCurrent" />
 
@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:textSize="20sp"
-                    android:text="0.00€"
+                    android:text="@string/zero_euros"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txtExpected" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -212,7 +212,7 @@
                         android:gravity="center"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="15dp"
-                        android:text="EXPENSE/BUDGET PROGRESS"
+                        android:text="@string/expense_budget_progress"
                         android:textColor="@color/dark"
                         android:textSize="12sp"/>
                 </LinearLayout>
@@ -296,7 +296,6 @@
             android:textSize="15sp"
             android:elevation="8dp"
             app:elevation="8dp"
-            android:text="5"
             android:gravity="center"
             android:background="@drawable/all_rounded_10_style"
             android:backgroundTint="@color/warning"

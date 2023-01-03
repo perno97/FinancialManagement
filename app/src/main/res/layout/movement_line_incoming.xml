@@ -33,7 +33,6 @@
                 android:id="@+id/txtCatLineName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Category"
                 android:layout_marginStart="15dp" />
         </LinearLayout>
         <LinearLayout
@@ -68,7 +67,7 @@
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:text="DELETE"
+            android:text="@string/delete_capital"
             android:textSize="12sp"
             android:padding="0dp"
             app:backgroundTint="@color/dark_10"
@@ -81,7 +80,7 @@
             android:id="@+id/btnConfirm"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:text="CONFIRM"
+            android:text="@string/confirm_capital"
             android:textSize="12sp"
             android:padding="0dp"
             app:backgroundTint="@color/dark_10"
@@ -100,7 +99,7 @@
             app:layout_constraintStart_toEndOf="@id/catProgContainer"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_baseline_edit_24"
-            android:contentDescription="Open edit incoming movement"/>
+            android:contentDescription="@string/open_edit_incoming_movement"/>
     </LinearLayout>
 
 </LinearLayout>

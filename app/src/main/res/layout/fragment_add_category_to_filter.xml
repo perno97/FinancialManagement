@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/txtTitle"
-        android:text="Select categories"
+        android:text="@string/select_categories"
         android:textColor="@color/dark_10"
         android:textSize="22sp"
         android:layout_width="wrap_content"

@@ -28,7 +28,6 @@
                     android:id="@+id/txtHeaderDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="03/01/2022"
                     android:textColor="@color/white" />
             </LinearLayout>
             <LinearLayout
@@ -40,7 +39,6 @@
                     android:id="@+id/txtHeaderPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+80€"
                     android:textColor="@color/success" />
             </LinearLayout>
             <LinearLayout
@@ -52,7 +50,6 @@
                     android:id="@+id/txtHeaderNegative"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-20€"
                     android:textColor="@color/warning" />
             </LinearLayout>
         </LinearLayout>

@@ -16,7 +16,7 @@
         android:id="@+id/txtEditCurrentAssets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="EDIT CURRENT ASSETS"
+        android:text="@string/edit_current_assets_capital"
         android:textSize="15sp"
         android:labelFor="@id/editTextCurrentAssets"
         app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="€"
+        android:text="@string/euro_symbol"
         android:textColor="@color/dark"
         android:textSize="28sp"
         android:layout_marginTop="65dp"
@@ -69,7 +69,7 @@
             android:layout_marginEnd="3dp"
             android:background="@drawable/all_rounded_10_style"
             app:backgroundTint="@color/dark"
-            android:text="CANCEL"
+            android:text="@string/cancel_capital"
             app:layout_constraintEnd_toStartOf="@+id/btnConfirmEditAssets"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -84,7 +84,7 @@
             android:textColor="@color/white"
             android:background="@drawable/all_rounded_10_style"
             app:backgroundTint="@color/primary"
-            android:text="CONFIRM"
+            android:text="@string/confirm_capital"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnCancelEditAssets"/>

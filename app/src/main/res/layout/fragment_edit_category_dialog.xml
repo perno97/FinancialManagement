@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="wrap_content"
-        android:text="EDIT CATEGORY"
+        android:text="@string/edit_category_capital"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
             android:id="@+id/txtCatName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="NAME"
+            android:text="@string/name_capital"
             android:labelFor="@id/editTextNewCatName"
             android:gravity="center_vertical"
             android:layout_weight=".5" />
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="COLOR"
+        android:text="@string/color_capital"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"/>
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_weight=".5"
             android:gravity="center_vertical"
-            android:text="DAILY BUDGET"
+            android:text="@string/daily_budget_capital"
             android:labelFor="@id/editTextNewCatBudget"/>
 
         <EditText
@@ -94,7 +94,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".1"
-            android:text="€" />
+            android:text="@string/euro_symbol" />
     </LinearLayout>
 
 
@@ -115,7 +115,7 @@
             android:layout_marginEnd="3dp"
             android:background="@drawable/all_rounded_10_style"
             app:backgroundTint="@color/dark"
-            android:text="CANCEL"
+            android:text="@string/cancel_capital"
             app:layout_constraintEnd_toStartOf="@id/btnConfirmEditCategory"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -130,7 +130,7 @@
             android:textColor="@color/white"
             android:background="@drawable/all_rounded_10_style"
             app:backgroundTint="@color/primary"
-            android:text="CONFIRM"
+            android:text="@string/confirm_capital"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/btnCancelEditCategory"/>

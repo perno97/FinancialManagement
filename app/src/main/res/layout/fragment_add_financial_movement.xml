@@ -47,7 +47,8 @@
                     android:inputType="numberDecimal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:importantForAutofill="no" />
 
                 <TextView
                     android:id="@+id/txtCurrency"
@@ -144,7 +145,9 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        tools:ignore="TextFields"
+                        android:importantForAutofill="no" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -189,7 +192,8 @@
                         app:srcCompat="@drawable/ic_baseline_add_24_dark"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:contentDescription="@string/open_create_new_category" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -224,7 +228,8 @@
                         android:background="@drawable/all_rounded_10_style"
                         android:backgroundTint="@color/dark_30"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/txtTitleInput" />
+                        app:layout_constraintTop_toBottomOf="@id/txtTitleInput"
+                        android:importantForAutofill="no" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -260,7 +265,8 @@
                         android:inputType="textLongMessage|textMultiLine|textNoSuggestions"
                         android:maxLength="200"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/txtNotesInput" />
+                        app:layout_constraintTop_toBottomOf="@id/txtNotesInput"
+                        android:importantForAutofill="no" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -362,7 +368,8 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            android:inputType="number" />
+                            android:inputType="number"
+                            android:importantForAutofill="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/inputMonthsPeriodic"
@@ -401,7 +408,8 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            android:inputType="number" />
+                            android:inputType="number"
+                            android:importantForAutofill="no" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -517,7 +525,8 @@
             android:layout_gravity="bottom"
             app:backgroundTint="@color/dark"
             app:tint="@color/white"
-            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="@string/abort_creating_new_movement" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabConfirmNew"
@@ -529,6 +538,7 @@
             app:useCompatPadding="true"
             app:fabCustomSize="55dp"
             app:backgroundTint="@color/success"
-            app:srcCompat="@drawable/ic_baseline_check_24" />
+            app:srcCompat="@drawable/ic_baseline_check_24"
+            android:contentDescription="@string/confirm_creation_of_new_movement" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

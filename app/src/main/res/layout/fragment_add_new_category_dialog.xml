@@ -46,7 +46,8 @@
             android:gravity="center_vertical"
             android:layout_weight=".5"
             android:maxLength="15"
-            android:inputType="text" />
+            android:inputType="text"
+            android:importantForAutofill="no" />
     </LinearLayout>
 
     <TextView
@@ -87,7 +88,8 @@
             android:layout_height="wrap_content"
             android:layout_weight=".4"
             android:ems="10"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal"
+            android:importantForAutofill="no" />
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"

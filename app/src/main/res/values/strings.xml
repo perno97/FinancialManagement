@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">FinancialManagement</string>
     <string name="button_day_string">DAY</string>
     <string name="button_week_string">WEEK</string>
@@ -32,7 +32,7 @@
     <string name="outcomes">Outcomes</string>
     <string name="graph_label_now">Now</string>
     <string name="graph_label_current">Current</string>
-    <string name="graph_label_week">-%d weeks</string>
+    <string name="graph_label_week" tools:ignore="PluralsCandidate">-%d weeks</string>
     <string name="success_incoming_to_movement">Created movement with new date</string>
     <string name="success_movement_to_incoming">Created new movement in the future</string>
     <string name="success_update_periodic">Updated periodic movement</string>
@@ -53,4 +53,13 @@
     <string name="channel_description">Movements for which the user has requested a reminder and need to be confirmed</string>
     <string name="notification_title">%s - %s - %s</string>
     <string name="notification_new_incoming">New movement to confirm</string>
+    <string name="abort_creating_new_category">Abort creating new category</string>
+    <string name="confirm_creating_new_category">Confirm creating new category</string>
+    <string name="open_create_new_category">Open create new category</string>
+    <string name="abort_creating_new_movement">Abort creating new movement</string>
+    <string name="confirm_creation_of_new_movement">Confirm creation of new movement</string>
+    <string name="delete_current_showing_movement">Delete current showing movement</string>
+    <string name="edit_current_showing_movement">Edit current showing movement</string>
+    <string name="abort_editing_current_showing_movement">Abort editing current showing movement</string>
+    <string name="confirm_changes_of_current_showing_movement">Confirm changes of current showing movement</string>
 </resources>

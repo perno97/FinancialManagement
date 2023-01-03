@@ -1,9 +1,5 @@
 package com.perno97.financialmanagement.fragments
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -20,12 +16,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.databinding.FragmentConfirmMovementDeleteDialogBinding
-import com.perno97.financialmanagement.notifications.AlarmReceiver
 import com.perno97.financialmanagement.utils.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
-import java.time.ZoneId
 
 class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDeletionData) :
     DialogFragment() {

@@ -3,7 +3,6 @@ package com.perno97.financialmanagement.fragments
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +24,6 @@ import kotlinx.coroutines.launch
 class ConfirmIncomingMovementDialog(private val incomingMovement: IncomingMovement) :
     DialogFragment() {
 
-    private val logTag = "ConfirmIncomingMovementDialog"
     private var _binding: FragmentConfirmIncomingMovementDialogBinding? = null
 
     // This property is only valid between onCreateView and

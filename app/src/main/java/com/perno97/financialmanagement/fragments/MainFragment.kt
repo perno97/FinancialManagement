@@ -1,13 +1,7 @@
 package com.perno97.financialmanagement.fragments
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -18,12 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.util.Pair
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
@@ -36,14 +26,12 @@ import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
-import com.perno97.financialmanagement.MainActivity
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.Category
 import com.perno97.financialmanagement.database.Expense
 import com.perno97.financialmanagement.database.PeriodicMovementsChecker
 import com.perno97.financialmanagement.database.Profile
 import com.perno97.financialmanagement.databinding.FragmentMainBinding
-import com.perno97.financialmanagement.notifications.AlarmReceiver
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -87,7 +75,6 @@ class MainFragment : Fragment() {
     private var state = PeriodState.MONTH
     private var availableDailyBudget: Float? = null
     private var categoriesExpenses: Map<Category, Expense>? = null
-    private var isAllDataLoaded = false
     private var uiLoaded = false
 
     override fun onCreateView(

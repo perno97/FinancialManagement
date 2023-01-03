@@ -21,10 +21,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     Getters without parameters
      */
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
-    val allMovements: LiveData<List<Movement>> = repository.allMovements.asLiveData()
     val availableDailyBudget: LiveData<Float> = repository.availableDailyBudget.asLiveData()
-    val allMovementsAndCategories: LiveData<List<MovementAndCategory>> =
-        repository.movementAndCategory.asLiveData()
 
     fun getDefaultProfile(): LiveData<Profile> {
         return repository.getProfile(defaultProfileId).asLiveData()
@@ -32,10 +29,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun countIncoming(beforeDateInclusive: LocalDate): LiveData<Int> {
         return repository.countIncoming(beforeDateInclusive).asLiveData()
-    }
-
-    suspend fun getLastAccess(): LocalDate {
-        return repository.getLastAccess(defaultProfileId)
     }
 
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
@@ -61,7 +54,11 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
     }
 
-    suspend fun getLatestIncomingPeriodic(periodicMovementId: Int, dateFrom: LocalDate, dateTo: LocalDate): IncomingMovement? {
+    suspend fun getLatestIncomingPeriodic(
+        periodicMovementId: Int,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): IncomingMovement? {
         return repository.getLatestIncomingPeriodic(periodicMovementId, dateFrom, dateTo)
     }
 
@@ -117,7 +114,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getMovementsInPeriod(dateFrom, dateTo).asLiveData()
     }
 
-    fun getIncomingMovementsInPeriod(dateFrom: LocalDate, dateTo: LocalDate): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+    fun getIncomingMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): LiveData<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
         return repository.getIncomingMovementsInPeriod(dateFrom, dateTo).asLiveData()
     }
 
@@ -130,14 +130,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         dateTo: LocalDate
     ): LiveData<Map<Category, Expense>> {
         return repository.getCategoryExpensesProgresses(dateFrom, dateTo).asLiveData()
-    }
-
-    fun getCategoryExpensesProgress(
-        dateFrom: LocalDate,
-        dateTo: LocalDate,
-        categoryName: String
-    ): LiveData<Expense> {
-        return repository.getCategoryExpensesProgress(dateFrom, dateTo, categoryName).asLiveData()
     }
 
     fun getCategoriesExpensesMonth(
@@ -299,10 +291,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun insertDefaultProfile(assets: Float, lastAccess: LocalDate) = viewModelScope.launch {
         repository.insert(Profile(defaultProfileId, assets, lastAccess))
-    }
-
-    fun insertLastAccess(date: LocalDate) = viewModelScope.launch {
-        repository.insertLastAccess(defaultProfileId, date)
     }
 
 

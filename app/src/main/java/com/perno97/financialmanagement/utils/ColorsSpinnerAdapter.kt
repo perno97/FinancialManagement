@@ -33,7 +33,8 @@ class ColorsSpinnerAdapter(private val context: Context) : BaseAdapter() {
     }
 
     override fun getView(index: Int, view: View?, viewGroup: ViewGroup?): View {
-        val v = LayoutInflater.from(context).inflate(R.layout.color_spinner_row, viewGroup, false)
+        val v = view ?: LayoutInflater.from(context)
+            .inflate(R.layout.color_spinner_row, viewGroup, false)
 
         v.findViewById<TextView>(R.id.spinnerText)
             .setBackgroundColor(Color.parseColor(colors[index]))

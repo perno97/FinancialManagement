@@ -3,19 +3,15 @@ package com.perno97.financialmanagement
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
-import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
 import com.perno97.financialmanagement.databinding.ActivityMainBinding
 import com.perno97.financialmanagement.fragments.IncomingMovementsFragment
-import com.perno97.financialmanagement.fragments.MainFragment
 
 class MainActivity : AppCompatActivity() {
 
-    val CHANNEL_ID: String = "incoming_movements_channel"
+    private val channelId: String = "incoming_movements_channel"
 
     private lateinit var binding: ActivityMainBinding
 
@@ -39,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         val name = getString(R.string.channel_name)
         val descriptionText = getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+        val channel = NotificationChannel(channelId, name, importance).apply {
             description = descriptionText
         }
         // Register the channel with the system

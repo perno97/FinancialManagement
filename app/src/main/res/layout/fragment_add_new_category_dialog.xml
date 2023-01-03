@@ -35,6 +35,7 @@
             android:layout_height="wrap_content"
             android:text="NAME"
             android:gravity="center_vertical"
+            android:labelFor="@id/editTextNewCatName"
             android:layout_weight=".5" />
 
         <EditText
@@ -44,7 +45,8 @@
             android:ems="10"
             android:gravity="center_vertical"
             android:layout_weight=".5"
-            android:maxLength="15" />
+            android:maxLength="15"
+            android:inputType="text" />
     </LinearLayout>
 
     <TextView
@@ -76,7 +78,8 @@
             android:layout_height="wrap_content"
             android:layout_weight=".5"
             android:gravity="center_vertical"
-            android:text="DAILY BUDGET" />
+            android:text="DAILY BUDGET"
+            android:labelFor="@id/editTextNewCatBudget"/>
 
         <EditText
             android:id="@+id/editTextNewCatBudget"

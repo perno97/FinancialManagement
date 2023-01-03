@@ -4,17 +4,15 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.perno97.financialmanagement.MainActivity
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.fragments.IncomingMovementsFragment
 
 class AlarmReceiver : BroadcastReceiver() {
 
-    private val CHANNEL_ID: String = "incoming_movements_channel"
+    private val channelId: String = "incoming_movements_channel"
     private val logTag = "AlarmReceiver"
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -43,7 +41,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
             val pendingIntent: PendingIntent =
                 PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_IMMUTABLE)
-            val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            val builder = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_baseline_attach_money_24)
                 .setContentTitle(notificationTitle)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -236,7 +236,10 @@ interface ApplicationDao {
                 " JOIN category ON category = name" +
                 " WHERE date >= :dateFrom AND date <= :dateTo ORDER BY date ASC"
     )
-    fun getIncomingMovementsInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
+    fun getIncomingMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>>
 
     @Query(
         "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch', 'start of month') AS groupDate," +
@@ -352,7 +355,11 @@ interface ApplicationDao {
     @Query(
         "SELECT * FROM incoming_movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date >= :dateFrom ORDER BY date DESC LIMIT 1"
     )
-    suspend fun getLatestIncomingPeriodic(periodicMovementId: Int, dateFrom: LocalDate, dateTo: LocalDate): IncomingMovement?
+    suspend fun getLatestIncomingPeriodic(
+        periodicMovementId: Int,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): IncomingMovement?
 
     @Query(
         "SELECT * FROM periodic_movement WHERE category = :categoryName"

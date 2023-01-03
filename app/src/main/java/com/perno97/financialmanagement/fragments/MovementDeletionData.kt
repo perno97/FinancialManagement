@@ -1,6 +1,5 @@
 package com.perno97.financialmanagement.fragments
 
-import com.perno97.financialmanagement.database.Category
 import java.time.LocalDate
 
 data class MovementDeletionData(

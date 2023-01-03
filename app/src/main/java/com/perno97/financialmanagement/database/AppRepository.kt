@@ -13,10 +13,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         Getters without parameters
          */
     val allCategories: Flow<List<Category>> = applicationDao.getAllCategories()
-    val allMovements: Flow<List<Movement>> = applicationDao.getAllMovements()
     val availableDailyBudget: Flow<Float> = applicationDao.getAvailableDailyBudget()
-    val movementAndCategory: Flow<List<MovementAndCategory>> =
-        applicationDao.getMovementAndCategory()
 
     @WorkerThread
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
@@ -41,8 +38,12 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun getLatestIncomingPeriodic(periodicMovementId: Int, dateFrom: LocalDate, dateTo: LocalDate): IncomingMovement? {
-        return applicationDao.getLatestIncomingPeriodic(periodicMovementId, dateFrom,dateTo)
+    suspend fun getLatestIncomingPeriodic(
+        periodicMovementId: Int,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): IncomingMovement? {
+        return applicationDao.getLatestIncomingPeriodic(periodicMovementId, dateFrom, dateTo)
     }
 
     @WorkerThread
@@ -53,11 +54,6 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun getIncomingMovements(categoryName: String): List<IncomingMovement> {
         return applicationDao.getIncomingMovements(categoryName)
-    }
-
-    @WorkerThread
-    suspend fun getLastAccess(defaultProfileId: Int): LocalDate {
-        return applicationDao.getLastAccess(defaultProfileId)
     }
 
     @WorkerThread
@@ -107,7 +103,10 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getIncomingMovementsInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
+    fun getIncomingMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<GroupInfo, List<IncomingMovementAndCategory>>> {
         return applicationDao.getIncomingMovementsInPeriod(dateFrom, dateTo)
     }
 
@@ -137,15 +136,6 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         dateTo: LocalDate
     ): Flow<Map<Category, Expense>> {
         return applicationDao.getCategoryExpensesProgresses(dateFrom, dateTo)
-    }
-
-    @WorkerThread
-    fun getCategoryExpensesProgress(
-        dateFrom: LocalDate,
-        dateTo: LocalDate,
-        categoryName: String
-    ): Flow<Expense> {
-        return applicationDao.getCategoryExpensesProgress(dateFrom, dateTo, categoryName)
     }
 
     @WorkerThread
@@ -263,16 +253,6 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun update(periodicMovement: PeriodicMovement) {
         applicationDao.updatePeriodicMovements(periodicMovement)
-    }
-
-    @WorkerThread
-    suspend fun update(profile: Profile) {
-        applicationDao.updateProfiles(profile)
-    }
-
-    @WorkerThread
-    suspend fun insertLastAccess(profileId: Int, date: LocalDate) {
-        applicationDao.insertLastAccess(profileId, date)
     }
 
     @WorkerThread

@@ -68,7 +68,7 @@
                     android:textColor="@color/dark_10"
                     android:textSize="24sp"
                     android:layout_marginBottom="11dp"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     app:layout_constraintStart_toEndOf="@id/editTextMovAmount"
                     app:layout_constraintBottom_toBottomOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -92,7 +92,8 @@
                     android:padding="0dp"
                     android:textSize="12sp"
                     android:layout_height="30dp"
-                    android:text="Income" />
+                    android:text="Income"
+                    style="?android:attr/buttonBarButtonStyle" />
 
                 <Button
                     android:id="@+id/btnOutcome"
@@ -103,7 +104,8 @@
                     app:backgroundTint="@color/dark"
                     android:textSize="12sp"
                     android:textColor="@drawable/btn_dark_colors"
-                    android:text="Outcome" />
+                    android:text="Outcome"
+                    style="?android:attr/buttonBarButtonStyle" />
 
             </LinearLayout>
 
@@ -151,7 +153,9 @@
                         android:focusable="false"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:inputType="text"
+                        tools:ignore="TextFields" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -372,7 +376,8 @@
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:inputType="number" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/inputMonthsPeriodic"
@@ -411,7 +416,8 @@
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:inputType="number" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                     <LinearLayout
                         android:layout_width="match_parent"

@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:baselineAligned="false">
         <LinearLayout
             android:id="@+id/movementCategory"
             android:layout_width="0dp"

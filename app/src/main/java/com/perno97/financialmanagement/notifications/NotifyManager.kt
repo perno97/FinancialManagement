@@ -1,10 +1,9 @@
-package com.perno97.financialmanagement.utils
+package com.perno97.financialmanagement.notifications
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.perno97.financialmanagement.notifications.AlarmReceiver
 import java.time.LocalDate
 import java.time.ZoneId
 

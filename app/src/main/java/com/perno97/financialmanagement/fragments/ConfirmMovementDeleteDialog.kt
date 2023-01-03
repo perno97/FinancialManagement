@@ -16,7 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.databinding.FragmentConfirmMovementDeleteDialogBinding
-import com.perno97.financialmanagement.utils.NotifyManager
+import com.perno97.financialmanagement.notifications.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch

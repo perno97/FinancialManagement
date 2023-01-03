@@ -2,7 +2,7 @@ package com.perno97.financialmanagement.database
 
 import android.content.Context
 import android.util.Log
-import com.perno97.financialmanagement.utils.NotifyManager
+import com.perno97.financialmanagement.notifications.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

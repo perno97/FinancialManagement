@@ -28,12 +28,6 @@ interface ApplicationDao {
     suspend fun insertProfiles(vararg profiles: Profile)
 
 
-    /*
-    Update
-     */
-    @Update
-    suspend fun updateProfiles(vararg profiles: Profile)
-
     @Update
     suspend fun updateCategories(vararg categories: Category)
 
@@ -45,11 +39,6 @@ interface ApplicationDao {
 
     @Update
     suspend fun updateIncumbentMovements(vararg incomingMovements: IncomingMovement)
-
-    @Query(
-        "UPDATE profile SET last_access = :date WHERE profileId = :profileId"
-    )
-    suspend fun insertLastAccess(profileId: Int, date: LocalDate)
 
     @Query(
         "UPDATE profile SET assets = :assetsValue WHERE profileId = :profileId"
@@ -85,9 +74,6 @@ interface ApplicationDao {
     @Query("SELECT * FROM category")
     fun getAllCategories(): Flow<List<Category>>
 
-    @Query("SELECT * FROM movement")
-    fun getAllMovements(): Flow<List<Movement>>
-
     @Query("SELECT * FROM periodic_movement")
     suspend fun getAllPeriodicMovements(): List<PeriodicMovement>
 
@@ -104,18 +90,11 @@ interface ApplicationDao {
     fun getCategory(categoryName: String): Flow<Category>
 
     @Transaction
-    @Query("SELECT * FROM movement")
-    fun getMovementAndCategory(): Flow<List<MovementAndCategory>>
-
-    @Transaction
     @Query("SELECT * FROM category")
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements>
 
     @Query("SELECT COUNT(*) AS value FROM incoming_movement WHERE :beforeDateInclusive >= date")
     fun countIncoming(beforeDateInclusive: LocalDate): Flow<Int>
-
-    @Query("SELECT last_access AS value FROM profile WHERE profileId = :defaultProfileId")
-    suspend fun getLastAccess(defaultProfileId: Int): LocalDate
 
 
     /*
@@ -131,15 +110,6 @@ interface ApplicationDao {
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<Category, Expense>>
-
-    @Query(
-        "SELECT SUM(amount) AS expense FROM movement WHERE date >= :dateFrom AND date <= :dateTo AND amount < 0 AND movement.category LIKE :categoryName"
-    )
-    fun getCategoryExpensesProgress(
-        dateFrom: LocalDate,
-        dateTo: LocalDate,
-        categoryName: String
-    ): Flow<Expense>
 
     @Transaction
     @Query(

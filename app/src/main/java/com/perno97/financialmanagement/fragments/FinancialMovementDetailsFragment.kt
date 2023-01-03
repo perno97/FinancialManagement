@@ -26,7 +26,7 @@ import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
-import com.perno97.financialmanagement.utils.NotifyManager
+import com.perno97.financialmanagement.notifications.NotifyManager
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch

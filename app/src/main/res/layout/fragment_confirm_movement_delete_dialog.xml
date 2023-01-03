@@ -48,7 +48,7 @@
         <Button
             android:id="@+id/btnAbortDeletion"
             android:layout_width="wrap_content"
-            android:layout_height="34dp"
+            android:layout_height="48dp"
             android:padding="0dp"
             android:textSize="12sp"
             android:textColor="@color/white"
@@ -63,7 +63,7 @@
         <Button
             android:id="@+id/btnConfirmDeletion"
             android:layout_width="wrap_content"
-            android:layout_height="34dp"
+            android:layout_height="48dp"
             android:padding="0dp"
             android:textSize="12sp"
             android:layout_marginStart="3dp"

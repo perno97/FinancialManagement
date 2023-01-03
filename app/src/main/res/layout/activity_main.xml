@@ -9,5 +9,6 @@
         android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.perno97.financialmanagement.fragments.MainFragment"/>
+        android:name="com.perno97.financialmanagement.fragments.MainFragment"
+        tools:layout="@layout/fragment_main" />
 </androidx.constraintlayout.widget.ConstraintLayout>

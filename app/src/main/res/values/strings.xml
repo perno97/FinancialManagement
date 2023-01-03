@@ -43,11 +43,11 @@
     <string name="group_by_week">Group by week</string>
     <string name="month_year">%s %s</string>
     <string name="selected_period">Selected period</string>
-    <string name="delete_movement_confirmation_message">Are you sure you wanna delete%s movement with date %s and title: %s ?</string>
+    <string name="delete_movement_confirmation_message">Are you sure you want to delete%s movement with date %s and title: %s ?</string>
     <string name="periodic">periodic</string>
     <string name="success_delete_movement">Deleted movement</string>
     <string name="success_delete_periodic">Deleted periodic movement</string>
-    <string name="confirm_incoming_confirmation_message">Are you sure you wanna confirm movement on date %s with title: %s ?</string>
+    <string name="confirm_incoming_confirmation_message">Are you sure you want to confirm movement on date %s with title: %s ?</string>
     <string name="success_confirmed_incoming">Movement confirmed</string>
     <string name="channel_name">Incoming movements</string>
     <string name="channel_description">Movements for which the user has requested a reminder and need to be confirmed</string>
@@ -107,4 +107,5 @@
     <string name="registered_movements_capital">REGISTERED MOVEMENTS</string>
     <string name="delete_capital">DELETE</string>
     <string name="open_edit_incoming_movement">Open edit incoming movement</string>
+    <string name="select_categories_for_comparison">Select categories for comparison</string>
 </resources>

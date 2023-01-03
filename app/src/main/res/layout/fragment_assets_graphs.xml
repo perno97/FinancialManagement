@@ -41,7 +41,7 @@
                 <Button
                     android:id="@+id/btnWeek"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="48dp"
                     android:text="@string/button_week_string"
                     android:textSize="12sp"
                     android:padding="0dp"
@@ -55,7 +55,7 @@
                 <Button
                     android:id="@+id/btnMonth"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="48dp"
                     android:text="@string/button_month_string"
                     android:textSize="12sp"
                     android:padding="0dp"
@@ -72,7 +72,7 @@
                     app:backgroundTint="@color/dark_10"
                     android:textColor="@drawable/btn_colors"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="48dp"
                     android:text="@string/button_period_string"
                     android:textSize="12sp"
                     android:padding="0dp"

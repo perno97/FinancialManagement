@@ -139,7 +139,7 @@ class AddFinancialMovementFragment : Fragment() {
 
         }
 
-        binding.editTextMovementDate.setOnTouchListener { _, event -> //TODO non si capisce che è cliccabile
+        binding.editTextMovementDate.setOnTouchListener { _, event ->
             dateOpen = true
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =

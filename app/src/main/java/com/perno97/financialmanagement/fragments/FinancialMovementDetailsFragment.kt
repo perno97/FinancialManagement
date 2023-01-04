@@ -160,9 +160,9 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
-        binding.editTextMovementDate.setOnTouchListener { _, event -> //TODO non si capisce che è cliccabile
+        binding.editTextMovementDate.setOnTouchListener { _, event -> // TODO mettere colore primary a data, anche in AddFinancialMovement
             dateOpen = true
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (event.action == MotionEvent.ACTION_DOWN) {// TODO colore primary anche per nome categoria, anche in AddFinancialMovement
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
                         .setTitleText("Select period")

@@ -158,7 +158,7 @@ class MainFragment : Fragment() {
                 )
             )
         else if (new < prev)
-            binding.txtExpectedValue.setTextColor(Color.RED) // TODO controllare colori
+            binding.txtExpectedValue.setTextColor(Color.RED)
         else
             binding.txtExpectedValue.setTextColor(
                 ContextCompat.getColor(
@@ -368,7 +368,7 @@ class MainFragment : Fragment() {
             dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
         }
         binding.txtCurrentValue.setOnClickListener {
-            // TODO non si capisce che il testo è cliccabile
+            // TODO non si capisce che il testo è cliccabile --> mettere tutti i cliccabili colore primary
             Log.i(logTag, "Clicked edit current assets value")
             EditCurrentAssetsDialog().show(
                 childFragmentManager, EditCurrentAssetsDialog.TAG

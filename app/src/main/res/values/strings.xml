@@ -101,7 +101,7 @@
     <string name="edit_category_capital">EDIT CATEGORY</string>
     <string name="edit_current_assets_capital">EDIT CURRENT ASSETS</string>
     <string name="edit_capital">EDIT</string>
-    <string name="incoming_capital">INCOMING</string>
+    <string name="incoming_capital">INCOMING MOVEMENTS</string>
     <string name="zero_euros">0.00€</string>
     <string name="expense_budget_progress">EXPENSE/BUDGET PROGRESS</string>
     <string name="registered_movements_capital">REGISTERED MOVEMENTS</string>

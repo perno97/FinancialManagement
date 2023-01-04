@@ -30,6 +30,8 @@ class EditCurrentAssetsDialog : DialogFragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    // TODO non viene caricato valore attuale degli asset?
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

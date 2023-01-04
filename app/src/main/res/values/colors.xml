@@ -9,7 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="warning">#FFAD08</color>
-    <!-- <color name="success">#EDD75A</color> TODO rimosso info -->
     <color name="success">#73B06F</color>
     <color name="primary">#0C8F7E</color>
     <color name="secondary">#0C8F8F</color>

@@ -180,7 +180,11 @@ class IncomingMovementsFragment : Fragment() {
                     val lineContainer = card.findViewById<LinearLayout>(R.id.movementLinesContainer)
                     val cardLine = LayoutInflater.from(requireContext())
                         .inflate(R.layout.movement_line_incoming, lineContainer, false)
-                    if (!mov.incomingMovement.date.isAfter(LocalDate.now())) {
+                    if (!mov.incomingMovement.date.isAfter(LocalDate.now())) { // TODO usare colore più sul grigio D9D9D9
+                        // TODO centrare bottoni delete e confirm e spaziarli un po', togliere edit, edit si apre premendo sulla riga
+                        // TODO spostare edit categoria in main con elenco di tutte le categorie, visualizzo come select filter
+                        // TODO icona periodicmovement a sinistra del titolo
+                        // TODO lista periodic movements in registered movements in basso a destra con stesso simbolo periodicmovement
                         cardLine.findViewById<LinearLayout>(R.id.singleRegisteredMov)
                             .setBackgroundColor(
                                 ContextCompat.getColor(requireContext(), R.color.warning)

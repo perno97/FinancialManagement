@@ -467,16 +467,6 @@ class MainFragment : Fragment() {
                         currentCatExpenseAsPositive,
                         multipliedBudget
                     )
-                // Set click listener for category line
-                viewCatProgressLayout.setOnClickListener { // TODO rimuovere click su elenco categorie in main?
-                    parentFragmentManager.commit {
-                        replace(
-                            R.id.fragment_container_view,
-                            CategoryDetailsFragment(c.name)
-                        )
-                        addToBackStack(null)
-                    }
-                }
             }
             // If current total expenses are lower than budget then there's a slice showing
             // the remaining available budget

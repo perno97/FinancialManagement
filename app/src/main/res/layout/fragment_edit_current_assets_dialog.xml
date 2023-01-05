@@ -30,7 +30,7 @@
         android:layout_marginTop="65dp"
         android:ems="6"
         android:textSize="28sp"
-        android:textAlignment="center"
+        android:textAlignment="textEnd"
         android:background="@drawable/all_rounded_30_style"
         android:backgroundTint="@color/dark_10"
         android:inputType="numberDecimal"

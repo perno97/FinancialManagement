@@ -106,6 +106,10 @@
     <string name="expense_budget_progress">EXPENSE/BUDGET PROGRESS</string>
     <string name="registered_movements_capital">REGISTERED MOVEMENTS</string>
     <string name="delete_capital">DELETE</string>
-    <string name="open_edit_incoming_movement">Open edit incoming movement</string>
     <string name="select_categories_for_comparison">Select categories for comparison</string>
+    <string name="no_categories_to_show">No category to show</string>
+    <string name="open_periodic_movements_page">Open periodic movements page</string>
+    <string name="periodic_movements_capital">PERIODIC MOVEMENTS</string>
+    <string name="open_categories_list_page">Open categories list page</string>
+    <string name="this_movement_is_periodic">This movement is periodic</string>
 </resources>

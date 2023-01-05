@@ -7,10 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
@@ -181,13 +178,9 @@ class IncomingMovementsFragment : Fragment() {
                     val cardLine = LayoutInflater.from(requireContext())
                         .inflate(R.layout.movement_line_incoming, lineContainer, false)
                     if (!mov.incomingMovement.date.isAfter(LocalDate.now())) { // TODO usare colore più sul grigio D9D9D9
-                        // TODO centrare bottoni delete e confirm e spaziarli un po', togliere edit, edit si apre premendo sulla riga
-                        // TODO spostare edit categoria in main con elenco di tutte le categorie, visualizzo come select filter
-                        // TODO icona periodicmovement a sinistra del titolo
-                        // TODO lista periodic movements in registered movements in basso a destra con stesso simbolo periodicmovement
                         cardLine.findViewById<LinearLayout>(R.id.singleRegisteredMov)
                             .setBackgroundColor(
-                                ContextCompat.getColor(requireContext(), R.color.warning)
+                                ContextCompat.getColor(requireContext(), R.color.grey)
                             )
                     }
                     cardLine.findViewById<TextView>(R.id.txtCatLineColor)
@@ -196,24 +189,17 @@ class IncomingMovementsFragment : Fragment() {
                     cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
                     cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text =
                         mov.incomingMovement.title
+                    cardLine.findViewById<ImageView>(R.id.imgPeriodic).visibility =
+                        if (mov.incomingMovement.periodicMovementId != null) View.VISIBLE else View.GONE
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
                         getString(R.string.euro_value, mov.incomingMovement.amount)
-                    cardLine.findViewById<LinearLayout>(R.id.movementCategory).setOnClickListener {
-                        parentFragmentManager.commit {
-                            replace(
-                                R.id.fragment_container_view,
-                                CategoryDetailsFragment(mov.category.name)
-                            )
-                            addToBackStack(null)
-                        }
-                    }
                     cardLine.findViewById<Button>(R.id.btnDelete).setOnClickListener {
                         deleteIncomingMovement(mov.incomingMovement)
                     }
                     cardLine.findViewById<Button>(R.id.btnConfirm).setOnClickListener {
                         confirmIncomingMovement(mov.incomingMovement)
                     }
-                    cardLine.findViewById<ImageButton>(R.id.imgBtnEdit)
+                    cardLine.findViewById<LinearLayout>(R.id.singleRegisteredMov)
                         .setOnClickListener {
                             parentFragmentManager.commit {
                                 replace(

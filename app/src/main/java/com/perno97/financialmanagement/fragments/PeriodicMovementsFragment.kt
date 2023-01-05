@@ -7,17 +7,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.util.Pair
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.database.*
-import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
+import com.perno97.financialmanagement.database.GroupInfo
+import com.perno97.financialmanagement.database.PeriodicMovementAndCategory
+import com.perno97.financialmanagement.databinding.FragmentPeriodicMovementsBinding
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -33,11 +36,11 @@ import java.util.*
 import kotlin.math.absoluteValue
 
 
-class RegisteredMovementsFragment : Fragment() {
+class PeriodicMovementsFragment : Fragment() {
 
-    private val logTag = "RegMovementsFragment"
+    private val logTag = "PeriodicMovementsFragment"
 
-    private var _binding: FragmentRegisteredMovementsBinding? = null
+    private var _binding: FragmentPeriodicMovementsBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -56,7 +59,7 @@ class RegisteredMovementsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRegisteredMovementsBinding.inflate(inflater, container, false)
+        _binding = FragmentPeriodicMovementsBinding.inflate(inflater, container, false)
 
         val f = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
         val t = f.with(TemporalAdjusters.previous(firstDayOfWeek))
@@ -69,10 +72,10 @@ class RegisteredMovementsFragment : Fragment() {
             Log.i(logTag, "Launched Coroutine")
             appViewModel.uiState.collect {
                 Log.i(logTag, "Collecting UI data")
-                dateFrom = it.dateFromMain
-                dateTo = it.dateToMain
-                state = it.stateMain
-                datePickerSelection = it.datePickerSelectionMain
+                dateFrom = it.dateFromPeriodic
+                dateTo = it.dateToPeriodic
+                state = it.statePeriodic
+                datePickerSelection = it.datePickerSelectionPeriodic
                 when (state) {
                     PeriodState.DAY -> setDay()
                     PeriodState.WEEK -> setWeek()
@@ -91,30 +94,35 @@ class RegisteredMovementsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        appViewModel.setMainPeriod(dateFrom, dateTo, state, datePickerSelection) // Saving UI state
+        appViewModel.setPeriodicPeriod(
+            dateFrom,
+            dateTo,
+            state,
+            datePickerSelection
+        ) // Saving UI state
     }
 
     private fun loadData() {
         when (state) {
             // ----------------- DAY -----------------
-            PeriodState.DAY -> appViewModel.getMovementsGroupByDay(LocalDate.now())
+            PeriodState.DAY -> appViewModel.getPeriodicMovementsGroupByDay(LocalDate.now())
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
-            PeriodState.WEEK -> appViewModel.getMovementsGroupByWeek(
+            PeriodState.WEEK -> appViewModel.getPeriodicMovementsGroupByWeek(
                 weekStartOffset,
                 LocalDate.now()
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
             // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getMovementsGroupByMonth(LocalDate.now())
+            PeriodState.MONTH -> appViewModel.getPeriodicMovementsGroupByMonth(LocalDate.now())
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ---------------- PERIOD ----------------
-            PeriodState.PERIOD -> appViewModel.getMovementsInPeriod(dateFrom, dateTo)
+            PeriodState.PERIOD -> appViewModel.getPeriodicMovementsInPeriod(dateFrom, dateTo)
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
@@ -123,7 +131,7 @@ class RegisteredMovementsFragment : Fragment() {
 
     }
 
-    private fun movementsLoaded(movements: Map<GroupInfo, List<MovementAndCategory>>) {
+    private fun movementsLoaded(movements: Map<GroupInfo, List<PeriodicMovementAndCategory>>) {
         binding.movementCardsContainer.removeAllViews()
         if (movements.isEmpty()) {
             return
@@ -173,11 +181,32 @@ class RegisteredMovementsFragment : Fragment() {
                         .backgroundTintList =
                         ColorStateList.valueOf(Color.parseColor(mov.category.color))
                     cardLine.findViewById<TextView>(R.id.txtCatLineName).text = mov.category.name
-                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text = mov.movement.title
+                    cardLine.findViewById<TextView>(R.id.txtMovLineTitle).text =
+                        mov.periodicMovement.title
                     cardLine.findViewById<TextView>(R.id.txtMovLineAmount).text =
-                        getString(R.string.euro_value, mov.movement.amount)
-                    cardLine.findViewById<ImageView>(R.id.imgPeriodic).visibility =
-                        if (mov.movement.periodicMovementId != null) View.VISIBLE else View.GONE
+                        getString(R.string.euro_value, mov.periodicMovement.amount)
+                    val weekDays = arrayListOf<DayOfWeek>()
+                    if (mov.periodicMovement.monday) {
+                        weekDays.add(DayOfWeek.MONDAY)
+                    }
+                    if (mov.periodicMovement.tuesday) {
+                        weekDays.add(DayOfWeek.TUESDAY)
+                    }
+                    if (mov.periodicMovement.wednesday) {
+                        weekDays.add(DayOfWeek.WEDNESDAY)
+                    }
+                    if (mov.periodicMovement.thursday) {
+                        weekDays.add(DayOfWeek.THURSDAY)
+                    }
+                    if (mov.periodicMovement.friday) {
+                        weekDays.add(DayOfWeek.FRIDAY)
+                    }
+                    if (mov.periodicMovement.saturday) {
+                        weekDays.add(DayOfWeek.SATURDAY)
+                    }
+                    if (mov.periodicMovement.sunday) {
+                        weekDays.add(DayOfWeek.SUNDAY)
+                    }
                     cardLine.findViewById<LinearLayout>(R.id.singleRegisteredMov)
                         .setOnClickListener {
                             parentFragmentManager.commit {
@@ -185,18 +214,18 @@ class RegisteredMovementsFragment : Fragment() {
                                     R.id.fragment_container_view,//mov
                                     FinancialMovementDetailsFragment(
                                         MovementDetailsData(
-                                            movementId = mov.movement.movementId,
-                                            date = mov.movement.date,
-                                            amount = mov.movement.amount,
-                                            category = mov.movement.category,
+                                            movementId = null,
+                                            date = mov.periodicMovement.date,
+                                            amount = mov.periodicMovement.amount,
+                                            category = mov.periodicMovement.category,
                                             color = mov.category.color,
-                                            title = mov.movement.title,
-                                            notes = mov.movement.notes,
-                                            periodicMovementId = null,
-                                            weekDays = null,
+                                            title = mov.periodicMovement.title,
+                                            notes = mov.periodicMovement.notes,
+                                            periodicMovementId = mov.periodicMovement.periodicMovementId,
+                                            weekDays = weekDays,
                                             days = 0,
                                             months = 0,
-                                            notify = false,
+                                            notify = mov.periodicMovement.notify,
                                             incomingMovementId = null
                                         )
                                     )
@@ -227,12 +256,6 @@ class RegisteredMovementsFragment : Fragment() {
         }
         binding.fabBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
-        }
-        binding.fabPeriodicMovements.setOnClickListener {
-            parentFragmentManager.commit {
-                replace(R.id.fragment_container_view, PeriodicMovementsFragment())
-                addToBackStack(null)
-            }
         }
         binding.btnMonth.setOnClickListener {
             setMonth()

@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/ic_baseline_delete_24"
+                app:srcCompat="@drawable/ic_baseline_delete_24"
                 android:backgroundTint="@color/primary"
                 android:contentDescription="@string/delete_current_showing_movement" />
 
@@ -152,6 +152,7 @@
                         android:layout_height="48dp"
                         android:ems="6"
                         android:textAlignment="textEnd"
+                        android:textColor="@color/primary"
                         android:textSize="14sp"
                         android:focusable="false"
                         app:layout_constraintBottom_toBottomOf="parent"

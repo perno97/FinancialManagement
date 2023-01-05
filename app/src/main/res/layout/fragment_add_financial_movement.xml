@@ -141,6 +141,7 @@
                         android:layout_height="48dp"
                         android:ems="6"
                         android:textAlignment="textEnd"
+                        android:textColor="@color/primary"
                         android:textSize="14sp"
                         android:focusable="false"
                         app:layout_constraintBottom_toBottomOf="parent"

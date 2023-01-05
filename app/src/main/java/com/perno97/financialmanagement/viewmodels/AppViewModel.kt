@@ -99,6 +99,29 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getIncomingMovementsGroupByDay().asLiveData()
     }
 
+    fun getPeriodicMovementsGroupByDay(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<PeriodicMovementAndCategory>>> {
+        return repository.getPeriodicMovementsGroupByDay(beforeDateInclusive).asLiveData()
+    }
+
+    fun getPeriodicMovementsGroupByWeek(
+        weekStartOffset: Int,
+        beforeDateInclusive: LocalDate
+    ): LiveData<Map<GroupInfo, List<PeriodicMovementAndCategory>>> {
+        return repository.getPeriodicMovementsGroupByWeek(weekStartOffset, beforeDateInclusive)
+            .asLiveData()
+    }
+
+    fun getPeriodicMovementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<PeriodicMovementAndCategory>>> {
+        return repository.getPeriodicMovementsGroupByMonth(beforeDateInclusive).asLiveData()
+    }
+
+    fun getPeriodicMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): LiveData<Map<GroupInfo, List<PeriodicMovementAndCategory>>> {
+        return repository.getPeriodicMovementsInPeriod(dateFrom, dateTo).asLiveData()
+    }
+
     fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): LiveData<Map<GroupInfo, List<MovementAndCategory>>> {
         return repository.getMovementsGroupByMonth(beforeDateInclusive).asLiveData()
     }
@@ -249,6 +272,22 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
                 dateToIncoming = to,
                 stateIncoming = state,
                 datePickerSelectionIncoming = datePickerSelection
+            )
+        }
+    }
+
+    fun setPeriodicPeriod(
+        from: LocalDate,
+        to: LocalDate,
+        state: PeriodState,
+        datePickerSelection: Pair<Long, Long>?
+    ) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                dateFromPeriodic = from,
+                dateToPeriodic = to,
+                statePeriodic = state,
+                datePickerSelectionPeriodic = datePickerSelection
             )
         }
     }

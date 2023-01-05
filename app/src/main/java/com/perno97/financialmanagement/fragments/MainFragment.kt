@@ -84,26 +84,6 @@ class MainFragment : Fragment() {
         Log.i(logTag, "Called onCreateView()")
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        // Load profile
-        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
-            if (profile != null) {
-                defaultProfile = profile
-                binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
-                PeriodicMovementsChecker.check(
-                    requireContext(),
-                    appViewModel,
-                    appViewModel.viewModelScope,
-                    profile.lastAccess,
-                    ::initReady
-                )
-                computeExpectedAssets()
-            } else {
-                createNewDefaultProfile()
-            }
-        }
-
-        loadUiData()
-        loadCountIncoming()
 
         // Setup chart styling
         val chart = binding.pieChartMain
@@ -154,7 +134,7 @@ class MainFragment : Fragment() {
             binding.txtExpectedValue.setTextColor(
                 ContextCompat.getColor(
                     requireContext(),
-                    R.color.primary
+                    R.color.blue
                 )
             )
         else if (new < prev)
@@ -213,6 +193,26 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Log.i(logTag, "Called onResume()")
+        // Load profile
+        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
+            if (profile != null) {
+                defaultProfile = profile
+                binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
+                PeriodicMovementsChecker.check(
+                    requireContext(),
+                    appViewModel,
+                    appViewModel.viewModelScope,
+                    profile.lastAccess,
+                    ::initReady
+                )
+                computeExpectedAssets()
+            } else {
+                createNewDefaultProfile()
+            }
+        }
+
+        loadUiData()
+        loadCountIncoming()
         initListeners()
     }
 
@@ -368,7 +368,6 @@ class MainFragment : Fragment() {
             dateRangePicker.show(parentFragmentManager, "rangeDatePickerDialog")
         }
         binding.txtCurrentValue.setOnClickListener {
-            // TODO non si capisce che il testo è cliccabile --> mettere tutti i cliccabili colore primary
             Log.i(logTag, "Clicked edit current assets value")
             EditCurrentAssetsDialog().show(
                 childFragmentManager, EditCurrentAssetsDialog.TAG
@@ -378,6 +377,13 @@ class MainFragment : Fragment() {
             Log.i(logTag, "Clicked on graphs button")
             parentFragmentManager.commit {
                 replace(R.id.fragment_container_view, AssetsGraphsFragment())
+                addToBackStack(null)
+            }
+        }
+        binding.imgBtnCategories.setOnClickListener {
+            Log.i(logTag, "Clicked on categories list button")
+            parentFragmentManager.commit {
+                replace(R.id.fragment_container_view, CategoriesListFragment())
                 addToBackStack(null)
             }
         }
@@ -462,7 +468,7 @@ class MainFragment : Fragment() {
                         multipliedBudget
                     )
                 // Set click listener for category line
-                viewCatProgressLayout.setOnClickListener {
+                viewCatProgressLayout.setOnClickListener { // TODO rimuovere click su elenco categorie in main?
                     parentFragmentManager.commit {
                         replace(
                             R.id.fragment_container_view,

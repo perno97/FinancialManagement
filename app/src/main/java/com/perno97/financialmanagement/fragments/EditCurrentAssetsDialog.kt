@@ -9,28 +9,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
-import com.perno97.financialmanagement.R
-import com.perno97.financialmanagement.viewmodels.AppViewModel
-import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
+import com.perno97.financialmanagement.viewmodels.AppViewModel
+import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 
 class EditCurrentAssetsDialog : DialogFragment() {
 
     private var _binding: FragmentEditCurrentAssetsDialogBinding? = null
 
-    /**
-     * Connection to data
-     */
-    private val appViewModel: AppViewModel by activityViewModels {
-        AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
-    }
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
-    // TODO non viene caricato valore attuale degli asset?
+    private val appViewModel: AppViewModel by activityViewModels {
+        AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,27 +33,6 @@ class EditCurrentAssetsDialog : DialogFragment() {
         _binding = FragmentEditCurrentAssetsDialogBinding.inflate(inflater, container, false)
         if (dialog != null)
             dialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        binding.btnConfirmEditAssets.setOnClickListener {
-            confirmAction()
-        }
-        binding.btnCancelEditAssets.setOnClickListener {
-            cancelAction()
-        }
-        binding.editTextCurrentAssets.filters =
-            arrayOf(DecimalDigitsInputFilter(binding.editTextCurrentAssets))
-        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
-            if (profile != null) {
-                binding.editTextCurrentAssets.setText(
-                    getString(
-                        R.string.euro_value,
-                        profile.assets
-                    )
-                )
-            } else {
-                binding.editTextCurrentAssets.setText("0")
-            }
-        }
         return binding.root
     }
 
@@ -73,6 +45,29 @@ class EditCurrentAssetsDialog : DialogFragment() {
 
     private fun cancelAction() {
         dismiss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initListeners()
+    }
+
+    private fun initListeners() {
+        binding.btnConfirmEditAssets.setOnClickListener {
+            confirmAction()
+        }
+        binding.btnCancelEditAssets.setOnClickListener {
+            cancelAction()
+        }
+        binding.editTextCurrentAssets.filters =
+            arrayOf(DecimalDigitsInputFilter(binding.editTextCurrentAssets))
+        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
+            if (profile != null) {
+                binding.editTextCurrentAssets.setText(String.format("%.2f", profile.assets))
+            } else {
+                binding.editTextCurrentAssets.setText(String.format("%.2f", 0f))
+            }
+        }
     }
 
     override fun onDestroyView() {

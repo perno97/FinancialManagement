@@ -136,8 +136,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     DayOfWeek.SUNDAY -> binding.checkSunday.isChecked = true
                 }
             }
-            binding.editTextDaysRepeat.setText(movementDetailsData.days)
-            binding.editTextMonthsRepeat.setText(movementDetailsData.months)
+            binding.editTextDaysRepeat.setText(movementDetailsData.days.toString())
+            binding.editTextMonthsRepeat.setText(movementDetailsData.months.toString())
         } else {
             binding.checkPeriodic.isChecked = false
             binding.checkPeriodic.isEnabled = true
@@ -160,9 +160,9 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
-        binding.editTextMovementDate.setOnTouchListener { _, event -> // TODO mettere colore primary a data, anche in AddFinancialMovement
+        binding.editTextMovementDate.setOnTouchListener { _, event ->
             dateOpen = true
-            if (event.action == MotionEvent.ACTION_DOWN) {// TODO colore primary anche per nome categoria, anche in AddFinancialMovement
+            if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
                         .setTitleText("Select period")

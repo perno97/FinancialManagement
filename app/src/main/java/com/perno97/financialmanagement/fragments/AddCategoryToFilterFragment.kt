@@ -60,9 +60,11 @@ class AddCategoryToFilterFragment(private val parentCategory: Category) : Fragme
 
     private fun initListeners() {
         binding.fabConfirmAdd.setOnClickListener {
+            binding.fabConfirmAdd.isEnabled = false
             confirmSelection()
         }
         binding.fabAbortAdd.setOnClickListener {
+            binding.fabAbortAdd.isEnabled = false
             parentFragmentManager.popBackStack()
         }
     }

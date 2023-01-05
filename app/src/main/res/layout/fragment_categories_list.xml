@@ -45,42 +45,44 @@
 
     </ScrollView>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAbortAdd"
+            android:id="@+id/fabAddMovement"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabCustomSize="55dp"
             android:clickable="true"
-            android:focusable="true"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="15dp"
             app:useCompatPadding="true"
-            app:fabCustomSize="36dp"
-            android:layout_gravity="bottom"
-            app:backgroundTint="@color/dark"
-            app:tint="@color/white"
-            android:tint="@color/white"
-            app:srcCompat="@drawable/ic_baseline_close_24"
-            android:contentDescription="@string/abort_creating_new_category" />
+            android:backgroundTint="@color/dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_baseline_add_24"
+            android:focusable="true"
+            android:contentDescription="@string/open_add_a_new_financial_movement" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabConfirmAdd"
+            android:id="@+id/fabBtnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:focusable="true"
-            android:layout_margin="15dp"
+            app:fabCustomSize="36dp"
             app:useCompatPadding="true"
-            app:fabCustomSize="55dp"
-            app:backgroundTint="@color/success"
-            app:srcCompat="@drawable/ic_baseline_check_24"
-            android:contentDescription="@string/confirm_creating_new_category" />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:backgroundTint="@color/dark_10"
+            app:backgroundTint="@color/dark"
+            app:tint="@color/dark"
+            app:borderWidth="2dp"
+            app:srcCompat="@drawable/ic_baseline_arrow_back_24"
+            android:focusable="true"
+            android:contentDescription="@string/go_back_to_previous_screen" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

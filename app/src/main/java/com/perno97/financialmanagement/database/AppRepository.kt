@@ -87,6 +87,28 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         applicationDao.getIncomingMovementsGroupByDay()
 
     @WorkerThread
+    fun getPeriodicMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<PeriodicMovementAndCategory>>> =
+        applicationDao.getPeriodicMovementsGroupByDay(beforeDateInclusive)
+
+    @WorkerThread
+    fun getPeriodicMovementsGroupByWeek(
+        weekStartOffset: Int,
+        beforeDateInclusive: LocalDate
+    ): Flow<Map<GroupInfo, List<PeriodicMovementAndCategory>>> =
+        applicationDao.getPeriodicMovementsGroupByWeek(weekStartOffset, beforeDateInclusive)
+
+    @WorkerThread
+    fun getPeriodicMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<PeriodicMovementAndCategory>>> =
+        applicationDao.getPeriodicMovementsGroupByMonth(beforeDateInclusive)
+
+    @WorkerThread
+    fun getPeriodicMovementsInPeriod(
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Flow<Map<GroupInfo, List<PeriodicMovementAndCategory>>> =
+        applicationDao.getPeriodicMovementsInPeriod(dateFrom, dateTo)
+
+    @WorkerThread
     fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>> =
         applicationDao.getMovementsGroupByMonth(beforeDateInclusive)
 

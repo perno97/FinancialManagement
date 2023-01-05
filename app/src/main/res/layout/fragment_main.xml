@@ -18,12 +18,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <Space
-                    android:id="@+id/spaceMain"
+                <ImageButton
+                    android:id="@+id/imgBtnCategories"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/all_rounded_20_style"
+                    android:backgroundTint="@color/dark_10"
+                    android:contentDescription="@string/open_categories_list_page"
+                    android:minHeight="48dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:layout_width="50dp"
-                    android:layout_height="20dp"/>
+                    app:srcCompat="@drawable/ic_baseline_edit_24" />
 
                 <TextView
                     android:id="@+id/txtTitle"
@@ -32,7 +37,7 @@
                     android:layout_marginTop="25dp"
                     android:textSize="15sp"
                     app:layout_constraintEnd_toStartOf="@id/imgBtnGraphs"
-                    app:layout_constraintStart_toEndOf="@id/spaceMain"
+                    app:layout_constraintStart_toEndOf="@id/imgBtnCategories"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -43,7 +48,7 @@
                     android:background="@drawable/all_rounded_20_style"
                     android:backgroundTint="@color/dark_10"
                     android:contentDescription="@string/open_assets_graphs_page"
-                    android:minHeight="32dp"
+                    android:minHeight="48dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_baseline_show_chart_24" />
@@ -164,7 +169,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:textSize="20sp"
-                    android:textColor="@color/dark"
+                    android:textColor="@color/primary"
                     android:text="@string/zero_euros"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txtCurrent" />

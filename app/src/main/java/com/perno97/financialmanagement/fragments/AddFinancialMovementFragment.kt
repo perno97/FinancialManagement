@@ -140,8 +140,8 @@ class AddFinancialMovementFragment : Fragment() {
         }
 
         binding.editTextMovementDate.setOnTouchListener { _, event ->
-            dateOpen = true
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (event.action == MotionEvent.ACTION_DOWN && !dateOpen) {
+                dateOpen = true
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
                         .setTitleText("Select period")

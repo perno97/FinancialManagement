@@ -38,7 +38,7 @@ interface ApplicationDao {
     suspend fun updatePeriodicMovements(vararg periodicMovements: PeriodicMovement)
 
     @Update
-    suspend fun updateIncumbentMovements(vararg incomingMovements: IncomingMovement)
+    suspend fun updateIncomingMovements(vararg incomingMovements: IncomingMovement)
 
     @Query(
         "UPDATE profile SET assets = :assetsValue WHERE profileId = :profileId"

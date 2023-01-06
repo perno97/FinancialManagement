@@ -87,7 +87,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
 
     private fun loadMovementData() {
         val amount = movementDetailsData.amount
-        binding.editTextMovAmount.setText(amount.absoluteValue.toString())
+        binding.editTextMovAmount.setText(String.format("%.2f", amount.absoluteValue))
         if (amount >= 0) {
             incomeSelected()
         } else {
@@ -394,59 +394,72 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         val newAmount = if (income) amount else -amount
 
         if (periodic) { // If periodic, stays periodic
-            updatePeriodic(date, newAmount, category, title, notes, notify)
-        } else {
+            updatePeriodic(
+                movementDetailsData.periodicMovementId!!,
+                date,
+                newAmount,
+                category,
+                title,
+                notes,
+                notify
+            )
+        } else { // Prior the edit it wasn't periodic
             if (checkPeriodic) {
                 createPeriodic(date, newAmount, category, title, notes, notify)
             } else {
                 if (date.isAfter(LocalDate.now())) {
-                    val incomingMovement = IncomingMovement(
-                        date = date,
-                        amount = amount,
-                        category = category,
-                        title = title,
-                        notes = notes,
-                        notify = notify,
-                        periodicMovementId = null
-                    )
-
                     if (movementDetailsData.movementId != null) { // If it was a movement and now it's an incoming movement
-                        createIncoming(incomingMovement, notify)
+                        createIncoming(date, newAmount, category, title, notes, notify)
                     } else { // If it was an incoming movement
-                        updateIncoming(incomingMovement, notify)
+                        updateIncoming(
+                            movementDetailsData.incomingMovementId!!,
+                            date,
+                            newAmount,
+                            category,
+                            title,
+                            notes,
+                            notify
+                        )
                     }
                 } else {
-                    val movement = Movement(
-                        date = date,
-                        amount = newAmount,
-                        category = category,
-                        title = title,
-                        notes = notes,
-                        periodicMovementId = null
-                    )
-
                     if (movementDetailsData.incomingMovementId != null) { // If it was an incoming movement and now it's a movement
-                        createMovement(movement)
+                        createMovement(date, newAmount, category, title, notes)
                     } else { // If it was a movement
-                        updateMovement(movement)
+                        updateMovement(
+                            movementDetailsData.movementId!!,
+                            date,
+                            newAmount,
+                            category,
+                            title,
+                            notes
+                        )
                     }
                     updateAssets(previousAmount, newAmount)
                 }
             }
         }
-        PeriodicMovementsChecker.check(
-            requireContext(),
-            appViewModel,
-            appViewModel.viewModelScope,
-            null,
-            null
-        )
         UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
         appViewModel.setSelectedCategory("") // Reset selected category
         parentFragmentManager.popBackStack()
     }
 
-    private fun updateMovement(movement: Movement) {
+    private fun updateMovement(
+        movementId: Int,
+        date: LocalDate,
+        amount: Float,
+        category: String,
+        title: String,
+        notes: String
+    ) {
+        val movement = Movement(
+            movementId = movementId,
+            date = date,
+            amount = amount,
+            category = category,
+            title = title,
+            notes = notes,
+            periodicMovementId = null
+        )
         appViewModel.update(movement)
         Snackbar.make(
             binding.editTextMovementDate,
@@ -460,7 +473,21 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         ).show()
     }
 
-    private fun createMovement(movement: Movement) {
+    private fun createMovement(
+        date: LocalDate,
+        amount: Float,
+        category: String,
+        title: String,
+        notes: String
+    ) {
+        val movement = Movement(
+            date = date,
+            amount = amount,
+            category = category,
+            title = title,
+            notes = notes,
+            periodicMovementId = null
+        )
         appViewModel.insert(movement)
         appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId!!)
 
@@ -486,9 +513,24 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     }
 
     private fun updateIncoming(
-        incomingMovement: IncomingMovement,
+        incomingMovementId: Int,
+        date: LocalDate,
+        amount: Float,
+        category: String,
+        title: String,
+        notes: String,
         notify: Boolean
     ) {
+        val incomingMovement = IncomingMovement(
+            incomingMovementId = incomingMovementId,
+            date = date,
+            amount = amount,
+            category = category,
+            title = title,
+            notes = notes,
+            notify = notify,
+            periodicMovementId = null
+        )
         appViewModel.update(incomingMovement)
 
         if (movementDetailsData.notify) { // Cancel previous alarm
@@ -524,9 +566,23 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     }
 
     private fun createIncoming(
-        incomingMovement: IncomingMovement,
+        date: LocalDate,
+        amount: Float,
+        category: String,
+        title: String,
+        notes: String,
         notify: Boolean
     ) {
+        val incomingMovement = IncomingMovement(
+            date = date,
+            amount = amount,
+            category = category,
+            title = title,
+            notes = notes,
+            notify = notify,
+            periodicMovementId = null
+        )
+
         appViewModel.viewModelScope.launch {
             val movementId = appViewModel.insert(incomingMovement)
             appViewModel.deleteMovement(movementDetailsData.movementId!!)
@@ -600,6 +656,19 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             notify = notify
         )
         appViewModel.insert(periodicMovement)
+        PeriodicMovementsChecker.check(
+            requireContext(),
+            appViewModel,
+            appViewModel.viewModelScope,
+            null,
+            null,
+            periodicMovement
+        )
+        if (movementDetailsData.incomingMovementId != null) {
+            appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId)
+        } else {
+            appViewModel.deleteMovement(movementDetailsData.movementId!!)
+        }
         Snackbar.make(
             binding.editTextMovementDate,
             R.string.success_update_periodic,
@@ -613,6 +682,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     }
 
     private fun updatePeriodic(
+        periodicMovementId: Int,
         date: LocalDate,
         newAmount: Float,
         category: String,
@@ -640,6 +710,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             sunday = false
         }
         val periodicMovement = PeriodicMovement(
+            periodicMovementId = periodicMovementId,
             days = days,
             months = months,
             monday = monday,
@@ -657,6 +728,14 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             notify = notify
         )
         appViewModel.update(periodicMovement)
+        PeriodicMovementsChecker.check(
+            requireContext(),
+            appViewModel,
+            appViewModel.viewModelScope,
+            null,
+            null,
+            periodicMovement
+        )
         Snackbar.make(
             binding.editTextMovementDate,
             R.string.success_update_periodic,

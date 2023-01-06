@@ -18,25 +18,30 @@ object PeriodicMovementsChecker {
         appViewModel: AppViewModel,
         scope: CoroutineScope,
         lastAccess: LocalDate?,
-        callback: (() -> Unit)?
+        callback: (() -> Unit)?,
+        periodicMovement: PeriodicMovement?,
     ) {
         Log.e(logTag, "Called check")
         scope.launch {
             val list =
-                appViewModel.getAllPeriodicMovements()
-            for (periodicMovement in list) {
+                if (periodicMovement == null) {
+                    appViewModel.getAllPeriodicMovements()
+                } else {
+                    listOf(periodicMovement)
+                }
+            for (periodicMov in list) {
                 var movement: Movement? = null
                 var incomingMovement: IncomingMovement? = null
                 if (lastAccess != null) {
                     // Search for last added movement of this periodic
                     movement = appViewModel.getLatestPeriodicMovement(
-                        periodicMovementId = periodicMovement.periodicMovementId,
+                        periodicMovementId = periodicMov.periodicMovementId,
                         dateTo = LocalDate.now(),
                         dateFrom = lastAccess
                     )
                     // Search for last added incoming movement of this periodic
                     incomingMovement = appViewModel.getLatestIncomingPeriodic(
-                        periodicMovementId = periodicMovement.periodicMovementId,
+                        periodicMovementId = periodicMov.periodicMovementId,
                         dateTo = LocalDate.now().plusWeeks(2),
                         dateFrom = lastAccess
                     )
@@ -46,7 +51,7 @@ object PeriodicMovementsChecker {
                     if (movement != null) {
                         // Generate movements starting the day after the found one
                         getMovementsFromPeriodicMovement(
-                            periodicMovement,
+                            periodicMov,
                             movement.date.plusDays(1),
                             LocalDate.now()
                                 .plusWeeks(2) // Generating incoming movements up to 2 weeks
@@ -54,8 +59,8 @@ object PeriodicMovementsChecker {
                     } else {
                         // No movements found before today and after last access or periodic movement's date
                         getMovementsFromPeriodicMovement(
-                            periodicMovement,
-                            lastAccess ?: periodicMovement.date,
+                            periodicMov,
+                            lastAccess ?: periodicMov.date,
                             LocalDate.now().plusWeeks(2)
                         )
                     }
@@ -76,7 +81,7 @@ object PeriodicMovementsChecker {
                                     title = mov.title,
                                     notes = mov.notes,
                                     notify = mov.notify,
-                                    periodicMovementId = periodicMovement.periodicMovementId
+                                    periodicMovementId = mov.periodicMovementId
                                 )
                             )
                             if (mov.notify) {
@@ -99,7 +104,7 @@ object PeriodicMovementsChecker {
                                     title = mov.title,
                                     notes = mov.notes,
                                     notify = mov.notify,
-                                    periodicMovementId = periodicMovement.periodicMovementId
+                                    periodicMovementId = mov.periodicMovementId
                                 )
                             )
                         }
@@ -111,7 +116,7 @@ object PeriodicMovementsChecker {
                                 category = mov.category,
                                 title = mov.title,
                                 notes = mov.notes,
-                                periodicMovementId = periodicMovement.periodicMovementId
+                                periodicMovementId = mov.periodicMovementId
                             )
                         )
                         amountsSum += amount

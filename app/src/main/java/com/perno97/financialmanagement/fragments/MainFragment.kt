@@ -203,7 +203,8 @@ class MainFragment : Fragment() {
                     appViewModel,
                     appViewModel.viewModelScope,
                     profile.lastAccess,
-                    ::initReady
+                    ::initReady,
+                    null
                 )
                 computeExpectedAssets()
             } else {

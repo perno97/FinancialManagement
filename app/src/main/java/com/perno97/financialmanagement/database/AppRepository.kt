@@ -269,7 +269,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     @WorkerThread
     suspend fun update(incomingMovement: IncomingMovement) {
-        applicationDao.updateIncumbentMovements(incomingMovement)
+        applicationDao.updateIncomingMovements(incomingMovement)
     }
 
     @WorkerThread

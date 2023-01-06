@@ -270,13 +270,6 @@ class AddFinancialMovementFragment : Fragment() {
             }
         }
 
-        PeriodicMovementsChecker.check(
-            requireContext(),
-            appViewModel,
-            appViewModel.viewModelScope,
-            null,
-            null
-        )
         UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
         appViewModel.setSelectedCategory("") // Reset selected category
         parentFragmentManager.popBackStack()
@@ -401,6 +394,14 @@ class AddFinancialMovementFragment : Fragment() {
             notify = notify
         )
         appViewModel.insert(periodicMovement)
+        PeriodicMovementsChecker.check(
+            requireContext(),
+            appViewModel,
+            appViewModel.viewModelScope,
+            null,
+            null,
+            periodicMovement
+        )
         Snackbar.make(
             binding.editTextMovementDate,
             R.string.success_create_periodic,

@@ -64,7 +64,7 @@
     <string name="confirm_changes_of_current_showing_movement">Confirm changes of current showing movement</string>
     <string name="select_categories">Select categories</string>
     <string name="new_maiusc">NEW</string>
-    <string name="zero">0</string>
+    <string name="zero">0.00</string>
     <string name="euro_symbol">€</string>
     <string name="income">Income</string>
     <string name="outcome">Outcome</string>

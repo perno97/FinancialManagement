@@ -87,7 +87,12 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
 
     private fun loadMovementData() {
         val amount = movementDetailsData.amount
-        binding.editTextMovAmount.setText(String.format("%.2f", amount.absoluteValue))
+        binding.editTextMovAmount.setText(
+            getString(
+                R.string.number_decimal,
+                amount.absoluteValue
+            ).replace(',', '.')
+        )
         if (amount >= 0) {
             incomeSelected()
         } else {

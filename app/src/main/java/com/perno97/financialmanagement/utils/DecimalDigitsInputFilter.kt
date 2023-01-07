@@ -26,7 +26,7 @@ class DecimalDigitsInputFilter(private val view: EditText) : InputFilter {
                     return if (string.toFloatOrNull() == null)
                         ""
                     else {
-                        view.setText(String.format("%.2f", string.toFloat()))
+                        view.setText(String.format("%.2f", string.toFloat()).replace(',', '.'))
                         ""
                     }
                 }

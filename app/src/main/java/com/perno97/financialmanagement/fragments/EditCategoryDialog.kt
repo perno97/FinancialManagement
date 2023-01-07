@@ -50,7 +50,12 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
             cancelAction()
         }
         binding.editTextNewCatName.setText(category.name)
-        binding.editTextNewCatBudget.setText(String.format("%.2f", category.budget))
+        binding.editTextNewCatBudget.setText(
+            getString(
+                R.string.number_decimal,
+                category.budget
+            ).replace(',', '.')
+        )
         val index = colorsSpinnerAdapter.getIndexFromColor(category.color)
         binding.spinnerColor.setSelection(index)
         binding.editTextNewCatBudget.filters =

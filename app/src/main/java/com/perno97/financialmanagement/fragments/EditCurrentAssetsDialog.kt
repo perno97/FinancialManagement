@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.perno97.financialmanagement.FinancialManagementApplication
+import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.databinding.FragmentEditCurrentAssetsDialogBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+
 
 class EditCurrentAssetsDialog : DialogFragment() {
 
@@ -34,9 +36,19 @@ class EditCurrentAssetsDialog : DialogFragment() {
 
         appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
             if (profile != null) {
-                binding.editTextCurrentAssets.setText(String.format("%.2f", profile.assets))
+                binding.editTextCurrentAssets.setText(
+                    getString(
+                        R.string.number_decimal,
+                        profile.assets
+                    ).replace(',', '.')
+                )
             } else {
-                binding.editTextCurrentAssets.setText(String.format("%.2f", 0f))
+                binding.editTextCurrentAssets.setText(
+                    getString(
+                        R.string.number_decimal,
+                        0f
+                    ).replace(',', '.')
+                )
             }
         }
 

@@ -10,7 +10,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
@@ -51,18 +50,6 @@ class CategoriesListFragment : Fragment() {
     }
 
     private fun initListeners() {
-        binding.fabAddMovement.setOnClickListener {
-            parentFragmentManager.commit {
-                setCustomAnimations(
-                    R.anim.slide_in_bottom,
-                    R.anim.slide_out_bottom,
-                    R.anim.slide_in_bottom,
-                    R.anim.slide_out_bottom
-                )
-                add<AddFinancialMovementFragment>(R.id.fragment_container_view)
-                addToBackStack(null)
-            }
-        }
         binding.fabBtnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -83,6 +70,12 @@ class CategoriesListFragment : Fragment() {
             itemView.findViewById<TextView>(R.id.txtCategoryFilterName).text = category.name
             itemView.findViewById<ImageButton>(R.id.imgBtnEditCat).setOnClickListener {
                 parentFragmentManager.commit {
+                    setCustomAnimations(
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right,
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left
+                    )
                     replace(
                         R.id.fragment_container_view,
                         CategoryDetailsFragment(category.name)

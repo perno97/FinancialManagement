@@ -181,7 +181,13 @@ class RegisteredMovementsFragment : Fragment() {
                     cardLine.findViewById<LinearLayout>(R.id.singleRegisteredMov)
                         .setOnClickListener {
                             parentFragmentManager.commit {
-                                replace(
+                                setCustomAnimations(
+                                    R.anim.slide_in_bottom,
+                                    R.anim.slide_out_top,
+                                    R.anim.slide_in_top,
+                                    R.anim.slide_out_bottom
+                                )
+                                add(
                                     R.id.fragment_container_view,//mov
                                     FinancialMovementDetailsFragment(
                                         MovementDetailsData(
@@ -230,6 +236,12 @@ class RegisteredMovementsFragment : Fragment() {
         }
         binding.fabPeriodicMovements.setOnClickListener {
             parentFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 replace(R.id.fragment_container_view, PeriodicMovementsFragment())
                 addToBackStack(null)
             }

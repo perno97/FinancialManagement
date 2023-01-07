@@ -369,6 +369,12 @@ class MainFragment : Fragment() {
         binding.imgBtnGraphs.setOnClickListener {
             Log.i(logTag, "Clicked on graphs button")
             parentFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 replace(R.id.fragment_container_view, AssetsGraphsFragment())
                 addToBackStack(null)
             }
@@ -376,6 +382,12 @@ class MainFragment : Fragment() {
         binding.imgBtnCategories.setOnClickListener {
             Log.i(logTag, "Clicked on categories list button")
             parentFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right,
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left
+                )
                 replace(R.id.fragment_container_view, CategoriesListFragment())
                 addToBackStack(null)
             }
@@ -396,6 +408,12 @@ class MainFragment : Fragment() {
         binding.fabIncomingMovements.setOnClickListener {
             Log.i(logTag, "Clicked incoming movements")
             parentFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in_bottom,
+                    R.anim.slide_out_top,
+                    R.anim.slide_in_top,
+                    R.anim.slide_out_bottom
+                )
                 replace(R.id.fragment_container_view, IncomingMovementsFragment())
                 addToBackStack(null)
             }

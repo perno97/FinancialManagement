@@ -53,21 +53,6 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAddMovement"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fabCustomSize="55dp"
-            android:clickable="true"
-            app:useCompatPadding="true"
-            android:backgroundTint="@color/dark"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_baseline_add_24"
-            android:focusable="true"
-            android:contentDescription="@string/open_add_a_new_financial_movement" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabBtnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

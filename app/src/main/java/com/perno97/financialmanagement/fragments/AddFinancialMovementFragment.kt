@@ -59,9 +59,6 @@ class AddFinancialMovementFragment : Fragment() {
     ): View {
         _binding = FragmentAddFinancialMovementBinding.inflate(inflater, container, false)
 
-        //UnusedCategoriesChecker.check(appViewModel, lifecycleScope)
-
-
         viewLifecycleOwner.lifecycleScope.launch {
             appViewModel.uiState.collect {
                 selectedCategory = it.selectedCategory

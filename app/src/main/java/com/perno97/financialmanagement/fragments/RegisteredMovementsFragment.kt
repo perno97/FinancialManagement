@@ -18,6 +18,7 @@ import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentRegisteredMovementsBinding
+import com.perno97.financialmanagement.utils.MovementDetailsData
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
@@ -132,7 +133,6 @@ class RegisteredMovementsFragment : Fragment() {
                 val card = LayoutInflater.from(requireContext())
                     .inflate(R.layout.movement_card, binding.movementCardsContainer, false)
                 var cardDate = ""
-                //val groupDate = LocalDate.parse(group.groupDate)
                 when (state) {
                     PeriodState.DAY -> {
                         val groupDate = LocalDate.parse(group.groupDate)

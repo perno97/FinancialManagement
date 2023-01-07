@@ -1,4 +1,4 @@
-package com.perno97.financialmanagement.fragments
+package com.perno97.financialmanagement.utils
 
 import java.time.DayOfWeek
 import java.time.LocalDate

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -18,6 +17,7 @@ import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.databinding.FragmentConfirmMovementDeleteDialogBinding
 import com.perno97.financialmanagement.notifications.NotifyManager
+import com.perno97.financialmanagement.utils.MovementDeletionData
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
@@ -126,11 +126,6 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
         } else {
             Log.e(logTag, "Error deleting movement $movementDeletionData")
         }
-        /*parentFragmentManager.popBackStack(
-            "after_deletion",
-            FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
-         */
         dismiss()
     }
 

@@ -51,9 +51,6 @@ class AssetsGraphsFragment : Fragment() {
 
     private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
 
-    /**
-     * Connection to data
-     */
     private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
@@ -95,12 +92,11 @@ class AssetsGraphsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 appViewModel.uiState.collect {
-                    Log.e(logTag, "Collected UI data")
+                    Log.i(logTag, "Collected UI data")
                     dateTo = it.dateToAssets
                     dateFrom = it.dateFromAssets
                     state = it.stateAssets
                     datePickerSelection = it.datePickerSelectionAssets
-                    //loadCategoryExpenses()
                     when (state) {
                         PeriodState.WEEK -> setWeek()
                         PeriodState.MONTH -> setMonth()

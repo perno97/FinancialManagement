@@ -21,6 +21,7 @@ import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.GroupInfo
 import com.perno97.financialmanagement.database.PeriodicMovementAndCategory
 import com.perno97.financialmanagement.databinding.FragmentPeriodicMovementsBinding
+import com.perno97.financialmanagement.utils.MovementDetailsData
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory

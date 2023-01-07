@@ -21,7 +21,7 @@ object PeriodicMovementsChecker {
         callback: (() -> Unit)?,
         periodicMovement: PeriodicMovement?,
     ) {
-        Log.e(logTag, "Called check")
+        Log.i(logTag, "Called check")
         scope.launch {
             val list =
                 if (periodicMovement == null) {

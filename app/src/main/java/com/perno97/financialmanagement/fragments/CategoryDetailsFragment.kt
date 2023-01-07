@@ -47,23 +47,17 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private val logTag = "CategoryDetailsFragment"
     private val numberOfColumnsInGraphs = 8
 
-    /**
-     * Connection to data
-     */
     private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
+
+    private var _binding: FragmentCategoryDetailsBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
     private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
-
-    /**
-     * Binding to layout resource
-     */
-    private var _binding: FragmentCategoryDetailsBinding? = null
 
     private lateinit var dateFrom: LocalDate
     private lateinit var dateTo: LocalDate
@@ -79,7 +73,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.e(logTag, "Called onCreateView")
+        Log.i(logTag, "Called onCreateView")
         _binding = FragmentCategoryDetailsBinding.inflate(inflater, container, false)
 
         val f = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
@@ -186,8 +180,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
         if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
             Log.e(logTag, "No category movements to show in horizontal graphs")
         } else {
-            //var currentSum = 0f
-            //var budgetsSum = 0f
             var maxGain = 0f
             var expFound = false
             for (c in categoriesExpenses!!.keys) {
@@ -314,10 +306,6 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         ) && !amountWithDate.amountDate.isAfter(dateToCheckBefore)
                     }
                     if (amountWithDateFound.size > 1) {
-                        /* Log.e(
-                            logTag,
-                            "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
-                        ) */
                         Log.e(
                             logTag,
                             "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
@@ -447,11 +435,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         ) && !amountWithDate.amountDate.isAfter(dateToCheckBefore)
                     }
                     if (amountWithDateFound.size > 1) {
-                        /*Log.e(
+                        Log.e(
                             logTag,
                             "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
-                        )*/
-                        throw Exception("Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount")
+                        )
                     }
                     val exp: Float
                     if (amountWithDateFound.isEmpty()) {
@@ -657,7 +644,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 appViewModel.uiState.collect {
-                    Log.e(logTag, "Collected UI data")
+                    Log.i(logTag, "Collected UI data")
                     dateTo = it.dateToCatDetails
                     dateFrom = it.dateFromCatDetails
                     state = it.stateCatDetails

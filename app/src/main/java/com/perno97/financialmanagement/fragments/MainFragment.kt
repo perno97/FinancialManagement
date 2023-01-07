@@ -63,9 +63,6 @@ class MainFragment : Fragment() {
 
     private val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
 
-    /**
-     * Binding to layout resource
-     */
     private var _binding: FragmentMainBinding? = null
 
     private lateinit var dateFrom: LocalDate
@@ -118,11 +115,6 @@ class MainFragment : Fragment() {
                 dateTo = it.dateToMain
                 state = it.stateMain
                 datePickerSelection = it.datePickerSelectionMain
-                //isAllDataLoaded = false
-                /*PeriodicMovementsChecker.check(
-                    appViewModel,
-                    appViewModel.viewModelScope,
-                    fun() { initReady() })*/
             }
         }
     }

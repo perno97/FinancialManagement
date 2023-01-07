@@ -27,9 +27,6 @@ class AddCategoryToFilterFragment(private val parentCategory: Category) : Fragme
     // onDestroyView.
     private val binding get() = _binding!!
 
-    /**
-     * Connection to data
-     */
     private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }

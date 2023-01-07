@@ -9,13 +9,13 @@ object UnusedCategoriesChecker {
     private const val logTag = "UnusedCategoriesChecker"
 
     fun check(appViewModel: AppViewModel, scope: CoroutineScope) {
-        Log.e(logTag, "Called check")
+        Log.i(logTag, "Called check")
         scope.launch {
-            Log.e(logTag, "Started checking")
+            Log.i(logTag, "Started checking")
             val list = appViewModel.getCategoryWithMovements()
-            Log.e(logTag, "Category list of ${list.size} items")
+            Log.i(logTag, "Category list of ${list.size} items")
             for (item in list) {
-                Log.e(
+                Log.i(
                     logTag,
                     "Checking category ${item.category.name} with ${item.movements.size} movements"
                 )
@@ -24,12 +24,12 @@ object UnusedCategoriesChecker {
                             .isEmpty() && appViewModel.getIncomingMovements(item.category.name)
                             .isEmpty()
                     ) {
-                        Log.e(logTag, "Category ${item.category.name} has no related movement")
+                        Log.i(logTag, "Category ${item.category.name} has no related movement")
                         appViewModel.deleteCategory(item.category)
                     }
                 }
             }
-            Log.e(logTag, "Finished checking")
+            Log.i(logTag, "Finished checking")
         }
     }
 }

@@ -22,6 +22,8 @@ import com.perno97.financialmanagement.database.GroupInfo
 import com.perno97.financialmanagement.database.IncomingMovement
 import com.perno97.financialmanagement.database.IncomingMovementAndCategory
 import com.perno97.financialmanagement.databinding.FragmentIncomingMovementsBinding
+import com.perno97.financialmanagement.utils.MovementDeletionData
+import com.perno97.financialmanagement.utils.MovementDetailsData
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory

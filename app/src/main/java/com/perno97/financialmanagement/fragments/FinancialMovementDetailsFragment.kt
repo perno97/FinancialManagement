@@ -27,6 +27,8 @@ import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.databinding.FragmentFinancialMovementDetailsBinding
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.notifications.NotifyManager
+import com.perno97.financialmanagement.utils.MovementDeletionData
+import com.perno97.financialmanagement.utils.MovementDetailsData
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
@@ -63,8 +65,6 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFinancialMovementDetailsBinding.inflate(inflater, container, false)
-
-        //UnusedCategoriesChecker.check(appViewModel, lifecycleScope)
 
         viewLifecycleOwner.lifecycleScope.launch {
             appViewModel.uiState.collect {

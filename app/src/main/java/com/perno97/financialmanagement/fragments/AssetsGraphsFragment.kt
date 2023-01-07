@@ -322,7 +322,7 @@ class AssetsGraphsFragment : Fragment() {
                             .withDayOfMonth(1)
                             .isEqual(columnDate)
                     }
-                    val l = columnDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                    val l = columnDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceFirstChar { c -> c.uppercase() }
 
                     // Check if there is item for this week
                     if (item != null) {
@@ -470,7 +470,7 @@ class AssetsGraphsFragment : Fragment() {
     }
 
     private fun setTitle(title: String) {
-        binding.txtTitle.text = title
+        binding.txtSubtitle.text = title
     }
 
     override fun onResume() {

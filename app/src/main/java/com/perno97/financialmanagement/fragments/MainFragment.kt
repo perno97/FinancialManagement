@@ -421,7 +421,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setTitle(title: String) {
-        binding.txtTitle.text = title
+        binding.txtSubtitle.text = title
     }
 
     private fun updateUI(categories: Map<Category, Expense>, dailyBudget: Float?) {

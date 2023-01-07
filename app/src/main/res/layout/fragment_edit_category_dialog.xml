@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:ems="10"
-            android:gravity="center_vertical"
+            android:textAlignment="textEnd"
             android:layout_weight=".5"
             android:maxLength="15"
             android:inputType="text"
@@ -87,6 +87,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight=".4"
+            android:textAlignment="textEnd"
             android:ems="10"
             android:inputType="numberDecimal"
             android:importantForAutofill="no" />

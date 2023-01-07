@@ -112,4 +112,7 @@
     <string name="periodic_movements_capital">PERIODIC MOVEMENTS</string>
     <string name="open_categories_list_page">Open categories list page</string>
     <string name="this_movement_is_periodic">This movement is periodic</string>
+    <string name="budgets_capital">BUDGETS</string>
+    <string name="assets_graphs_capital">ASSETS GRAPHS</string>
+    <string name="category_details_capital">CATEGORY DETAILS</string>
 </resources>

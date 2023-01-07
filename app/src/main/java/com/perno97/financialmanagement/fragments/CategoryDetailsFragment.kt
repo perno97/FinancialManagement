@@ -860,7 +860,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     }
 
     private fun setTitle(title: String) {
-        binding.txtTitle.text = title
+        binding.txtSubtitle.text = title
     }
 
     override fun onDestroyView() {

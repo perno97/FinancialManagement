@@ -36,9 +36,21 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="25dp"
                     android:textSize="15sp"
+                    android:text="@string/budgets_capital"
                     app:layout_constraintEnd_toStartOf="@id/imgBtnGraphs"
                     app:layout_constraintStart_toEndOf="@id/imgBtnCategories"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/txtSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text=""
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@id/imgBtnGraphs"
+                    app:layout_constraintStart_toEndOf="@id/imgBtnCategories"
+                    app:layout_constraintTop_toBottomOf="@id/txtTitle"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <ImageButton

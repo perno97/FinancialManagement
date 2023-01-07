@@ -1,16 +1,20 @@
 package com.perno97.financialmanagement.viewmodels
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.core.util.Pair
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.perno97.financialmanagement.database.*
 import com.perno97.financialmanagement.utils.PeriodState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import androidx.core.util.Pair
-import com.perno97.financialmanagement.database.*
-import kotlinx.coroutines.flow.*
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
-    private val logTag = "AppViewModel"
 
     private val defaultProfileId = 0
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
@@ -32,10 +36,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
-        Log.i(logTag, "Getting categories with movements")
-        val toreturn = repository.getCategoryWithMovements()
-        Log.i(logTag, "Returning $toreturn value")
-        return toreturn
+        return repository.getCategoryWithMovements()
     }
 
     suspend fun getCurrentAssetDefault(): Float {
@@ -155,26 +156,30 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getCategoryExpensesProgresses(dateFrom, dateTo).asLiveData()
     }
 
-    fun getCategoriesExpensesMonth(
+    fun getCategoriesMovementsMonth(
         categories: List<String>,
-        beforeDateInclusive: LocalDate
+        beforeDateInclusive: LocalDate,
+        limitData: Int
     ): LiveData<Map<Category, List<AmountWithDate>>> {
-        return repository.getCategoriesExpensesMonth(categories, beforeDateInclusive).asLiveData()
+        return repository.getCategoriesMovementsMonth(categories, beforeDateInclusive, limitData)
+            .asLiveData()
     }
 
-    fun getCategoriesExpensesWeek(
+    fun getCategoriesMovementsWeek(
         categories: List<String>,
-        weekStartOffset: Int
+        weekStartOffset: Int,
+        limitData: Int
     ): LiveData<Map<Category, List<AmountWithDate>>> {
-        return repository.getCategoriesExpensesWeek(categories, weekStartOffset).asLiveData()
+        return repository.getCategoriesMovementsWeek(categories, weekStartOffset, limitData)
+            .asLiveData()
     }
 
-    fun getCategoriesExpensesPeriod(
+    fun getCategoriesMovementsPeriod(
         categories: List<String>,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): LiveData<Map<Category, List<AmountWithDate>>> {
-        return repository.getCategoriesExpensesPeriod(categories, dateFrom, dateTo).asLiveData()
+        return repository.getCategoriesMovementsPeriod(categories, dateFrom, dateTo).asLiveData()
     }
 
     fun getCategoryProgresses(
@@ -188,15 +193,23 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getExpectedSum(dateFrom, dateTo).asLiveData()
     }
 
-    fun getMovementsSumGroupByMonth(beforeDateInclusive: LocalDate): LiveData<List<GroupInfo>> {
-        return repository.getMovementsSumGroupByMonth(beforeDateInclusive).asLiveData()
+    fun getMovementsSumGroupByMonth(
+        beforeDateInclusive: LocalDate,
+        limitData: Int
+    ): LiveData<List<GroupInfo>> {
+        return repository.getMovementsSumGroupByMonth(beforeDateInclusive, limitData).asLiveData()
     }
 
     fun getMovementsSumGroupByWeek(
         weekStartOffset: Int,
-        beforeDateInclusive: LocalDate
+        beforeDateInclusive: LocalDate,
+        limitData: Int
     ): LiveData<List<GroupInfo>> {
-        return repository.getMovementsSumGroupByWeek(weekStartOffset, beforeDateInclusive)
+        return repository.getMovementsSumGroupByWeek(
+            weekStartOffset,
+            beforeDateInclusive,
+            limitData
+        )
             .asLiveData()
     }
 

@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.perno97.financialmanagement.database
 
 import androidx.room.*
@@ -268,9 +270,12 @@ interface ApplicationDao {
         "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch', 'start of month') AS groupDate," +
                 " SUM(CASE WHEN movement.amount > 0 THEN movement.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS negative FROM movement" +
-                " WHERE :beforeDateInclusive >= movement.date GROUP BY groupDate ORDER BY groupDate DESC"
+                " WHERE :beforeDateInclusive >= movement.date GROUP BY groupDate ORDER BY groupDate DESC LIMIT :limitData"
     )
-    fun getMovementsSumGroupByMonth(beforeDateInclusive: LocalDate): Flow<List<GroupInfo>>
+    fun getMovementsSumGroupByMonth(
+        beforeDateInclusive: LocalDate,
+        limitData: Int
+    ): Flow<List<GroupInfo>>
 
 
     // move to sunday then move to the first day of the week, if they're equal the events are in the same week
@@ -278,11 +283,12 @@ interface ApplicationDao {
         "SELECT STRFTIME('%Y-%m-%d', movement.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days') AS groupDate," +
                 " SUM(CASE WHEN movement.amount > 0 THEN movement.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS negative FROM movement" +
-                " WHERE :beforeDateInclusive >= movement.date GROUP BY groupDate ORDER BY groupDate DESC"
+                " WHERE :beforeDateInclusive >= movement.date GROUP BY groupDate ORDER BY groupDate DESC LIMIT :limitData"
     )
     fun getMovementsSumGroupByWeek(
         weekStartOffset: Int,
-        beforeDateInclusive: LocalDate
+        beforeDateInclusive: LocalDate,
+        limitData: Int
     ): Flow<List<GroupInfo>>
 
 
@@ -302,22 +308,24 @@ interface ApplicationDao {
         "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
                 "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
                 " JOIN movement ON name = movement.category WHERE name IN (:categories) AND :beforeDateInclusive >= movement.date" +
-                " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch') LIMIT 12"
+                " GROUP BY STRFTIME('%Y-%m', movement.date, 'unixepoch'), category ORDER BY category LIMIT :limitData"
     )
-    fun getCategoriesExpensesMonth(
+    fun getCategoriesMovementsMonth(
         categories: List<String>,
-        beforeDateInclusive: LocalDate
+        beforeDateInclusive: LocalDate,
+        limitData: Int
     ): Flow<Map<Category, List<AmountWithDate>>>
 
     @Query(
         "SELECT category.*, SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS expense, " +
                 "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate " +
                 "FROM category JOIN movement ON name = movement.category WHERE name IN (:categories)" +
-                " GROUP BY STRFTIME('%Y-%m-%d', movement.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days') LIMIT 12"
+                " GROUP BY STRFTIME('%Y-%m-%d', movement.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days'), category ORDER BY category LIMIT :limitData"
     )
-    fun getCategoriesExpensesWeek(
+    fun getCategoriesMovementsWeek(
         categories: List<String>,
-        weekStartOffset: Int
+        weekStartOffset: Int,
+        limitData: Int,
     ): Flow<Map<Category, List<AmountWithDate>>>
 
     @Query(
@@ -325,9 +333,9 @@ interface ApplicationDao {
                 "SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS gain, movement.date AS amountDate FROM category" +
                 " LEFT JOIN movement ON name = movement.category WHERE name IN (:categories)" +
                 " AND movement.date >= :dateFrom AND movement.date <= :dateTo" +
-                " GROUP BY movement.date"
+                " GROUP BY movement.date, category ORDER BY category"
     )
-    fun getCategoriesExpensesPeriod(
+    fun getCategoriesMovementsPeriod(
         categories: List<String>,
         dateFrom: LocalDate,
         dateTo: LocalDate
@@ -342,7 +350,7 @@ interface ApplicationDao {
                 "(SELECT movement.category AS catName, SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
                 " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +
-                " ON category.name = catName"
+                " ON category.name = catName ORDER BY category.name"
     )
     fun getCategoryProgresses(
         dateFrom: LocalDate,

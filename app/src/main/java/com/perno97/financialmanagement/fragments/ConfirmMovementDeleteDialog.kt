@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -75,6 +76,9 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
     private fun confirmDeletion() {
         if (movementDeletionData.movementId != null) {
             appViewModel.deleteMovement(movementDeletionData.movementId)
+            appViewModel.viewModelScope.launch {
+                appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() - movementDeletionData.amount)
+            }
             Snackbar.make(
                 binding.btnConfirmDeletion,
                 R.string.success_delete_movement,
@@ -122,6 +126,11 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
         } else {
             Log.e(logTag, "Error deleting movement $movementDeletionData")
         }
+        /*parentFragmentManager.popBackStack(
+            "after_deletion",
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
+         */
         dismiss()
     }
 
@@ -141,6 +150,7 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        parentFragmentManager.popBackStack()
     }
 
     companion object {

@@ -118,10 +118,10 @@ class AssetsGraphsFragment : Fragment() {
     private fun initGraphs() {
         val lineChart = binding.assetsLineChart
         val barChart = binding.assetsBarChart
-        lineChart.setExtraOffsets(10f, 0f, 10f, 30f)
+        lineChart.setExtraOffsets(10f, 0f, 10f, 10f)
         lineChart.description.isEnabled = false
         lineChart.legend.isEnabled = false
-        barChart.setExtraOffsets(10f, 0f, 10f, 30f)
+        barChart.setExtraOffsets(10f, 0f, 10f, 10f)
         barChart.description.isEnabled = false
         barChart.legend.isEnabled = false
 
@@ -132,6 +132,7 @@ class AssetsGraphsFragment : Fragment() {
         xAxisLine.labelRotationAngle = -90f
 
         val xAxisBar = barChart.xAxis
+        xAxisBar.yOffset = 10f
         xAxisBar.setCenterAxisLabels(true)
         xAxisBar.setDrawGridLines(false)
         xAxisBar.setDrawAxisLine(false)
@@ -158,7 +159,8 @@ class AssetsGraphsFragment : Fragment() {
             PeriodState.WEEK -> {
                 appViewModel.getMovementsSumGroupByWeek(
                     weekStartOffset,
-                    LocalDate.now()
+                    LocalDate.now(),
+                    numberOfColumnsInGraphs
                 ).observe(viewLifecycleOwner) { data ->
                     updateLineAndBarCharts(data)
                 }
@@ -171,7 +173,7 @@ class AssetsGraphsFragment : Fragment() {
             }
             // ---------------- MONTH ----------------
             PeriodState.MONTH -> {
-                appViewModel.getMovementsSumGroupByMonth(LocalDate.now())
+                appViewModel.getMovementsSumGroupByMonth(LocalDate.now(), numberOfColumnsInGraphs)
                     .observe(viewLifecycleOwner) { data ->
                         updateLineAndBarCharts(data)
                     }
@@ -201,7 +203,7 @@ class AssetsGraphsFragment : Fragment() {
         val expProgressBar = binding.progressBarAssetsOutcomes
         val gainProgressBar = binding.progressBarAssetsIncomes
         val txtViewExp = binding.txtAssetsOutcomes
-        val txtViewGain = binding.txtAssetsIcomes
+        val txtViewGain = binding.txtAssetsIncomes
         if (data != null) {
             val exp = data.negative.absoluteValue
             val gain = data.positive

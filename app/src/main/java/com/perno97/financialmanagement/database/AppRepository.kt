@@ -1,13 +1,11 @@
 package com.perno97.financialmanagement.database
 
-import android.util.Log
 import androidx.annotation.WorkerThread
 import com.perno97.financialmanagement.viewmodels.PositiveNegativeSums
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 class AppRepository(private val applicationDao: ApplicationDao) {
-    private val logTag = "AppRepository"
 
     /*
         Getters without parameters
@@ -17,10 +15,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     @WorkerThread
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {
-        Log.e(logTag, "Getting categories with movements")
-        val toreturn = applicationDao.getCategoryWithMovements()
-        Log.e(logTag, "Returning $toreturn value")
-        return toreturn
+        return applicationDao.getCategoryWithMovements()
     }
 
     @WorkerThread
@@ -161,28 +156,34 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategoriesExpensesMonth(
+    fun getCategoriesMovementsMonth(
         categories: List<String>,
-        beforeDateInclusive: LocalDate
+        beforeDateInclusive: LocalDate,
+        limitData: Int
     ): Flow<Map<Category, List<AmountWithDate>>> {
-        return applicationDao.getCategoriesExpensesMonth(categories, beforeDateInclusive)
+        return applicationDao.getCategoriesMovementsMonth(
+            categories,
+            beforeDateInclusive,
+            limitData
+        )
     }
 
     @WorkerThread
-    fun getCategoriesExpensesWeek(
+    fun getCategoriesMovementsWeek(
         categories: List<String>,
-        weekStartOffset: Int
+        weekStartOffset: Int,
+        limitData: Int
     ): Flow<Map<Category, List<AmountWithDate>>> {
-        return applicationDao.getCategoriesExpensesWeek(categories, weekStartOffset)
+        return applicationDao.getCategoriesMovementsWeek(categories, weekStartOffset, limitData)
     }
 
     @WorkerThread
-    fun getCategoriesExpensesPeriod(
+    fun getCategoriesMovementsPeriod(
         categories: List<String>,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Flow<Map<Category, List<AmountWithDate>>> {
-        return applicationDao.getCategoriesExpensesPeriod(categories, dateFrom, dateTo)
+        return applicationDao.getCategoriesMovementsPeriod(categories, dateFrom, dateTo)
     }
 
     @WorkerThread
@@ -199,18 +200,23 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getMovementsSumGroupByMonth(beforeDateInclusive: LocalDate): Flow<List<GroupInfo>> {
-        return applicationDao.getMovementsSumGroupByMonth(beforeDateInclusive)
+    fun getMovementsSumGroupByMonth(
+        beforeDateInclusive: LocalDate,
+        limitData: Int
+    ): Flow<List<GroupInfo>> {
+        return applicationDao.getMovementsSumGroupByMonth(beforeDateInclusive, limitData)
     }
 
     @WorkerThread
     fun getMovementsSumGroupByWeek(
         weekStartOffset: Int,
-        beforeDateInclusive: LocalDate
+        beforeDateInclusive: LocalDate,
+        limitData: Int
     ): Flow<List<GroupInfo>> {
         return applicationDao.getMovementsSumGroupByWeek(
             weekStartOffset,
-            beforeDateInclusive
+            beforeDateInclusive,
+            limitData
         )
     }
 

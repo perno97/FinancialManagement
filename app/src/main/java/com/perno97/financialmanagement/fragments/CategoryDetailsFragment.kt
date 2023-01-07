@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,8 +23,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AmountWithDate
@@ -48,7 +45,7 @@ import kotlin.math.roundToInt
 class CategoryDetailsFragment(private val categoryName: String) :
     Fragment() {
     private val logTag = "CategoryDetailsFragment"
-    private val numberOfColumnsInGraphs = 12
+    private val numberOfColumnsInGraphs = 8
 
     /**
      * Connection to data
@@ -108,9 +105,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun initGraphs() {
         val expChart = binding.expensesLineChart
         val gainsChart = binding.incomesLineChart
-        expChart.setExtraOffsets(10f, 0f, 10f, 30f)
+        expChart.setExtraOffsets(10f, 0f, 10f, 10f)
         expChart.description.isEnabled = false
-        gainsChart.setExtraOffsets(10f, 0f, 10f, 30f)
+        gainsChart.setExtraOffsets(10f, 0f, 10f, 10f)
         gainsChart.description.isEnabled = false
 
         val xAxisExp = expChart.xAxis
@@ -139,30 +136,33 @@ class CategoryDetailsFragment(private val categoryName: String) :
     private fun loadGraphsData() {
         Log.i(logTag, "Called loadGraphsData()")
         val catList = categoryFilters.map { c -> c.name } + listOf(category.name)
+        binding.noDataCategoryDetails.visibility = View.GONE
         when (state) {
             // ----------------- DAY -----------------
             PeriodState.DAY -> Log.e(logTag, "Period day not defined in this screen")
             // ----------------- WEEK ----------------
-            PeriodState.WEEK -> appViewModel.getCategoriesExpensesWeek(
+            PeriodState.WEEK -> appViewModel.getCategoriesMovementsWeek(
                 catList,
-                weekStartOffset
-            ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphsWeek(categoryWithExpense)
+                weekStartOffset,
+                numberOfColumnsInGraphs
+            ).observe(viewLifecycleOwner) { categoryWithMovements ->
+                updateLineGraphsWeek(categoryWithMovements)
             }
             // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getCategoriesExpensesMonth(
+            PeriodState.MONTH -> appViewModel.getCategoriesMovementsMonth(
                 catList,
-                LocalDate.now()
-            ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphsMonth(categoryWithExpense)
+                LocalDate.now(),
+                numberOfColumnsInGraphs
+            ).observe(viewLifecycleOwner) { categoryWithMovements ->
+                updateLineGraphsMonth(categoryWithMovements)
             }
             // ---------------- PERIOD ----------------
-            PeriodState.PERIOD -> appViewModel.getCategoriesExpensesPeriod(
+            PeriodState.PERIOD -> appViewModel.getCategoriesMovementsPeriod(
                 catList,
                 dateFrom,
                 dateTo
-            ).observe(viewLifecycleOwner) { categoryWithExpense ->
-                updateLineGraphsPeriod(categoryWithExpense)
+            ).observe(viewLifecycleOwner) { categoryWithMovements ->
+                updateLineGraphsPeriod(categoryWithMovements)
             }
             // ----------------------------------------
         }
@@ -189,21 +189,29 @@ class CategoryDetailsFragment(private val categoryName: String) :
             //var currentSum = 0f
             //var budgetsSum = 0f
             var maxGain = 0f
+            var expFound = false
             for (c in categoriesExpenses!!.keys) {
                 if (categoriesExpenses!![c] != null && maxGain < categoriesExpenses!![c]!!.positive) {
                     maxGain = categoriesExpenses!![c]!!.positive
                 }
+                if (!expFound && categoriesExpenses!![c] != null && categoriesExpenses!![c]!!.negative < 0f)
+                    expFound = true
             }
-            for (c in categoriesExpenses!!.keys) {
-                val multipliedBudget = c.budget * budgetMultiplier
-                if (categoriesExpenses!![c] == null) {
-                    Log.e(logTag, "No expense progress data found for category ${category.name}")
-                    break
-                }
-                val currentCatExpenseAsPositive = categoriesExpenses!![c]!!.negative.absoluteValue
-                val currentCatGain = categoriesExpenses!![c]!!.positive
-                if (currentCatExpenseAsPositive != 0f || currentCatGain != 0f) {
-                    if (currentCatExpenseAsPositive != 0f) {
+            if (maxGain != 0f || expFound) {
+                for (c in categoriesExpenses!!.keys) {
+                    val multipliedBudget = c.budget * budgetMultiplier
+                    if (categoriesExpenses!![c] == null) {
+                        Log.e(
+                            logTag,
+                            "No expense progress data found for category ${category.name}"
+                        )
+                        break
+                    }
+                    val currentCatExpenseAsPositive =
+                        categoriesExpenses!![c]!!.negative.absoluteValue
+                    val currentCatGain = categoriesExpenses!![c]!!.positive
+
+                    if (expFound) {
                         // Load layout
                         val viewCatProgressLayoutExp =
                             layoutInflater.inflate(
@@ -217,7 +225,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         val progressBarExp =
                             viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                         // Set category name for progress bar
-                        viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
+                        viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
                             c.name
                         // Set progress bar progress and color
                         progressBarExp.progress =
@@ -232,7 +240,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                                 multipliedBudget
                             )
                     }
-                    if (currentCatGain != 0f) {
+                    if (maxGain != 0f) {
                         // Load layout
                         val viewCatProgressLayoutGain =
                             layoutInflater.inflate(
@@ -247,11 +255,10 @@ class CategoryDetailsFragment(private val categoryName: String) :
                             viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
 
                         // Set category name for progress bar
-                        viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgMinimalCategoryName).text =
+                        viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
                             c.name
                         // Set progress bar progress and color
-                        progressBarGain.progress =
-                            if (maxGain == 0f) currentCatGain.roundToInt() else (currentCatGain * 100 / maxGain).roundToInt()
+                        progressBarGain.progress = (currentCatGain * 100 / maxGain).roundToInt()
                         progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
                         // Set category budget of category line
                         viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtCategoryBudget).text =
@@ -272,17 +279,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
         if (data.isEmpty()) {
             binding.expensesSectionCatDetails.visibility = View.GONE
             binding.incomesSectionCatDetails.visibility = View.GONE
-            Snackbar.make(
-                binding.expensesLineChart,
-                R.string.error_no_data_in_period,
-                BaseTransientBottomBar.LENGTH_LONG
-            ).setBackgroundTint(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.warning
-                )
-            ).show()
+            binding.noDataCategoryDetails.visibility = View.VISIBLE
         } else {
+            val categories = data.keys.plusElement(category)
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
             val lineChartExpData = LineData()
@@ -291,7 +290,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
             var labelsLoaded = false
             var expensesFound = false
             var gainsFound = false
-            for (category in data.keys) {
+            for (category in categories) {
                 val expEntries = arrayListOf<Entry>()
                 val gainEntries = arrayListOf<Entry>()
                 if (data[category] == null) {
@@ -319,9 +318,9 @@ class CategoryDetailsFragment(private val categoryName: String) :
                             logTag,
                             "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
                         ) */
-                        throw Exception(
-                            "Found multiple expenses for same column.\n" +
-                                    "Category: ${category.name}, column: $columnCount"
+                        Log.e(
+                            logTag,
+                            "Found multiple expenses for same column.\nCategory: ${category.name}, column: $columnCount"
                         )
                     }
                     val exp: Float
@@ -331,7 +330,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     } else {
                         // Found a value for this column for this category
                         exp = amountWithDateFound[0].expense.absoluteValue
-                        expensesFound = exp != 0f
+                        if (exp != 0f) expensesFound = true
                     }
 
                     val gain: Float
@@ -341,7 +340,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                     } else {
                         // Found a value for this column for this category
                         gain = amountWithDateFound[0].gain
-                        gainsFound = gain != 0f
+                        if (gain != 0f) gainsFound = true
                     }
                     expEntries.add(
                         Entry(
@@ -401,16 +400,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGain.invalidate()
             }
             if (!expensesFound && !gainsFound) {
-                Snackbar.make(
-                    binding.expensesLineChart,
-                    R.string.error_no_data_in_period,
-                    BaseTransientBottomBar.LENGTH_LONG
-                ).setBackgroundTint(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.warning
-                    )
-                ).show()
+                binding.noDataCategoryDetails.visibility = View.VISIBLE
             }
         }
     }
@@ -422,16 +412,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
         if (data.isEmpty()) {
             binding.expensesSectionCatDetails.visibility = View.GONE
             binding.incomesSectionCatDetails.visibility = View.GONE
-            Snackbar.make(
-                binding.expensesLineChart,
-                R.string.error_no_data_in_period,
-                BaseTransientBottomBar.LENGTH_LONG
-            ).setBackgroundTint(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.warning
-                )
-            ).show()
+            binding.noDataCategoryDetails.visibility = View.VISIBLE
         } else {
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
@@ -550,16 +531,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGain.invalidate()
             }
             if (!expensesFound && !gainsFound) {
-                Snackbar.make(
-                    binding.expensesLineChart,
-                    R.string.error_no_data_in_period,
-                    BaseTransientBottomBar.LENGTH_LONG
-                ).setBackgroundTint(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.warning
-                    )
-                ).show()
+                binding.noDataCategoryDetails.visibility = View.VISIBLE
             }
         }
     }
@@ -571,16 +543,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
         if (data.isEmpty()) {
             binding.expensesSectionCatDetails.visibility = View.GONE
             binding.incomesSectionCatDetails.visibility = View.GONE
-            Snackbar.make(
-                binding.expensesLineChart,
-                R.string.error_no_data_in_period,
-                BaseTransientBottomBar.LENGTH_LONG
-            ).setBackgroundTint(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.warning
-                )
-            ).show()
+            binding.noDataCategoryDetails.visibility = View.VISIBLE
         } else {
             val lineChartExp = binding.expensesLineChart
             val lineChartGain = binding.incomesLineChart
@@ -684,16 +647,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
                 lineChartGain.invalidate()
             }
             if (!expensesFound && !gainsFound) {
-                Snackbar.make(
-                    binding.expensesLineChart,
-                    R.string.error_no_data_in_period,
-                    BaseTransientBottomBar.LENGTH_LONG
-                ).setBackgroundTint(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.warning
-                    )
-                ).show()
+                binding.noDataCategoryDetails.visibility = View.VISIBLE
             }
         }
     }

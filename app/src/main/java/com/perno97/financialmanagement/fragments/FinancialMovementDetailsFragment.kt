@@ -260,7 +260,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     notify = movementDetailsData.notify
                 )
             ).show(
-                childFragmentManager, ConfirmMovementDeleteDialog.TAG
+                parentFragmentManager, ConfirmMovementDeleteDialog.TAG
             )
         }
     }
@@ -586,6 +586,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         appViewModel.viewModelScope.launch {
             val movementId = appViewModel.insert(incomingMovement)
             appViewModel.deleteMovement(movementDetailsData.movementId!!)
+            appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() - movementDetailsData.amount)
 
             if (notify) {
                 NotifyManager.setAlarm(
@@ -668,6 +669,9 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId)
         } else {
             appViewModel.deleteMovement(movementDetailsData.movementId!!)
+            appViewModel.viewModelScope.launch {
+                appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() - movementDetailsData.amount)
+            }
         }
         Snackbar.make(
             binding.editTextMovementDate,

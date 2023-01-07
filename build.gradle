@@ -19,5 +19,5 @@ ext {
     // testing
     junitVersion = '4.13.2'
     espressoVersion = '3.5.0'
-    androidxJunitVersion = '1.1.4'
+    androidxJunitVersion = '1.1.5'
 }

@@ -31,6 +31,15 @@ class EditCurrentAssetsDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentEditCurrentAssetsDialogBinding.inflate(inflater, container, false)
+
+        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
+            if (profile != null) {
+                binding.editTextCurrentAssets.setText(String.format("%.2f", profile.assets))
+            } else {
+                binding.editTextCurrentAssets.setText(String.format("%.2f", 0f))
+            }
+        }
+
         if (dialog != null)
             dialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
@@ -61,13 +70,6 @@ class EditCurrentAssetsDialog : DialogFragment() {
         }
         binding.editTextCurrentAssets.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextCurrentAssets))
-        appViewModel.getDefaultProfile().observe(viewLifecycleOwner) { profile ->
-            if (profile != null) {
-                binding.editTextCurrentAssets.setText(String.format("%.2f", profile.assets))
-            } else {
-                binding.editTextCurrentAssets.setText(String.format("%.2f", 0f))
-            }
-        }
     }
 
     override fun onDestroyView() {

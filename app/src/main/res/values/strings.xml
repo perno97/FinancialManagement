@@ -118,4 +118,5 @@
     <string name="category_details_capital">CATEGORY DETAILS</string>
     <string name="select_period">Select period</string>
     <string name="select_date">Select a date</string>
+    <string name="error_no_periodicity">Periodic is checked but no repetition was given</string>
 </resources>

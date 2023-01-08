@@ -18,8 +18,7 @@ object PeriodicMovementsChecker {
         appViewModel: AppViewModel,
         scope: CoroutineScope,
         lastAccess: LocalDate?,
-        callback: (() -> Unit)?,
-        periodicMovement: PeriodicMovement?,
+        periodicMovement: PeriodicMovement?
     ) {
         Log.i(logTag, "Called check")
         scope.launch {
@@ -42,7 +41,7 @@ object PeriodicMovementsChecker {
                     // Search for last added incoming movement of this periodic
                     incomingMovement = appViewModel.getLatestIncomingPeriodic(
                         periodicMovementId = periodicMov.periodicMovementId,
-                        dateTo = LocalDate.now().plusWeeks(2),
+                        dateTo = LocalDate.now().plusMonths(5),
                         dateFrom = lastAccess
                     )
                 }
@@ -54,14 +53,14 @@ object PeriodicMovementsChecker {
                             periodicMov,
                             movement.date.plusDays(1),
                             LocalDate.now()
-                                .plusWeeks(2) // Generating incoming movements up to 2 weeks
+                                .plusMonths(5) // Generating incoming movements up to 5 months
                         )
                     } else {
                         // No movements found before today and after last access or periodic movement's date
                         getMovementsFromPeriodicMovement(
                             periodicMov,
                             lastAccess ?: periodicMov.date,
-                            LocalDate.now().plusWeeks(2)
+                            LocalDate.now().plusMonths(5)
                         )
                     }
                 var amountsSum = 0f
@@ -124,9 +123,6 @@ object PeriodicMovementsChecker {
                 }
                 if (amountsSum != 0f)
                     appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() + amountsSum)
-            }
-            if (callback != null) {
-                callback()
             }
         }
     }
@@ -240,5 +236,20 @@ object PeriodicMovementsChecker {
             }
         }
         return movements
+    }
+
+    fun getMovementsSumPeriodicMovement(
+        periodicMovement: PeriodicMovement,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Float {
+        val movements = getMovementsFromPeriodicMovement(periodicMovement, dateFrom, dateTo)
+        var amountSum = 0f
+        for (date in movements.keys) {
+            if (movements[date] != null) {
+                amountSum += movements[date]?.amount!!
+            }
+        }
+        return amountSum
     }
 }

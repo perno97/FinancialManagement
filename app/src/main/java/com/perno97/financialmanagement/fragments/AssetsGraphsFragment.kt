@@ -322,7 +322,8 @@ class AssetsGraphsFragment : Fragment() {
                             .withDayOfMonth(1)
                             .isEqual(columnDate)
                     }
-                    val l = columnDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceFirstChar { c -> c.uppercase() }
+                    val l = columnDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                        .replaceFirstChar { c -> c.uppercase() }
 
                     // Check if there is item for this week
                     if (item != null) {

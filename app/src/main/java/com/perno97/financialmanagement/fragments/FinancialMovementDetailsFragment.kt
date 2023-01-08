@@ -117,6 +117,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         binding.inputNotifyRow.visibility = View.VISIBLE
         binding.checkNotify.isChecked = movementDetailsData.notify
         binding.checkNotify.isEnabled = false
+        binding.checkPeriodic.isEnabled = false
         binding.categoryEditMovColor.backgroundTintList =
             ColorStateList.valueOf(Color.parseColor(movementDetailsData.color))
         binding.editTextMovementDate.setText(movementDetailsData.date.toString())
@@ -297,8 +298,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         binding.checkSaturday.isEnabled = false
         binding.checkSunday.isEnabled = false
 
-        if (periodic)
-            binding.checkPeriodic.isEnabled = false
+        binding.checkPeriodic.isEnabled = false
     }
 
     private fun enableEditing() {
@@ -328,8 +328,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         binding.checkSaturday.isEnabled = true
         binding.checkSunday.isEnabled = true
 
-        if (periodic)
-            binding.checkPeriodic.isEnabled = true
+        binding.checkPeriodic.isEnabled = true
 
     }
 
@@ -364,8 +363,10 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             ).show()
             return
         }
-        val category = binding.spinnerCategory.selectedItem.toString()
-        if (category.isEmpty()) {
+
+        if (binding.spinnerCategory.selectedItem == null || (binding.spinnerCategory.selectedItem != null && binding.spinnerCategory.selectedItem.toString()
+                .isEmpty())
+        ) {
             Snackbar.make(
                 binding.editTextMovementDate,
                 R.string.error_no_category,
@@ -378,6 +379,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             ).show()
             return
         }
+        val category = binding.spinnerCategory.selectedItem.toString()
+
         val title = binding.editTextTitle.text.toString()
         if (title.isEmpty()) {
             Snackbar.make(
@@ -392,11 +395,13 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             ).show()
             return
         }
+
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
         val previousAmount = movementDetailsData.amount
         val checkPeriodic = binding.checkPeriodic.isChecked
         val newAmount = if (income) amount else -amount
+
 
         if (periodic) { // If periodic, stays periodic
             updatePeriodic(
@@ -644,6 +649,20 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             saturday = false
             sunday = false
         }
+
+        if (days == 0 && months == 0 && !monday && !tuesday && !wednesday && !thursday && !friday && !saturday && !sunday) {
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_no_periodicity,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
+            ).show()
+            return
+        }
         val periodicMovement = PeriodicMovement(
             days = days,
             months = months,
@@ -661,33 +680,32 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             notes = notes,
             notify = notify
         )
-        appViewModel.insert(periodicMovement)
-        PeriodicMovementsChecker.check(
-            requireContext(),
-            appViewModel,
-            appViewModel.viewModelScope,
-            null,
-            null,
-            periodicMovement
-        )
-        if (movementDetailsData.incomingMovementId != null) {
-            appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId)
-        } else {
-            appViewModel.deleteMovement(movementDetailsData.movementId!!)
-            appViewModel.viewModelScope.launch {
+        appViewModel.viewModelScope.launch {
+            val periodicMovementId = appViewModel.insert(periodicMovement)
+            PeriodicMovementsChecker.check(
+                requireContext(),
+                appViewModel,
+                appViewModel.viewModelScope,
+                null,
+                appViewModel.getPeriodicMovement(periodicMovementId)
+            )
+            if (movementDetailsData.incomingMovementId != null) {
+                appViewModel.deleteIncomingMovement(movementDetailsData.incomingMovementId)
+            } else {
+                appViewModel.deleteMovement(movementDetailsData.movementId!!)
                 appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() - movementDetailsData.amount)
             }
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.success_update_periodic,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.success
+                )
+            ).show()
         }
-        Snackbar.make(
-            binding.editTextMovementDate,
-            R.string.success_update_periodic,
-            BaseTransientBottomBar.LENGTH_LONG
-        ).setBackgroundTint(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.success
-            )
-        ).show()
     }
 
     private fun updatePeriodic(
@@ -718,6 +736,19 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             saturday = false
             sunday = false
         }
+        if (days == 0 && months == 0 && !monday && !tuesday && !wednesday && !thursday && !friday && !saturday && !sunday) {
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_no_periodicity,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
+            ).show()
+            return
+        }
         val periodicMovement = PeriodicMovement(
             periodicMovementId = periodicMovementId,
             days = days,
@@ -741,7 +772,6 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             requireContext(),
             appViewModel,
             appViewModel.viewModelScope,
-            null,
             null,
             periodicMovement
         )

@@ -50,9 +50,6 @@ import kotlin.math.roundToInt
 class MainFragment : Fragment() {
     private val logTag = "MainFragment"
 
-    /**
-     * Connection to data
-     */
     private val appViewModel: AppViewModel by activityViewModels {
         AppViewModelFactory((activity?.application as FinancialManagementApplication).repository)
     }
@@ -81,6 +78,15 @@ class MainFragment : Fragment() {
         Log.i(logTag, "Called onCreateView()")
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
+        lifecycleScope.launch {
+            PeriodicMovementsChecker.check(
+                requireContext(),
+                appViewModel,
+                appViewModel.viewModelScope,
+                appViewModel.getLastAccess(),
+                null
+            )
+        }
 
         // Setup chart styling
         val chart = binding.pieChartMain
@@ -151,26 +157,54 @@ class MainFragment : Fragment() {
                 PeriodState.WEEK -> appViewModel.getExpectedSum(
                     tomorrow,
                     LocalDate.now().with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
-                ).observe(viewLifecycleOwner) { movementsSum ->
-                    if (movementsSum != null)
+                ).observe(viewLifecycleOwner) { expectedSum ->
+                    var movementsSum = expectedSum ?: 0f
+                    lifecycleScope.launch {
+                        for (periodicMovement in appViewModel.getAllPeriodicMovements()) {
+                            movementsSum += PeriodicMovementsChecker.getMovementsSumPeriodicMovement(
+                                periodicMovement,
+                                tomorrow,
+                                LocalDate.now()
+                                    .with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
+                            )
+                        }
                         updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                    }
                 }
                 // ---------------- MONTH ----------------
                 PeriodState.MONTH -> appViewModel.getExpectedSum(
                     tomorrow,
                     LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
-                ).observe(viewLifecycleOwner) { movementsSum ->
-                    if (movementsSum != null)
+                ).observe(viewLifecycleOwner) { expectedSum ->
+                    var movementsSum = expectedSum ?: 0f
+                    lifecycleScope.launch {
+                        for (periodicMovement in appViewModel.getAllPeriodicMovements()) {
+                            movementsSum += PeriodicMovementsChecker.getMovementsSumPeriodicMovement(
+                                periodicMovement,
+                                tomorrow,
+                                LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
+                            )
+                        }
                         updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                    }
                 }
                 // ---------------- PERIOD ----------------
                 PeriodState.PERIOD -> {
                     val from = if (dateFrom.isBefore(tomorrow)) tomorrow else dateFrom
                     val to = if (dateTo.isBefore(from)) from else dateTo
                     appViewModel.getExpectedSum(from, to)
-                        .observe(viewLifecycleOwner) { movementsSum ->
-                            if (movementsSum != null)
+                        .observe(viewLifecycleOwner) { expectedSum ->
+                            var movementsSum = expectedSum ?: 0f
+                            lifecycleScope.launch {
+                                for (periodicMovement in appViewModel.getAllPeriodicMovements()) {
+                                    movementsSum += PeriodicMovementsChecker.getMovementsSumPeriodicMovement(
+                                        periodicMovement,
+                                        from,
+                                        to
+                                    )
+                                }
                                 updateExpectedAssets(currentAssets, currentAssets + movementsSum)
+                            }
                         }
                 }
                 // ----------------------------------------
@@ -190,15 +224,7 @@ class MainFragment : Fragment() {
             if (profile != null) {
                 defaultProfile = profile
                 binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
-                PeriodicMovementsChecker.check(
-                    requireContext(),
-                    appViewModel,
-                    appViewModel.viewModelScope,
-                    profile.lastAccess,
-                    ::initReady,
-                    null
-                )
-                computeExpectedAssets()
+                initReady()
             } else {
                 createNewDefaultProfile()
             }
@@ -264,6 +290,7 @@ class MainFragment : Fragment() {
         val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
         setTitle("${dateTo.dayOfMonth} $month ${dateTo.year}")
         updateCategoriesExpenses()
+        computeExpectedAssets()
     }
 
     private fun setWeek() {
@@ -280,6 +307,7 @@ class MainFragment : Fragment() {
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
         updateCategoriesExpenses()
+        computeExpectedAssets()
     }
 
     private fun setMonth() {
@@ -293,6 +321,7 @@ class MainFragment : Fragment() {
         val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
         setTitle("$month ${dateTo.year}")
         updateCategoriesExpenses()
+        computeExpectedAssets()
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
@@ -308,6 +337,7 @@ class MainFragment : Fragment() {
                     "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
         )
         updateCategoriesExpenses()
+        computeExpectedAssets()
     }
 
     private fun initListeners() {
@@ -470,7 +500,7 @@ class MainFragment : Fragment() {
                     viewCatProgressLayout.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
                 progressBar.progress =
-                    if (multipliedBudget == 0f) 100 else
+                    if (multipliedBudget == 0f) 0 else
                         (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
                 // Set category current expenses of category line

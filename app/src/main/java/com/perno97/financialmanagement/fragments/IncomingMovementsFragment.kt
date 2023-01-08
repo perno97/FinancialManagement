@@ -108,18 +108,23 @@ class IncomingMovementsFragment : Fragment() {
     private fun loadData() {
         when (state) {
             // ----------------- DAY -----------------
-            PeriodState.DAY -> appViewModel.getIncomingMovementsGroupByDay()
+            PeriodState.DAY -> appViewModel.getIncomingMovementsGroupByDay(
+                LocalDate.now().plusWeeks(2)
+            )
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getIncomingMovementsGroupByWeek(
-                weekStartOffset
+                weekStartOffset,
+                LocalDate.now().plusMonths(2)
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
             // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getIncomingMovementsGroupByMonth()
+            PeriodState.MONTH -> appViewModel.getIncomingMovementsGroupByMonth(
+                LocalDate.now().plusMonths(5)
+            )
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }

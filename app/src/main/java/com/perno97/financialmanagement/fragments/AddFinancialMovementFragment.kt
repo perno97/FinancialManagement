@@ -224,8 +224,10 @@ class AddFinancialMovementFragment : Fragment() {
             ).show()
             return
         }
-        val category = binding.spinnerCategory.selectedItem.toString()
-        if (category.isEmpty()) {
+
+        if (binding.spinnerCategory.selectedItem == null || (binding.spinnerCategory.selectedItem != null && binding.spinnerCategory.selectedItem.toString()
+                .isEmpty())
+        ) {
             Snackbar.make(
                 binding.editTextMovementDate,
                 R.string.error_no_category,
@@ -238,6 +240,8 @@ class AddFinancialMovementFragment : Fragment() {
             ).show()
             return
         }
+        val category = binding.spinnerCategory.selectedItem.toString()
+
         val title = binding.editTextTitle.text.toString()
         if (title.isEmpty()) {
             Snackbar.make(
@@ -252,13 +256,64 @@ class AddFinancialMovementFragment : Fragment() {
             ).show()
             return
         }
+
+        var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
+        val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
+        var monday = binding.checkMonday.isChecked
+        var tuesday = binding.checkTuesday.isChecked
+        var wednesday = binding.checkWednesday.isChecked
+        var thursday = binding.checkThursday.isChecked
+        var friday = binding.checkFriday.isChecked
+        var saturday = binding.checkSaturday.isChecked
+        var sunday = binding.checkSunday.isChecked
+        if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
+            days = 1
+            monday = false
+            tuesday = false
+            wednesday = false
+            thursday = false
+            friday = false
+            saturday = false
+            sunday = false
+        }
+
         val notes = binding.editTextNotes.text.toString()
         val notify = binding.checkNotify.isChecked
         val periodic = binding.checkPeriodic.isChecked
         val newAmount = if (income) amount else -amount
 
+        if (periodic && days == 0 && months == 0 && !monday && !tuesday && !wednesday && !thursday && !friday && !saturday && !sunday) {
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.error_no_periodicity,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.warning
+                )
+            ).show()
+            return
+        }
+
         if (periodic) {
-            createPeriodic(date, newAmount, category, title, notes, notify)
+            createPeriodic(
+                date,
+                newAmount,
+                category,
+                title,
+                notes,
+                notify,
+                days,
+                months,
+                monday,
+                tuesday,
+                wednesday,
+                thursday,
+                friday,
+                saturday,
+                sunday
+            )
         } else {
             if (date.isAfter(LocalDate.now())) {
                 createIncoming(date, newAmount, category, title, notes, notify)
@@ -352,27 +407,17 @@ class AddFinancialMovementFragment : Fragment() {
         category: String,
         title: String,
         notes: String,
-        notify: Boolean
+        notify: Boolean,
+        days: Int,
+        months: Int,
+        monday: Boolean,
+        tuesday: Boolean,
+        wednesday: Boolean,
+        thursday: Boolean,
+        friday: Boolean,
+        saturday: Boolean,
+        sunday: Boolean
     ) {
-        var days = binding.editTextDaysRepeat.text.toString().toIntOrNull() ?: 0
-        val months = binding.editTextMonthsRepeat.text.toString().toIntOrNull() ?: 0
-        var monday = binding.checkMonday.isChecked
-        var tuesday = binding.checkTuesday.isChecked
-        var wednesday = binding.checkWednesday.isChecked
-        var thursday = binding.checkThursday.isChecked
-        var friday = binding.checkFriday.isChecked
-        var saturday = binding.checkSaturday.isChecked
-        var sunday = binding.checkSunday.isChecked
-        if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
-            days = 1
-            monday = false
-            tuesday = false
-            wednesday = false
-            thursday = false
-            friday = false
-            saturday = false
-            sunday = false
-        }
         val periodicMovement = PeriodicMovement(
             days = days,
             months = months,
@@ -390,25 +435,27 @@ class AddFinancialMovementFragment : Fragment() {
             notes = notes,
             notify = notify
         )
-        appViewModel.insert(periodicMovement)
-        PeriodicMovementsChecker.check(
-            requireContext(),
-            appViewModel,
-            appViewModel.viewModelScope,
-            null,
-            null,
-            periodicMovement
-        )
-        Snackbar.make(
-            binding.editTextMovementDate,
-            R.string.success_create_periodic,
-            BaseTransientBottomBar.LENGTH_LONG
-        ).setBackgroundTint(
-            ContextCompat.getColor(
+
+        appViewModel.viewModelScope.launch {
+            val periodicMovementId = appViewModel.insert(periodicMovement)
+            PeriodicMovementsChecker.check(
                 requireContext(),
-                R.color.success
+                appViewModel,
+                appViewModel.viewModelScope,
+                null,
+                appViewModel.getPeriodicMovement(periodicMovementId)
             )
-        ).show()
+            Snackbar.make(
+                binding.editTextMovementDate,
+                R.string.success_create_periodic,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.success
+                )
+            ).show()
+        }
     }
 
     private fun updateAssets(newAmount: Float) {

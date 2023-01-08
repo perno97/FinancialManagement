@@ -73,10 +73,10 @@ class PeriodicMovementsFragment : Fragment() {
             Log.i(logTag, "Launched Coroutine")
             appViewModel.uiState.collect {
                 Log.i(logTag, "Collecting UI data")
-                dateFrom = it.dateFromPeriodic
-                dateTo = it.dateToPeriodic
-                state = it.statePeriodic
-                datePickerSelection = it.datePickerSelectionPeriodic
+                dateFrom = it.dateFromMain
+                dateTo = it.dateToMain
+                state = it.stateMain
+                datePickerSelection = it.datePickerSelectionMain
                 when (state) {
                     PeriodState.DAY -> setDay()
                     PeriodState.WEEK -> setWeek()
@@ -95,7 +95,7 @@ class PeriodicMovementsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        appViewModel.setPeriodicPeriod(
+        appViewModel.setMainPeriod(
             dateFrom,
             dateTo,
             state,
@@ -279,7 +279,7 @@ class PeriodicMovementsFragment : Fragment() {
             // Build
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker()
-                    .setTitleText("Select period")
+                    .setTitleText(getString(R.string.select_period))
                     .setSelection(
                         datePickerSelection ?: Pair(
                             MaterialDatePicker.thisMonthInUtcMilliseconds(),

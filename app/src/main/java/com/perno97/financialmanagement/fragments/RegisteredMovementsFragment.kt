@@ -261,7 +261,7 @@ class RegisteredMovementsFragment : Fragment() {
             // Build
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker()
-                    .setTitleText("Select period")
+                    .setTitleText(getString(R.string.select_period))
                     .setSelection(
                         datePickerSelection ?: Pair(
                             MaterialDatePicker.thisMonthInUtcMilliseconds(),

@@ -273,7 +273,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
-    fun setIncomingPeriod(
+    /*fun setIncomingPeriod( TODO remove
         from: LocalDate,
         to: LocalDate,
         state: PeriodState,
@@ -287,9 +287,9 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
                 datePickerSelectionIncoming = datePickerSelection
             )
         }
-    }
+    }*/
 
-    fun setPeriodicPeriod(
+    /*fun setPeriodicPeriod( TODO remove
         from: LocalDate,
         to: LocalDate,
         state: PeriodState,
@@ -303,7 +303,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
                 datePickerSelectionPeriodic = datePickerSelection
             )
         }
-    }
+    }*/
 
     fun setCategoryFilters(filters: List<Category>) {
         _uiState.update { currentState ->

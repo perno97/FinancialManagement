@@ -170,7 +170,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
-                        .setTitleText("Select period")
+                        .setTitleText(getString(R.string.select_date))
                         .setSelection(
                             MaterialDatePicker.todayInUtcMilliseconds()
                         )

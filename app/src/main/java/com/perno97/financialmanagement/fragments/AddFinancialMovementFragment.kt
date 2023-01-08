@@ -141,7 +141,7 @@ class AddFinancialMovementFragment : Fragment() {
                 dateOpen = true
                 val datePicker =
                     MaterialDatePicker.Builder.datePicker()
-                        .setTitleText("Select period")
+                        .setTitleText(getString(R.string.select_date))
                         .setSelection(
                             MaterialDatePicker.todayInUtcMilliseconds()
                         )

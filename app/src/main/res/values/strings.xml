@@ -116,4 +116,6 @@
     <string name="budgets_capital">BUDGETS</string>
     <string name="assets_graphs_capital">ASSETS GRAPHS</string>
     <string name="category_details_capital">CATEGORY DETAILS</string>
+    <string name="select_period">Select period</string>
+    <string name="select_date">Select a date</string>
 </resources>

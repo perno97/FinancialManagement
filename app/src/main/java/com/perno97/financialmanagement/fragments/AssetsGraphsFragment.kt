@@ -451,7 +451,8 @@ class AssetsGraphsFragment : Fragment() {
         dateTo = LocalDate.now()
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
         state = PeriodState.MONTH
-        setTitle("${dateTo.month} ${dateTo.year}")
+        val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+        setTitle("$month ${dateTo.year}")
         loadData()
     }
 
@@ -514,7 +515,7 @@ class AssetsGraphsFragment : Fragment() {
             // Build
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker()
-                    .setTitleText("Select period")
+                    .setTitleText(getString(R.string.select_period))
                     .setCalendarConstraints(calendarConstraints.build())
                     .setSelection(
                         datePickerSelection ?: Pair(

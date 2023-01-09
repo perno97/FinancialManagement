@@ -301,10 +301,11 @@ class MainFragment : Fragment() {
         dateTo = LocalDate.now()
         dateFrom = LocalDate.now()
             .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+        val to = dateFrom.with(TemporalAdjusters.next(firstDayOfWeek))
         state = PeriodState.WEEK
         setTitle(
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+                    "- ${to.dayOfMonth}/${to.monthValue}/${to.year}"
         )
         updateCategoriesExpenses()
         computeExpectedAssets()

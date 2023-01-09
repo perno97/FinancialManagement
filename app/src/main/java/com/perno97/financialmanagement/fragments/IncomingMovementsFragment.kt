@@ -117,7 +117,7 @@ class IncomingMovementsFragment : Fragment() {
             // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getIncomingMovementsGroupByWeek(
                 weekStartOffset,
-                LocalDate.now().plusMonths(2)
+                LocalDate.now().plusWeeks(4)
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
@@ -330,7 +330,7 @@ class IncomingMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
         state = PeriodState.DAY
-        setTitle(getString(R.string.group_by_day))
+        setTitle(getString(R.string.of_the_next_two_weeks))
         loadData()
     }
 
@@ -340,7 +340,7 @@ class IncomingMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
         state = PeriodState.WEEK
-        setTitle(getString(R.string.group_by_week))
+        setTitle(getString(R.string.of_the_next_four_weeks))
         loadData()
     }
 
@@ -350,8 +350,7 @@ class IncomingMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
         state = PeriodState.MONTH
-        val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-        setTitle(getString(R.string.month_year, month, dateTo.year.toString()))
+        setTitle(getString(R.string.of_the_next_five_months))
         loadData()
     }
 
@@ -363,7 +362,10 @@ class IncomingMovementsFragment : Fragment() {
         dateTo = to
         dateFrom = from
         state = PeriodState.PERIOD
-        setTitle(getString(R.string.selected_period))
+        setTitle(
+            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
+                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+        )
         loadData()
     }
 

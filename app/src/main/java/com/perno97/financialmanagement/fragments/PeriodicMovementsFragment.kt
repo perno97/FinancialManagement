@@ -230,8 +230,8 @@ class PeriodicMovementsFragment : Fragment() {
                                             notes = mov.periodicMovement.notes,
                                             periodicMovementId = mov.periodicMovement.periodicMovementId,
                                             weekDays = weekDays,
-                                            days = 0,
-                                            months = 0,
+                                            days = mov.periodicMovement.days,
+                                            months = mov.periodicMovement.months,
                                             notify = mov.periodicMovement.notify,
                                             incomingMovementId = null
                                         )
@@ -330,7 +330,7 @@ class PeriodicMovementsFragment : Fragment() {
         binding.btnMonth.isEnabled = false
         state = PeriodState.MONTH
         val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-        setTitle(getString(R.string.month_year, month, dateTo.year.toString()))
+        setTitle(getString(R.string.group_by_month))
         loadData()
     }
 
@@ -342,7 +342,10 @@ class PeriodicMovementsFragment : Fragment() {
         dateTo = to
         dateFrom = from
         state = PeriodState.PERIOD
-        setTitle(getString(R.string.selected_period))
+        setTitle(
+            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
+                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
+        )
         loadData()
     }
 

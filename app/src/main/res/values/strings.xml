@@ -119,4 +119,8 @@
     <string name="select_period">Select period</string>
     <string name="select_date">Select a date</string>
     <string name="error_no_periodicity">Periodic is checked but no repetition was given</string>
+    <string name="of_the_next_two_weeks">Of the next 2 weeks</string>
+    <string name="of_the_next_four_weeks">Of the next 4 weeks</string>
+    <string name="of_the_next_five_months">Of the next 5 months</string>
+    <string name="group_by_month">Group by month</string>
 </resources>

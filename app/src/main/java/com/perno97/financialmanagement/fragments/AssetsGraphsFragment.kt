@@ -438,10 +438,7 @@ class AssetsGraphsFragment : Fragment() {
         dateFrom = LocalDate.now()
             .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
         state = PeriodState.WEEK
-        setTitle(
-            "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
-                    "- ${dateTo.dayOfMonth}/${dateTo.monthValue}/${dateTo.year}"
-        )
+        setTitle(getString(R.string.group_by_week))
         loadData()
     }
 
@@ -453,7 +450,7 @@ class AssetsGraphsFragment : Fragment() {
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
         state = PeriodState.MONTH
         val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-        setTitle("$month ${dateTo.year}")
+        setTitle(getString(R.string.group_by_month))
         loadData()
     }
 

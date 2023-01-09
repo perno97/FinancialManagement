@@ -454,7 +454,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     }
 
     private fun updateMovement(
-        movementId: Int,
+        movementId: Long,
         date: LocalDate,
         amount: Float,
         category: String,
@@ -523,7 +523,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     }
 
     private fun updateIncoming(
-        incomingMovementId: Int,
+        incomingMovementId: Long,
         date: LocalDate,
         amount: Float,
         category: String,
@@ -601,7 +601,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             if (notify) {
                 NotifyManager.setAlarm(
                     requireContext(),
-                    movementId.toInt(),
+                    movementId,
                     incomingMovement.title,
                     incomingMovement.category,
                     incomingMovement.amount,
@@ -709,7 +709,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     }
 
     private fun updatePeriodic(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         date: LocalDate,
         newAmount: Float,
         category: String,
@@ -768,11 +768,12 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             notify = notify
         )
         appViewModel.update(periodicMovement)
+        appViewModel.deleteAllIncomingOfPeriodic(periodicMovementId)
         PeriodicMovementsChecker.check(
             requireContext(),
             appViewModel,
             appViewModel.viewModelScope,
-            null,
+            LocalDate.now(),
             periodicMovement
         )
         Snackbar.make(

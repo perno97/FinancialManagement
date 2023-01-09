@@ -45,7 +45,7 @@ interface ApplicationDao {
     @Query(
         "UPDATE profile SET assets = :assetsValue WHERE profileId = :profileId"
     )
-    suspend fun updateAssets(profileId: Int, assetsValue: Float)
+    suspend fun updateAssets(profileId: Long, assetsValue: Float)
 
 
     /*
@@ -57,17 +57,22 @@ interface ApplicationDao {
     @Query(
         "DELETE FROM movement WHERE movement_id = :movementId"
     )
-    suspend fun deleteMovementFromId(movementId: Int)
+    suspend fun deleteMovementFromId(movementId: Long)
 
     @Query(
         "DELETE FROM incoming_movement WHERE incoming_movement_id = :incomingMovementId"
     )
-    suspend fun deleteIncumbentMovementFromId(incomingMovementId: Int)
+    suspend fun deleteIncumbentMovementFromId(incomingMovementId: Long)
 
     @Query(
         "DELETE FROM periodic_movement WHERE periodic_movement_id = :periodicMovementId"
     )
-    suspend fun deletePeriodicMovementFromId(periodicMovementId: Int)
+    suspend fun deletePeriodicMovementFromId(periodicMovementId: Long)
+
+    @Query(
+        "DELETE FROM incoming_movement WHERE periodic_movement_id = :periodicMovementId"
+    )
+    suspend fun deleteAllIncomingOfPeriodic(periodicMovementId: Long)
 
 
     /*
@@ -83,13 +88,13 @@ interface ApplicationDao {
     fun getAvailableDailyBudget(): Flow<Float>
 
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
-    fun getProfile(profileId: Int): Flow<Profile>
+    fun getProfile(profileId: Long): Flow<Profile>
 
     @Query("SELECT assets AS value FROM profile WHERE profileId = :profileId")
-    suspend fun getCurrentAsset(profileId: Int): Float
+    suspend fun getCurrentAsset(profileId: Long): Float
 
     @Query("SELECT last_access FROM profile WHERE profileId = :profileId")
-    suspend fun getLastAccess(profileId: Int): LocalDate?
+    suspend fun getLastAccess(profileId: Long): LocalDate?
 
     @Query("SELECT * FROM category WHERE name = :categoryName")
     fun getCategory(categoryName: String): Flow<Category>
@@ -387,7 +392,7 @@ interface ApplicationDao {
         "SELECT * FROM movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date >= :dateFrom ORDER BY date DESC LIMIT 1"
     )
     suspend fun getLatestPeriodicMovement(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Movement?
@@ -396,7 +401,7 @@ interface ApplicationDao {
         "SELECT * FROM incoming_movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date >= :dateFrom ORDER BY date DESC LIMIT 1"
     )
     suspend fun getLatestIncomingPeriodic(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): IncomingMovement?
@@ -414,5 +419,5 @@ interface ApplicationDao {
     @Query(
         "SELECT * FROM incoming_movement WHERE periodic_movement_id = :periodicMovementId"
     )
-    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Int): List<IncomingMovement>
+    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Long): List<IncomingMovement>
 }

@@ -25,7 +25,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     @WorkerThread
     suspend fun getLatestPeriodicMovement(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Movement? {
@@ -34,7 +34,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
 
     @WorkerThread
     suspend fun getLatestIncomingPeriodic(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): IncomingMovement? {
@@ -52,7 +52,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Int): List<IncomingMovement> {
+    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Long): List<IncomingMovement> {
         return applicationDao.getAllIncomingFromPeriodic(periodicMovementId)
     }
 
@@ -136,7 +136,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getProfile(profileId: Int): Flow<Profile> {
+    fun getProfile(profileId: Long): Flow<Profile> {
         return applicationDao.getProfile(profileId)
     }
 
@@ -146,12 +146,12 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun getCurrentAsset(profileId: Int): Float {
+    suspend fun getCurrentAsset(profileId: Long): Float {
         return applicationDao.getCurrentAsset(profileId)
     }
 
     @WorkerThread
-    suspend fun getLastAccess(profileId: Int): LocalDate? {
+    suspend fun getLastAccess(profileId: Long): LocalDate? {
         return applicationDao.getLastAccess(profileId)
     }
 
@@ -297,7 +297,7 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun updateAssets(profileId: Int, assetsValue: Float) {
+    suspend fun updateAssets(profileId: Long, assetsValue: Float) {
         applicationDao.updateAssets(profileId, assetsValue)
     }
 
@@ -311,17 +311,22 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun deleteMovementFromId(movementId: Int) {
+    suspend fun deleteMovementFromId(movementId: Long) {
         applicationDao.deleteMovementFromId(movementId)
     }
 
     @WorkerThread
-    suspend fun deleteIncomingMovementFromId(incomingMovementId: Int) {
+    suspend fun deleteIncomingMovementFromId(incomingMovementId: Long) {
         applicationDao.deleteIncumbentMovementFromId(incomingMovementId)
     }
 
     @WorkerThread
-    suspend fun deletePeriodicMovement(periodicMovementId: Int) {
+    suspend fun deletePeriodicMovement(periodicMovementId: Long) {
         applicationDao.deletePeriodicMovementFromId(periodicMovementId)
+    }
+
+    @WorkerThread
+    suspend fun deleteAllIncomingOfPeriodic(periodicMovementId: Long) {
+        applicationDao.deleteAllIncomingOfPeriodic(periodicMovementId)
     }
 }

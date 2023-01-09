@@ -5,9 +5,9 @@ import java.time.LocalDate
 data class MovementDeletionData(
     val date: LocalDate,
     val title: String,
-    val movementId: Int?,
-    val incomingMovementId: Int?,
-    val periodicMovementId: Int?,
+    val movementId: Long?,
+    val incomingMovementId: Long?,
+    val periodicMovementId: Long?,
     val notify: Boolean,
     val category: String,
     val amount: Float

@@ -129,7 +129,7 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
         dismiss()
     }
 
-    private fun deleteIncomingMovement(incomingMovementId: Int, notify: Boolean) {
+    private fun deleteIncomingMovement(incomingMovementId: Long, notify: Boolean) {
         appViewModel.deleteIncomingMovement(incomingMovementId)
         if (notify) {
             NotifyManager.removeAlarm(

@@ -573,7 +573,8 @@ class MainFragment : Fragment() {
                     viewCatProgressLayout.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
                 // Set progress bar progress and color
                 progressBar.progress =
-                    if (multipliedBudget == 0f) 0 else
+                    if (multipliedBudget == 0f && currentCatExpenseAsPositive == 0f) 0
+                    else if (multipliedBudget == 0f) 100 else
                         (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                 progressBar.indicatorColor[0] = Color.parseColor(c.color)
                 // Set category current expenses of category line

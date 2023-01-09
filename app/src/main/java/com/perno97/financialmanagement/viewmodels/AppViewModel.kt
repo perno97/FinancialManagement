@@ -16,7 +16,7 @@ import java.time.LocalDate
 
 class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
-    private val defaultProfileId = 0
+    private val defaultProfileId = 0L
     private val _uiState = MutableStateFlow(FinancialManagementUiState())
     val uiState: StateFlow<FinancialManagementUiState> = _uiState.asStateFlow()
 
@@ -52,7 +52,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     suspend fun getLatestPeriodicMovement(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): Movement? {
@@ -60,7 +60,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     }
 
     suspend fun getLatestIncomingPeriodic(
-        periodicMovementId: Int,
+        periodicMovementId: Long,
         dateFrom: LocalDate,
         dateTo: LocalDate
     ): IncomingMovement? {
@@ -75,7 +75,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getIncomingMovements(categoryName)
     }
 
-    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Int): List<IncomingMovement> {
+    suspend fun getAllIncomingFromPeriodic(periodicMovementId: Long): List<IncomingMovement> {
         return repository.getAllIncomingFromPeriodic(periodicMovementId)
     }
 
@@ -387,15 +387,19 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         repository.delete(category)
     }
 
-    fun deleteMovement(movementId: Int) = viewModelScope.launch {
+    fun deleteMovement(movementId: Long) = viewModelScope.launch {
         repository.deleteMovementFromId(movementId)
     }
 
-    fun deleteIncomingMovement(incomingMovementId: Int) = viewModelScope.launch {
+    fun deleteIncomingMovement(incomingMovementId: Long) = viewModelScope.launch {
         repository.deleteIncomingMovementFromId(incomingMovementId)
     }
 
-    fun deletePeriodicMovement(periodicMovementId: Int) = viewModelScope.launch {
+    fun deletePeriodicMovement(periodicMovementId: Long) = viewModelScope.launch {
         repository.deletePeriodicMovement(periodicMovementId)
+    }
+
+    fun deleteAllIncomingOfPeriodic(periodicMovementId: Long) = viewModelScope.launch {
+        repository.deleteAllIncomingOfPeriodic(periodicMovementId)
     }
 }

@@ -10,7 +10,7 @@ import java.time.ZoneId
 object NotifyManager {
     fun setAlarm(
         context: Context,
-        incomingMovementId: Int,
+        incomingMovementId: Long,
         title: String,
         category: String,
         amount: Float,
@@ -26,7 +26,7 @@ object NotifyManager {
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            incomingMovementId,
+            incomingMovementId.toInt(),
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
@@ -41,7 +41,7 @@ object NotifyManager {
 
     fun removeAlarm(
         context: Context,
-        incomingMovementId: Int,
+        incomingMovementId: Long,
         title: String,
         category: String,
         amount: Float
@@ -56,7 +56,7 @@ object NotifyManager {
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            incomingMovementId,
+            incomingMovementId.toInt(),
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )

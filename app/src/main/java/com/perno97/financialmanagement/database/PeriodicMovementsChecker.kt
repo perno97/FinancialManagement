@@ -86,7 +86,7 @@ object PeriodicMovementsChecker {
                             if (mov.notify) {
                                 NotifyManager.setAlarm(
                                     context,
-                                    movementId.toInt(),
+                                    movementId,
                                     mov.title,
                                     mov.category,
                                     mov.amount,

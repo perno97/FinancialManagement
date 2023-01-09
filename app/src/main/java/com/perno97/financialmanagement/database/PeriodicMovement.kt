@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 @Entity(tableName = "periodic_movement")
 data class PeriodicMovement(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "periodic_movement_id") val periodicMovementId: Int = 0,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "periodic_movement_id") val periodicMovementId: Long = 0,
     val days: Int,
     val months: Int,
     val monday: Boolean,

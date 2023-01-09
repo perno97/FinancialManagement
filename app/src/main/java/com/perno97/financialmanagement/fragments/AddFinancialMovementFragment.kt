@@ -381,7 +381,7 @@ class AddFinancialMovementFragment : Fragment() {
             if (notify) {
                 NotifyManager.setAlarm(
                     requireContext(),
-                    movementId.toInt(),
+                    movementId,
                     incomingMovement.title,
                     incomingMovement.category,
                     incomingMovement.amount,

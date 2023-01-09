@@ -220,8 +220,11 @@ class CategoryDetailsFragment(private val categoryName: String) :
                         viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
                             c.name
                         // Set progress bar progress and color
+                        //If multiplied budget is 0 and there's no expense then empty the progress bar
+                        //If multiplied budget is 0 and there's some expense then fill the progress bar
                         progressBarExp.progress =
-                            if (multipliedBudget == 0f) 0 else // If multiplied budget is 0 then empty the progress bar
+                            if (multipliedBudget == 0f && currentCatExpenseAsPositive == 0f) 0
+                            else if (multipliedBudget == 0f) 100 else
                                 (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
                         progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
                         // Set category budget of category line
@@ -718,7 +721,8 @@ class CategoryDetailsFragment(private val categoryName: String) :
         val multipliedBudget = category.budget * budgetMultiplier
         val currentCatExpenseAsPositive = expense.absoluteValue
         val progress =
-            if (multipliedBudget == 0f) 0 else
+            if (multipliedBudget == 0f && currentCatExpenseAsPositive == 0f) 0
+            else if (multipliedBudget == 0f) 100 else
                 (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
         binding.progressBarCategoryBudget.indicatorColor[0] = Color.parseColor(category.color)
         binding.progressBarCategoryBudget.progress = progress

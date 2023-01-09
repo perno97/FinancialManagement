@@ -189,26 +189,90 @@ class MainFragment : Fragment() {
                     }
                 }
                 // ---------------- PERIOD ----------------
-                PeriodState.PERIOD -> {
-                    val from = if (dateFrom.isBefore(tomorrow)) tomorrow else dateFrom
-                    val to = if (dateTo.isBefore(from)) from else dateTo
-                    appViewModel.getExpectedSum(from, to)
-                        .observe(viewLifecycleOwner) { expectedSum ->
-                            var movementsSum = expectedSum ?: 0f
-                            lifecycleScope.launch {
-                                for (periodicMovement in appViewModel.getAllPeriodicMovements()) {
-                                    movementsSum += PeriodicMovementsChecker.getMovementsSumPeriodicMovement(
-                                        periodicMovement,
-                                        from,
-                                        to
-                                    )
-                                }
-                                updateExpectedAssets(currentAssets, currentAssets + movementsSum)
-                            }
-                        }
-                }
+                PeriodState.PERIOD -> periodSelected()
                 // ----------------------------------------
             }
+        }
+    }
+
+    private fun periodSelected() {
+        /*
+        Compute the assets value at the start of the period and at the end of the period:
+        - if the start/end is in the past then remove past movements from current assets
+        - if the start/end is in the future then add incoming movements to current assets
+         */
+
+        setStartingAssets()
+    }
+
+    private fun setStartingAssets() {
+        var startingAssets = defaultProfile.assets
+        //Update starting assets
+        if (dateFrom.isBefore(LocalDate.now())) {
+            appViewModel.getGainsAndExpensesInPeriod(dateFrom, LocalDate.now())
+                .observe(viewLifecycleOwner) { pastGroupInfo ->
+                    val pastSum = pastGroupInfo.positive + pastGroupInfo.negative
+                    binding.txtCurrent.text = getString(R.string.assets_at_start_capital)
+                    startingAssets = defaultProfile.assets - pastSum
+                    binding.txtCurrentValue.text =
+                        getString(R.string.euro_value, startingAssets)
+                    setEndingAssets(startingAssets) // Calling after startingAssets is updated, in each if-branch
+                }
+        } else if (dateFrom.isAfter(LocalDate.now())) {
+            val from = LocalDate.now().plusDays(1)
+            val to = dateFrom
+            appViewModel.getExpectedSum(from, to)
+                .observe(viewLifecycleOwner) { expectedSum ->
+                    var movementsSum = expectedSum ?: 0f
+                    lifecycleScope.launch {
+                        for (periodicMovement in appViewModel.getAllPeriodicMovements()) {
+                            movementsSum += PeriodicMovementsChecker.getMovementsSumPeriodicMovement(
+                                periodicMovement,
+                                from,
+                                to
+                            )
+                        }
+                        startingAssets = defaultProfile.assets + movementsSum
+                        binding.txtCurrentValue.text =
+                            getString(R.string.euro_value, startingAssets)
+                        setEndingAssets(startingAssets)
+                    }
+
+                }
+        } else {
+            binding.txtCurrentValue.text = getString(R.string.euro_value, startingAssets)
+            setEndingAssets(startingAssets)
+        }
+    }
+
+    private fun setEndingAssets(startingAssets: Float) {
+        //Update ending assets
+        if (dateTo.isBefore(LocalDate.now())) {
+            appViewModel.getGainsAndExpensesInPeriod(dateTo, LocalDate.now())
+                .observe(viewLifecycleOwner) { pastGroupInfo ->
+                    val pastSum = pastGroupInfo.positive + pastGroupInfo.negative
+                    updateExpectedAssets(startingAssets, defaultProfile.assets - pastSum)
+                }
+        } else if (dateTo.isAfter(LocalDate.now())) {
+            val from = LocalDate.now().plusDays(1)
+            val to = dateTo
+            appViewModel.getExpectedSum(from, to)
+                .observe(viewLifecycleOwner) { expectedSum ->
+                    var movementsSum = expectedSum ?: 0f
+                    lifecycleScope.launch {
+                        for (periodicMovement in appViewModel.getAllPeriodicMovements()) {
+                            movementsSum += PeriodicMovementsChecker.getMovementsSumPeriodicMovement(
+                                periodicMovement,
+                                from,
+                                to
+                            )
+                        }
+                        updateExpectedAssets(startingAssets, defaultProfile.assets + movementsSum)
+                    }
+
+                }
+        } else {
+            updateExpectedAssets(startingAssets, defaultProfile.assets)
         }
     }
 
@@ -281,6 +345,8 @@ class MainFragment : Fragment() {
 
     private fun setDay() {
         Log.i(logTag, "Called setDay()")
+        binding.txtCurrent.text = getString(R.string.current_assets_label)
+        binding.txtExpected.text = getString(R.string.expected_assets_label)
         binding.btnDay.isEnabled = false
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = true
@@ -295,6 +361,8 @@ class MainFragment : Fragment() {
 
     private fun setWeek() {
         Log.i(logTag, "Called setWeek()")
+        binding.txtCurrent.text = getString(R.string.current_assets_label)
+        binding.txtExpected.text = getString(R.string.expected_assets_label)
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
@@ -312,6 +380,8 @@ class MainFragment : Fragment() {
     }
 
     private fun setMonth() {
+        binding.txtCurrent.text = getString(R.string.current_assets_label)
+        binding.txtExpected.text = getString(R.string.expected_assets_label)
         Log.i(logTag, "Called setMonth()")
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = true
@@ -326,6 +396,8 @@ class MainFragment : Fragment() {
     }
 
     private fun setPeriod(from: LocalDate, to: LocalDate) {
+        binding.txtCurrent.text = getString(R.string.assets_at_start_capital)
+        binding.txtExpected.text = getString(R.string.assets_at_end_capital)
         Log.i(logTag, "Called setPeriod()")
         binding.btnDay.isEnabled = true
         binding.btnWeek.isEnabled = true

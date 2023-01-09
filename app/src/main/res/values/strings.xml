@@ -42,8 +42,6 @@
     <string name="success_create_movement">Created movement</string>
     <string name="group_by_day">Group by day</string>
     <string name="group_by_week">Group by week</string>
-    <string name="month_year">%s %s</string>
-    <string name="selected_period">Selected period</string>
     <string name="delete_movement_confirmation_message">Are you sure you want to delete%s movement with date %s and title: %s ?</string>
     <string name="periodic">periodic</string>
     <string name="success_delete_movement">Deleted movement</string>
@@ -123,4 +121,6 @@
     <string name="of_the_next_four_weeks">Of the next 4 weeks</string>
     <string name="of_the_next_five_months">Of the next 5 months</string>
     <string name="group_by_month">Group by month</string>
+    <string name="assets_at_start_capital">ASSETS AT START</string>
+    <string name="assets_at_end_capital">ASSETS AT END</string>
 </resources>

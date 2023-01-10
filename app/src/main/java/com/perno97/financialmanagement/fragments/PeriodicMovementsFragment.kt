@@ -106,19 +106,23 @@ class PeriodicMovementsFragment : Fragment() {
     private fun loadData() {
         when (state) {
             // ----------------- DAY -----------------
-            PeriodState.DAY -> appViewModel.getPeriodicMovementsGroupByDay(LocalDate.now())
+            PeriodState.DAY -> appViewModel.getPeriodicMovementsGroupByDay(
+                LocalDate.now().plusWeeks(2)
+            )
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
             // ----------------- WEEK ----------------
             PeriodState.WEEK -> appViewModel.getPeriodicMovementsGroupByWeek(
                 weekStartOffset,
-                LocalDate.now()
+                LocalDate.now().plusWeeks(4)
             ).observe(viewLifecycleOwner) {
                 movementsLoaded(it)
             }
             // ---------------- MONTH ----------------
-            PeriodState.MONTH -> appViewModel.getPeriodicMovementsGroupByMonth(LocalDate.now())
+            PeriodState.MONTH -> appViewModel.getPeriodicMovementsGroupByMonth(
+                LocalDate.now().plusMonths(5)
+            )
                 .observe(viewLifecycleOwner) {
                     movementsLoaded(it)
                 }
@@ -329,7 +333,6 @@ class PeriodicMovementsFragment : Fragment() {
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
         state = PeriodState.MONTH
-        val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
         setTitle(getString(R.string.group_by_month))
         loadData()
     }

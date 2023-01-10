@@ -69,7 +69,7 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
         val budget = binding.editTextNewCatBudget.text.toString().toFloat()
         appViewModel.update(
             Category(
-                name = name,
+                name = name.trim(),
                 color = color,
                 budget = budget
             )

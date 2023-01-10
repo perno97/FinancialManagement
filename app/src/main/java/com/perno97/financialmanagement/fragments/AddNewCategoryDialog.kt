@@ -59,7 +59,7 @@ class AddNewCategoryDialog : DialogFragment() {
         val budget = binding.editTextNewCatBudget.text.toString().toFloatOrNull() ?: 0f
         appViewModel.insert(
             Category(
-                name = name,
+                name = name.trim(),
                 color = color,
                 budget = budget
             )

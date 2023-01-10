@@ -466,8 +466,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             date = date,
             amount = amount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             periodicMovementId = null
         )
         appViewModel.update(movement)
@@ -494,8 +494,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             date = date,
             amount = amount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             periodicMovementId = null
         )
         appViewModel.insert(movement)
@@ -536,8 +536,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             date = date,
             amount = amount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             notify = notify,
             periodicMovementId = null
         )
@@ -587,8 +587,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             date = date,
             amount = amount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             notify = notify,
             periodicMovementId = null
         )
@@ -676,8 +676,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             date = date,
             amount = newAmount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             notify = notify
         )
         appViewModel.viewModelScope.launch {
@@ -763,8 +763,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             date = date,
             amount = newAmount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             notify = notify
         )
         appViewModel.update(periodicMovement)

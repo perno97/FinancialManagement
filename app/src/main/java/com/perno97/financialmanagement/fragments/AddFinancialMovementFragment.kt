@@ -338,8 +338,8 @@ class AddFinancialMovementFragment : Fragment() {
             date = date,
             amount = newAmount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             periodicMovementId = null
         )
 
@@ -369,8 +369,8 @@ class AddFinancialMovementFragment : Fragment() {
             date = date,
             amount = newAmount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             notify = notify,
             periodicMovementId = null
         )
@@ -431,8 +431,8 @@ class AddFinancialMovementFragment : Fragment() {
             date = date,
             amount = newAmount,
             category = category,
-            title = title,
-            notes = notes,
+            title = title.trim(),
+            notes = notes.trim(),
             notify = notify
         )
 

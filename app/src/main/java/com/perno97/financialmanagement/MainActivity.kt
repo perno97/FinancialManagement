@@ -25,6 +25,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
         if (intent.action == "ACTION_INCOMING_MOVEMENTS") {
             supportFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in_bottom,
+                    R.anim.slide_out_bottom,
+                    R.anim.slide_in_bottom,
+                    R.anim.slide_out_bottom
+                )
                 add(R.id.fragment_container_view, IncomingMovementsFragment())
                 addToBackStack(null)
             }

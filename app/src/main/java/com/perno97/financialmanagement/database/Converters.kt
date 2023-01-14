@@ -17,6 +17,6 @@ class Converters {
 
     @TypeConverter
     fun dateToTimestamp(date: LocalDate): Long {
-        return date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()
+        return date.atTime(12, 0).atZone(ZoneId.systemDefault()).toEpochSecond()
     }
 }

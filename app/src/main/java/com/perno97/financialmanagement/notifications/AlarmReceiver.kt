@@ -44,7 +44,7 @@ class AlarmReceiver : BroadcastReceiver() {
             val builder = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_baseline_attach_money_24)
                 .setContentTitle(notificationTitle)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
 

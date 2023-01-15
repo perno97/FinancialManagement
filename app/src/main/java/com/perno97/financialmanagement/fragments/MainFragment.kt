@@ -369,7 +369,7 @@ class MainFragment : Fragment() {
         dateTo = LocalDate.now()
         dateFrom = LocalDate.now()
             .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
-        val to = dateFrom.with(TemporalAdjusters.next(firstDayOfWeek))
+        val to = dateFrom.with(TemporalAdjusters.next(firstDayOfWeek)).minusDays(1)
         state = PeriodState.WEEK
         setTitle(
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +

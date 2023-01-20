@@ -246,7 +246,7 @@ class IncomingMovementsFragment : Fragment() {
     }
 
     private fun confirmIncomingMovement(incomingMovement: IncomingMovement) {
-        ConfirmIncomingMovementDialog(incomingMovement).show(
+        ConfirmIncomingMovementDialog(incomingMovement, binding.txtTitle).show(
             childFragmentManager, ConfirmIncomingMovementDialog.TAG
         )
     }
@@ -262,7 +262,8 @@ class IncomingMovementsFragment : Fragment() {
                 amount = incomingMovement.amount,
                 notify = incomingMovement.notify,
                 category = incomingMovement.category
-            )
+            ),
+            binding.txtTitle
         ).show(
             childFragmentManager, ConfirmMovementDeleteDialog.TAG
         )

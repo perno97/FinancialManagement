@@ -432,5 +432,5 @@ interface ApplicationDao {
     @Query(
         "SELECT * FROM category WHERE name = :name"
     )
-    suspend fun getCategory(name: String): Category?
+    suspend fun getCategoryByName(name: String): Category?
 }

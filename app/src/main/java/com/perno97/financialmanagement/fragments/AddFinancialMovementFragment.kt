@@ -167,7 +167,7 @@ class AddFinancialMovementFragment : Fragment() {
             false
         }
         binding.btnAddNewCategory.setOnClickListener {
-            AddNewCategoryDialog().show(
+            AddNewCategoryDialog(binding.editTextMovAmount).show(
                 childFragmentManager, AddNewCategoryDialog.TAG
             )
         }

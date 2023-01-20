@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
@@ -19,8 +20,9 @@ import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+import kotlinx.coroutines.launch
 
-class AddNewCategoryDialog : DialogFragment() {
+class AddNewCategoryDialog(private val viewForSnack: View) : DialogFragment() {
 
     private var _binding: FragmentAddNewCategoryDialogBinding? = null
 
@@ -54,28 +56,45 @@ class AddNewCategoryDialog : DialogFragment() {
     }
 
     private fun confirmAction() {
-        val name = binding.editTextNewCatName.text.toString()
+        val name = binding.editTextNewCatName.text.toString().trim()
         val color = binding.spinnerColor.selectedItem.toString()
         val budget = binding.editTextNewCatBudget.text.toString().toFloatOrNull() ?: 0f
-        appViewModel.insert(
-            Category(
-                name = name.trim(),
-                color = color,
-                budget = budget
-            )
-        )
-        Snackbar.make(
-            binding.btnConfirmNewCategory,
-            R.string.success_add_category,
-            BaseTransientBottomBar.LENGTH_LONG
-        ).setBackgroundTint(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.success
-            )
-        ).show()
-        appViewModel.setSelectedCategory(name)
-        dismiss()
+
+        appViewModel.viewModelScope.launch {
+            if (appViewModel.getCategoryByName(name) == null) {
+                appViewModel.insert(
+                    Category(
+                        name = name,
+                        color = color,
+                        budget = budget
+                    )
+                )
+                Snackbar.make(
+                    viewForSnack,
+                    R.string.success_add_category,
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.success
+                    )
+                ).show()
+            } else {
+                Snackbar.make(
+                    viewForSnack,
+                    getString(R.string.error_category_already_exists, name),
+                    BaseTransientBottomBar.LENGTH_LONG
+                ).setBackgroundTint(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.warning
+                    )
+                ).show()
+            }
+            appViewModel.setSelectedCategory(name)
+            dismiss()
+        }
+
     }
 
     private fun cancelAction() {

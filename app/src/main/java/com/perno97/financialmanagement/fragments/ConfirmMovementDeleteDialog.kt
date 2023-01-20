@@ -22,7 +22,10 @@ import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
 
-class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDeletionData) :
+class ConfirmMovementDeleteDialog(
+    private val movementDeletionData: MovementDeletionData,
+    private val viewForSnack: View
+) :
     DialogFragment() {
 
     private val logTag = "ConfirmMovementDeleteDialog"
@@ -80,7 +83,7 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
                 appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() - movementDeletionData.amount)
             }
             Snackbar.make(
-                binding.btnConfirmDeletion,
+                viewForSnack,
                 R.string.success_delete_movement,
                 BaseTransientBottomBar.LENGTH_LONG
             ).setBackgroundTint(
@@ -95,7 +98,7 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
                 movementDeletionData.notify
             )
             Snackbar.make(
-                binding.btnConfirmDeletion,
+                viewForSnack,
                 R.string.success_delete_movement,
                 BaseTransientBottomBar.LENGTH_LONG
             ).setBackgroundTint(
@@ -114,7 +117,7 @@ class ConfirmMovementDeleteDialog(private val movementDeletionData: MovementDele
                 }
             }
             Snackbar.make(
-                binding.btnConfirmDeletion,
+                viewForSnack,
                 R.string.success_delete_periodic,
                 BaseTransientBottomBar.LENGTH_LONG
             ).setBackgroundTint(

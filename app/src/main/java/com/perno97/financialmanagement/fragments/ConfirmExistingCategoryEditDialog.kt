@@ -62,7 +62,7 @@ class ConfirmExistingCategoryEditDialog(
     private fun confirmEdit() {
         appViewModel.updateCategoryNameInMovements(oldCategoryData.name, newCategoryData.name)
         appViewModel.viewModelScope.launch {
-            val cat = appViewModel.getCategory(newCategoryData.name)
+            val cat = appViewModel.getCategoryByName(newCategoryData.name)
             if (cat != null) {
                 appViewModel.deleteCategory(cat)
                 appViewModel.update(newCategoryData)

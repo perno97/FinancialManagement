@@ -126,4 +126,5 @@
     <string name="confirm_existing_category_edit">There is already a category called \"%s\". If you confirm, all the movements of the two colliding categories will be merged, otherwise you can cancel and choose another name.</string>
     <string name="category_already_exists_capital">CATEGORY ALREADY EXISTS</string>
     <string name="error_category_conflict_not_found">Category not found even if there\'s conflict on name</string>
+    <string name="error_category_already_exists">Category %s already exists</string>
 </resources>

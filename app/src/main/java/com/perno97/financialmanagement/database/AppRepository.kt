@@ -57,8 +57,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun getCategory(name: String): Category? {
-        return applicationDao.getCategory(name)
+    suspend fun getCategoryByName(name: String): Category? {
+        return applicationDao.getCategoryByName(name)
     }
 
 

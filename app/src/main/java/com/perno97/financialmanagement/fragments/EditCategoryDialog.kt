@@ -22,7 +22,8 @@ import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
 
-class EditCategoryDialog(private val category: Category) : DialogFragment() {
+class EditCategoryDialog(private val category: Category, private val viewForSnack: View) :
+    DialogFragment() {
 
     private var _binding: FragmentEditCategoryDialogBinding? = null
 
@@ -77,7 +78,7 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
         )
 
         appViewModel.viewModelScope.launch {
-            if (category.name != newCategoryData.name && appViewModel.getCategory(name) != null) {
+            if (category.name != newCategoryData.name && appViewModel.getCategoryByName(name) != null) {
                 ConfirmExistingCategoryEditDialog(category, newCategoryData).show(
                     parentFragmentManager,
                     ConfirmExistingCategoryEditDialog.TAG
@@ -87,7 +88,7 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
                 appViewModel.updateCategoryNameInMovements(category.name, newCategoryData.name)
             }
             Snackbar.make(
-                binding.btnConfirmEditCategory,
+                viewForSnack,
                 R.string.success_edit_category,
                 BaseTransientBottomBar.LENGTH_LONG
             ).setBackgroundTint(

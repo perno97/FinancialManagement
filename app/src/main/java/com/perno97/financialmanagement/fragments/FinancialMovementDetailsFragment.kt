@@ -249,7 +249,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             cancelEdit()
         }
         binding.btnAddNewCategory.setOnClickListener {
-            AddNewCategoryDialog().show(
+            AddNewCategoryDialog(binding.editTextMovAmount).show(
                 childFragmentManager, AddNewCategoryDialog.TAG
             )
         }
@@ -264,7 +264,8 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     amount = movementDetailsData.amount,
                     category = movementDetailsData.category,
                     notify = movementDetailsData.notify
-                )
+                ),
+                binding.editTextMovAmount
             ).show(
                 parentFragmentManager, ConfirmMovementDeleteDialog.TAG
             )

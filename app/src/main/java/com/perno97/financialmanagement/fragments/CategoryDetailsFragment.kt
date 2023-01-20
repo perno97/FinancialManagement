@@ -800,7 +800,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
             parentFragmentManager.popBackStack()
         }
         binding.imgBtnEdit.setOnClickListener {
-            EditCategoryDialog(category).show(
+            EditCategoryDialog(category, binding.txtCategoryName).show(
                 childFragmentManager, EditCategoryDialog.TAG
             )
         }

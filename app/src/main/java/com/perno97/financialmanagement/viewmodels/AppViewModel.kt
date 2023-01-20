@@ -87,8 +87,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getPeriodicMovement(periodicMovementId)
     }
 
-    suspend fun getCategory(name: String): Category? {
-        return repository.getCategory(name)
+    suspend fun getCategoryByName(name: String): Category? {
+        return repository.getCategoryByName(name)
     }
 
     fun getMovementsGroupByWeek(

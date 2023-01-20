@@ -21,7 +21,10 @@ import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
 import kotlinx.coroutines.launch
 
-class ConfirmIncomingMovementDialog(private val incomingMovement: IncomingMovement) :
+class ConfirmIncomingMovementDialog(
+    private val incomingMovement: IncomingMovement,
+    private val viewForSnack: View
+) :
     DialogFragment() {
 
     private var _binding: FragmentConfirmIncomingMovementDialogBinding? = null
@@ -79,7 +82,7 @@ class ConfirmIncomingMovementDialog(private val incomingMovement: IncomingMoveme
             appViewModel.updateAssets(appViewModel.getCurrentAssetDefault() + incomingMovement.amount)
         }
         Snackbar.make(
-            binding.btnConfirmIncoming,
+            viewForSnack,
             R.string.success_confirmed_incoming,
             BaseTransientBottomBar.LENGTH_LONG
         ).setBackgroundTint(

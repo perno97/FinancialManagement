@@ -56,6 +56,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         return applicationDao.getAllIncomingFromPeriodic(periodicMovementId)
     }
 
+    @WorkerThread
+    suspend fun getCategory(name: String): Category? {
+        return applicationDao.getCategory(name)
+    }
+
 
     /*
     Getters with parameters
@@ -156,8 +161,8 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    fun getCategory(categoryName: String): Flow<Category> {
-        return applicationDao.getCategory(categoryName)
+    fun getCategory(categoryId: Long): Flow<Category> {
+        return applicationDao.getCategory(categoryId)
     }
 
     @WorkerThread
@@ -299,6 +304,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun updateAssets(profileId: Long, assetsValue: Float) {
         applicationDao.updateAssets(profileId, assetsValue)
+    }
+
+    @WorkerThread
+    suspend fun updateCategoryNameInMovements(oldName: String, newName: String) {
+        applicationDao.updateCategoryNameInMovements(oldName, newName)
     }
 
 

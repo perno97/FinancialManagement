@@ -449,7 +449,6 @@ class AssetsGraphsFragment : Fragment() {
         dateTo = LocalDate.now()
         dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
         state = PeriodState.MONTH
-        val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
         setTitle(getString(R.string.group_by_month))
         loadData()
     }

@@ -30,6 +30,9 @@ interface ApplicationDao {
     suspend fun insertProfiles(vararg profiles: Profile)
 
 
+    /*
+    Update
+     */
     @Update
     suspend fun updateCategories(vararg categories: Category)
 
@@ -46,6 +49,11 @@ interface ApplicationDao {
         "UPDATE profile SET assets = :assetsValue WHERE profileId = :profileId"
     )
     suspend fun updateAssets(profileId: Long, assetsValue: Float)
+
+    @Query(
+        "UPDATE movement SET category = :newName WHERE category = :oldName"
+    )
+    suspend fun updateCategoryNameInMovements(oldName: String, newName: String)
 
 
     /*
@@ -96,8 +104,8 @@ interface ApplicationDao {
     @Query("SELECT last_access FROM profile WHERE profileId = :profileId")
     suspend fun getLastAccess(profileId: Long): LocalDate?
 
-    @Query("SELECT * FROM category WHERE name = :categoryName")
-    fun getCategory(categoryName: String): Flow<Category>
+    @Query("SELECT * FROM category WHERE category_id = :categoryId")
+    fun getCategory(categoryId: Long): Flow<Category>
 
     @Transaction
     @Query("SELECT * FROM category")
@@ -114,7 +122,7 @@ interface ApplicationDao {
     Advanced getters
      */
     @Query(
-        "SELECT name, color, daily_budget, current AS expense FROM category" +
+        "SELECT category.*, current AS expense FROM category" +
                 " INNER JOIN (SELECT movement.category AS catName, SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS current FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +
                 " ON category.name = catName WHERE daily_budget > 0"
@@ -360,7 +368,7 @@ interface ApplicationDao {
     in the selected period
      */
     @Query(
-        "SELECT name, color, daily_budget, positive, negative FROM category LEFT JOIN " +
+        "SELECT category.*, positive, negative FROM category LEFT JOIN " +
                 "(SELECT movement.category AS catName, SUM(CASE WHEN amount > 0 THEN amount else 0 END) AS positive," +
                 " SUM(CASE WHEN amount < 0 THEN amount else 0 END) AS negative FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +
@@ -420,4 +428,9 @@ interface ApplicationDao {
         "SELECT * FROM incoming_movement WHERE periodic_movement_id = :periodicMovementId"
     )
     suspend fun getAllIncomingFromPeriodic(periodicMovementId: Long): List<IncomingMovement>
+
+    @Query(
+        "SELECT * FROM category WHERE name = :name"
+    )
+    suspend fun getCategory(name: String): Category?
 }

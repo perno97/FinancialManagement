@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
@@ -19,6 +20,7 @@ import com.perno97.financialmanagement.utils.ColorsSpinnerAdapter
 import com.perno97.financialmanagement.utils.DecimalDigitsInputFilter
 import com.perno97.financialmanagement.viewmodels.AppViewModel
 import com.perno97.financialmanagement.viewmodels.AppViewModelFactory
+import kotlinx.coroutines.launch
 
 class EditCategoryDialog(private val category: Category) : DialogFragment() {
 
@@ -64,27 +66,38 @@ class EditCategoryDialog(private val category: Category) : DialogFragment() {
     }
 
     private fun confirmAction() {
-        val name = binding.editTextNewCatName.text.toString()
+        val name = binding.editTextNewCatName.text.toString().trim()
         val color = binding.spinnerColor.selectedItem.toString()
         val budget = binding.editTextNewCatBudget.text.toString().toFloat()
-        appViewModel.update(
-            Category(
-                name = name.trim(),
-                color = color,
-                budget = budget
-            )
+
+        val newCategoryData = category.copy(
+            name = name,
+            color = color,
+            budget = budget
         )
-        Snackbar.make(
-            binding.btnConfirmEditCategory,
-            R.string.success_edit_category,
-            BaseTransientBottomBar.LENGTH_LONG
-        ).setBackgroundTint(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.success
-            )
-        ).show()
-        dismiss()
+
+        appViewModel.viewModelScope.launch {
+            if (category.name != newCategoryData.name && appViewModel.getCategory(name) != null) {
+                ConfirmExistingCategoryEditDialog(category, newCategoryData).show(
+                    parentFragmentManager,
+                    ConfirmExistingCategoryEditDialog.TAG
+                )
+            } else {
+                appViewModel.update(newCategoryData)
+                appViewModel.updateCategoryNameInMovements(category.name, newCategoryData.name)
+            }
+            Snackbar.make(
+                binding.btnConfirmEditCategory,
+                R.string.success_edit_category,
+                BaseTransientBottomBar.LENGTH_LONG
+            ).setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.success
+                )
+            ).show()
+            dismiss()
+        }
     }
 
     private fun cancelAction() {

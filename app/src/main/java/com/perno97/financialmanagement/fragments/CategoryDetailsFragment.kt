@@ -16,6 +16,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -27,6 +28,7 @@ import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
 import com.perno97.financialmanagement.database.AmountWithDate
 import com.perno97.financialmanagement.database.Category
+import com.perno97.financialmanagement.database.UnusedCategoriesChecker
 import com.perno97.financialmanagement.databinding.FragmentCategoryDetailsBinding
 import com.perno97.financialmanagement.utils.PeriodState
 import com.perno97.financialmanagement.viewmodels.AppViewModel
@@ -42,7 +44,7 @@ import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-class CategoryDetailsFragment(private val categoryName: String) :
+class CategoryDetailsFragment(private val categoryId: Long) :
     Fragment() {
     private val logTag = "CategoryDetailsFragment"
     private val numberOfColumnsInGraphs = 8
@@ -82,12 +84,12 @@ class CategoryDetailsFragment(private val categoryName: String) :
         // Workaround for having custom first day of week in SQLite
         weekStartOffset = ChronoUnit.DAYS.between(f, t).toInt().absoluteValue
 
-        appViewModel.getCategory(categoryName).observe(viewLifecycleOwner) {
+        appViewModel.getCategory(categoryId).observe(viewLifecycleOwner) {
             if (it != null) {
                 category = it
                 loadUiData()
             } else {
-                Log.e(logTag, "No category found with name: $categoryName")
+                Log.e(logTag, "No category found with id: $categoryId")
             }
         }
 
@@ -871,6 +873,7 @@ class CategoryDetailsFragment(private val categoryName: String) :
     override fun onDestroyView() {
         super.onDestroyView()
         Log.i(logTag, "Called onDestroyView()")
+        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
         _binding = null
     }
 }

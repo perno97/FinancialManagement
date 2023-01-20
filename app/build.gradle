@@ -41,7 +41,6 @@ dependencies {
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation "androidx.fragment:fragment-ktx:1.5.5"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.core:core-ktx:1.9.0'
 
     // Dependencies for working with Architecture components

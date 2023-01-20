@@ -87,6 +87,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getPeriodicMovement(periodicMovementId)
     }
 
+    suspend fun getCategory(name: String): Category? {
+        return repository.getCategory(name)
+    }
+
     fun getMovementsGroupByWeek(
         weekStartOffset: Int,
         beforeDateInclusive: LocalDate
@@ -155,8 +159,8 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getIncomingMovementsInPeriod(dateFrom, dateTo).asLiveData()
     }
 
-    fun getCategory(categoryName: String): LiveData<Category> {
-        return repository.getCategory(categoryName).asLiveData()
+    fun getCategory(categoryId: Long): LiveData<Category> {
+        return repository.getCategory(categoryId).asLiveData()
     }
 
     fun getCategoryExpensesProgresses(
@@ -283,38 +287,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         }
     }
 
-    /*fun setIncomingPeriod( TODO remove
-        from: LocalDate,
-        to: LocalDate,
-        state: PeriodState,
-        datePickerSelection: Pair<Long, Long>?
-    ) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                dateFromIncoming = from,
-                dateToIncoming = to,
-                stateIncoming = state,
-                datePickerSelectionIncoming = datePickerSelection
-            )
-        }
-    }*/
-
-    /*fun setPeriodicPeriod( TODO remove
-        from: LocalDate,
-        to: LocalDate,
-        state: PeriodState,
-        datePickerSelection: Pair<Long, Long>?
-    ) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                dateFromPeriodic = from,
-                dateToPeriodic = to,
-                statePeriodic = state,
-                datePickerSelectionPeriodic = datePickerSelection
-            )
-        }
-    }*/
-
     fun setCategoryFilters(filters: List<Category>) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -377,6 +349,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun updateAssets(assetsValue: Float) = viewModelScope.launch {
         repository.updateAssets(defaultProfileId, assetsValue)
+    }
+
+    fun updateCategoryNameInMovements(oldName: String, newName: String) = viewModelScope.launch {
+        repository.updateCategoryNameInMovements(oldName, newName)
     }
 
 

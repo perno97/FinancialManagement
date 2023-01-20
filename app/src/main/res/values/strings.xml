@@ -123,4 +123,7 @@
     <string name="group_by_month">Group by month</string>
     <string name="assets_at_start_capital">ASSETS AT START</string>
     <string name="assets_at_end_capital">ASSETS AT END</string>
+    <string name="confirm_existing_category_edit">There is already a category called \"%s\". If you confirm, all the movements of the two colliding categories will be merged, otherwise you can cancel and choose another name.</string>
+    <string name="category_already_exists_capital">CATEGORY ALREADY EXISTS</string>
+    <string name="error_category_conflict_not_found">Category not found even if there\'s conflict on name</string>
 </resources>

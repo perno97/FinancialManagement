@@ -78,7 +78,7 @@ class CategoriesListFragment : Fragment() {
                     )
                     replace(
                         R.id.fragment_container_view,
-                        CategoryDetailsFragment(category.name)
+                        CategoryDetailsFragment(category.categoryId)
                     )
                     addToBackStack(null)
                 }

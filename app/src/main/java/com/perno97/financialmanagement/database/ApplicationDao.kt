@@ -123,7 +123,7 @@ interface ApplicationDao {
      */
     @Query(
         "SELECT category.*, current AS expense FROM category" +
-                " INNER JOIN (SELECT movement.category AS catName, SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS current FROM" +
+                " LEFT JOIN (SELECT movement.category AS catName, SUM(CASE WHEN movement.amount < 0 THEN movement.amount else 0 END) AS current FROM" +
                 " movement WHERE date >= :dateFrom AND date <= :dateTo GROUP BY catName)" +
                 " ON category.name = catName WHERE daily_budget > 0"
     )

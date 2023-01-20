@@ -549,7 +549,7 @@ class MainFragment : Fragment() {
             var budgetsSum = 0f
             for (c in categories.keys) {
                 val multipliedBudget = c.budget * budgetMultiplier
-                val currentCatExpenseAsPositive = categories[c]!!.expense.absoluteValue
+                val currentCatExpenseAsPositive = categories[c]?.expense?.absoluteValue ?: 0f
                 budgetsSum += multipliedBudget
                 currentSum += currentCatExpenseAsPositive
 

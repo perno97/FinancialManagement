@@ -204,11 +204,11 @@ class AssetsGraphsFragment : Fragment() {
             val exp = data.negative.absoluteValue
             val gain = data.positive
             val max = max(exp, gain)
-            expProgressBar.progress = exp.roundToInt()
             expProgressBar.max = max.roundToInt()
+            expProgressBar.progress = exp.roundToInt()
             txtViewExp.text = getString(R.string.current_on_max_budget, exp, max)
-            gainProgressBar.progress = gain.roundToInt()
             gainProgressBar.max = max.roundToInt()
+            gainProgressBar.progress = gain.roundToInt()
             txtViewGain.text = getString(R.string.current_on_max_budget, gain, max)
         }
     }

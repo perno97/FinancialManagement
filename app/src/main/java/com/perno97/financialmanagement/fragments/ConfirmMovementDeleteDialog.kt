@@ -130,6 +130,7 @@ class ConfirmMovementDeleteDialog(
             Log.e(logTag, "Error deleting movement $movementDeletionData")
         }
         dismiss()
+        parentFragmentManager.popBackStack()
     }
 
     private fun deleteIncomingMovement(incomingMovementId: Long, notify: Boolean) {
@@ -148,7 +149,6 @@ class ConfirmMovementDeleteDialog(
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        parentFragmentManager.popBackStack()
     }
 
     companion object {

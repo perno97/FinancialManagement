@@ -149,6 +149,7 @@ class MainFragment : Fragment() {
     private fun computeExpectedAssets() {
         lifecycleScope.launch {
             val currentAssets = appViewModel.getCurrentAssetDefault()
+            binding.txtCurrentValue.text = getString(R.string.euro_value, defaultProfile.assets)
             val tomorrow = LocalDate.now().plusDays(1)
             when (state) {
                 // ----------------- DAY -----------------

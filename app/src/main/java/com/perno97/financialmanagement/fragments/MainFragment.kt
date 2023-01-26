@@ -66,7 +66,6 @@ class MainFragment : Fragment() {
     private lateinit var defaultProfile: Profile
     private var datePickerSelection: Pair<Long, Long>? = null
     private var state = PeriodState.MONTH
-    private var availableDailyBudget: Float? = null
     private var categoriesExpenses: Map<Category, Expense>? = null
     private var uiLoaded = false
 
@@ -316,21 +315,9 @@ class MainFragment : Fragment() {
             .observe(viewLifecycleOwner) { list ->
                 Log.i(logTag, "Observed getCategoryExpensesProgress")
                 categoriesExpenses = list
-                updateAvailableBudget()
+                updateUI(categoriesExpenses!!)
             }
 
-    }
-
-    private fun updateAvailableBudget() {
-        Log.i(logTag, "Called updateAvailableBudget()")
-        appViewModel.availableDailyBudget.observe(viewLifecycleOwner) { budget ->
-            Log.i(logTag, "Observed availableDailyBudget")
-            availableDailyBudget = budget
-            updateUI(
-                categoriesExpenses!!,
-                availableDailyBudget
-            )
-        }
     }
 
     private fun initReady() {
@@ -529,7 +516,7 @@ class MainFragment : Fragment() {
         binding.txtSubtitle.text = title
     }
 
-    private fun updateUI(categories: Map<Category, Expense>, dailyBudget: Float?) {
+    private fun updateUI(categories: Map<Category, Expense>) {
         Log.i(logTag, "Called updateUI")
         binding.categoryList.removeAllViews()
         val pieChartEntries = ArrayList<PieEntry>()
@@ -601,7 +588,6 @@ class MainFragment : Fragment() {
         chart.data = pieData
         val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
         val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
-        //val s1 = SpannableString("AVAILABLE \n BUDGET") TODO REMOVE
         val availableBudget =
             if (currentSum > budgetsSum) 0 else (budgetsSum - currentSum).roundToInt()
         val s1 = SpannableString(getString(R.string.pie_chart_center_first_text))

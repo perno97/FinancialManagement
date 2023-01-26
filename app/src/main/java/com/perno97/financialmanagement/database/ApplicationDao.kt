@@ -92,9 +92,6 @@ interface ApplicationDao {
     @Query("SELECT * FROM periodic_movement")
     suspend fun getAllPeriodicMovements(): List<PeriodicMovement>
 
-    @Query("SELECT SUM(daily_budget) as budget FROM category")
-    fun getAvailableDailyBudget(): Flow<Float> // TODO REMOVE
-
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
     fun getProfile(profileId: Long): Flow<Profile>
 

@@ -33,17 +33,5 @@ data class FinancialManagementUiState(
     val datePickerSelectionAssets: Pair<Long, Long>? = null,
     val stateAssets: PeriodState = PeriodState.MONTH,
     val dateFromAssets: LocalDate = LocalDate.of(LocalDate.now().year, LocalDate.now().month, 1),
-    val dateToAssets: LocalDate = LocalDate.now(),
-
-    //IncomingMovementsFragment TODO remove
-    //val dateFromIncoming: LocalDate = LocalDate.of(LocalDate.now().year, LocalDate.now().month, 1),
-    //val dateToIncoming: LocalDate = LocalDate.now(),
-    //val stateIncoming: PeriodState = PeriodState.MONTH,
-    //val datePickerSelectionIncoming: Pair<Long, Long>? = null,
-
-    //PeriodicMovementsFragment TODO remove
-    //val datePickerSelectionPeriodic: Pair<Long, Long>? = null,
-    //val statePeriodic: PeriodState = PeriodState.MONTH,
-    //val dateToPeriodic: LocalDate = LocalDate.now(),
-    //val dateFromPeriodic: LocalDate = LocalDate.of(LocalDate.now().year, LocalDate.now().month, 1)
+    val dateToAssets: LocalDate = LocalDate.now()
 )

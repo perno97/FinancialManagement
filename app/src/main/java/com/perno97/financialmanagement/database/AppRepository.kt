@@ -11,7 +11,6 @@ class AppRepository(private val applicationDao: ApplicationDao) {
         Getters without parameters
          */
     val allCategories: Flow<List<Category>> = applicationDao.getAllCategories()
-    val availableDailyBudget: Flow<Float> = applicationDao.getAvailableDailyBudget()
 
     @WorkerThread
     suspend fun getCategoryWithMovements(): List<CategoryWithMovements> {

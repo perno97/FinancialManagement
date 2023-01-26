@@ -25,7 +25,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
     Getters without parameters
      */
     val allCategories: LiveData<List<Category>> = repository.allCategories.asLiveData()
-    val availableDailyBudget: LiveData<Float> = repository.availableDailyBudget.asLiveData()
 
     fun getDefaultProfile(): LiveData<Profile> {
         return repository.getProfile(defaultProfileId).asLiveData()

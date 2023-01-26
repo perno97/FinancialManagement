@@ -30,7 +30,7 @@
     <string name="error_no_data_in_period">Can\'t find any movement in the selected period</string>
     <string name="incomes">Incomes</string>
     <string name="assets">Assets</string>
-    <string name="outcomes">Outcomes</string>
+    <string name="expenses">Expenses</string>
     <string name="graph_label_now">Now</string>
     <string name="graph_label_current">Current</string>
     <string name="graph_label_week" tools:ignore="PluralsCandidate">-%d weeks</string>
@@ -66,7 +66,6 @@
     <string name="zero">0.00</string>
     <string name="euro_symbol">€</string>
     <string name="income">Income</string>
-    <string name="outcome">Outcome</string>
     <string name="date_capital">DATE</string>
     <string name="category_capital">CATEGORY</string>
     <string name="title_capital">TITLE</string>
@@ -127,4 +126,7 @@
     <string name="category_already_exists_capital">CATEGORY ALREADY EXISTS</string>
     <string name="error_category_conflict_not_found">Category not found even if there\'s conflict on name</string>
     <string name="error_category_already_exists">Category %s already exists</string>
+    <string name="pie_chart_center_first_text">BUDGET LEFT</string>
+    <string name="pie_chart_center_third_text">of %d€</string>
+    <string name="pie_chart_center_second_text">%d€</string>
 </resources>

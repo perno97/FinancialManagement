@@ -55,7 +55,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
 
     private var editingEnabled = false
 
-    // Outcome is default
+    // Expense is default
     private var income = false
     private var dateOpen: Boolean = false
     private var periodic = false
@@ -96,7 +96,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         if (amount >= 0) {
             incomeSelected()
         } else {
-            outcomeSelected()
+            expenseSelected()
         }
 
 
@@ -152,16 +152,16 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
         }
     }
 
-    private fun outcomeSelected() {
+    private fun expenseSelected() {
         income = false
         binding.btnIncome.isEnabled = true
-        binding.btnOutcome.isEnabled = false
+        binding.btnExpense.isEnabled = false
     }
 
     private fun incomeSelected() {
         income = true
         binding.btnIncome.isEnabled = false
-        binding.btnOutcome.isEnabled = true
+        binding.btnExpense.isEnabled = true
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -231,9 +231,9 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                 incomeSelected()
             }
         }
-        binding.btnOutcome.setOnClickListener {
+        binding.btnExpense.setOnClickListener {
             if (editingEnabled) {
-                outcomeSelected()
+                expenseSelected()
             }
         }
         binding.fabEditMovement.setOnClickListener {

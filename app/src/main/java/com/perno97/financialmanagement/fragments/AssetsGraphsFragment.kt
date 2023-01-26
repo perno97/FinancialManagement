@@ -196,9 +196,9 @@ class AssetsGraphsFragment : Fragment() {
     }
 
     private fun updateHorizontalGraph(data: GroupInfo?) {
-        val expProgressBar = binding.progressBarAssetsOutcomes
+        val expProgressBar = binding.progressBarAssetsExpenses
         val gainProgressBar = binding.progressBarAssetsIncomes
-        val txtViewExp = binding.txtAssetsOutcomes
+        val txtViewExp = binding.txtAssetsExpenses
         val txtViewGain = binding.txtAssetsIncomes
         if (data != null) {
             val exp = data.negative.absoluteValue
@@ -408,7 +408,7 @@ class AssetsGraphsFragment : Fragment() {
         lineChart.data = lineChartData
         lineChart.invalidate()
 
-        val barDataSetExp = BarDataSet(barEntriesExp, getString(R.string.outcomes))
+        val barDataSetExp = BarDataSet(barEntriesExp, getString(R.string.expenses))
         barDataSetExp.color = ContextCompat.getColor(
             requireContext(),
             R.color.warning

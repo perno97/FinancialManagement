@@ -49,7 +49,7 @@ class AddFinancialMovementFragment : Fragment() {
     private lateinit var categoryList: List<Category>
     private lateinit var selectedCategory: String
 
-    // Outcome is default
+    // Expense is default
     private var income = false
     private var dateOpen: Boolean = false
 
@@ -67,16 +67,15 @@ class AddFinancialMovementFragment : Fragment() {
 
         loadCategories()
 
-
-
-        binding.checkNotify.isEnabled = false // Can't notify if date is not after today
-        binding.inputNotifyRow.visibility = View.GONE
+        binding.editTextMovementDate.inputType = InputType.TYPE_NULL
+        binding.editTextMovementDate.setText(LocalDate.now().toString())
+        updateVisibilityOfCheckNotify()
 
         binding.editTextMovAmount.filters =
             arrayOf(DecimalDigitsInputFilter(binding.editTextMovAmount))
 
-        // Outcome is default
-        binding.btnOutcome.isEnabled = false
+        // Expense is default
+        binding.btnExpense.isEnabled = false
 
         return binding.root
     }
@@ -101,9 +100,6 @@ class AddFinancialMovementFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initListeners() {
-        binding.editTextMovementDate.inputType = InputType.TYPE_NULL
-        binding.editTextMovementDate.setText(LocalDate.now().toString())
-
         binding.spinnerCategory.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -150,14 +146,7 @@ class AddFinancialMovementFragment : Fragment() {
                     val date = Instant.ofEpochMilli(value)
                         .atZone(ZoneId.systemDefault()).toLocalDate()
                     binding.editTextMovementDate.setText(date.toString())
-                    if (date.isAfter(LocalDate.now())) {
-                        // Can't notify if date is not after today
-                        binding.checkNotify.isEnabled = true
-                        binding.inputNotifyRow.visibility = View.VISIBLE
-                    } else {
-                        binding.checkNotify.isEnabled = false
-                        binding.inputNotifyRow.visibility = View.GONE
-                    }
+                    updateVisibilityOfCheckNotify()
                 }
                 datePicker.addOnDismissListener {
                     dateOpen = false
@@ -180,17 +169,38 @@ class AddFinancialMovementFragment : Fragment() {
         }
         binding.btnIncome.setOnClickListener {
             binding.btnIncome.isEnabled = false
-            binding.btnOutcome.isEnabled = true
+            binding.btnExpense.isEnabled = true
             income = true
         }
-        binding.btnOutcome.setOnClickListener {
+        binding.btnExpense.setOnClickListener {
             binding.btnIncome.isEnabled = true
-            binding.btnOutcome.isEnabled = false
+            binding.btnExpense.isEnabled = false
             income = false
         }
         binding.checkPeriodic.setOnClickListener {
-            binding.layoutPeriodic.visibility =
-                if (binding.checkPeriodic.isChecked) View.VISIBLE else View.GONE
+            updateVisibilityOfCheckNotify()
+            if (binding.checkPeriodic.isChecked) {
+                binding.layoutPeriodic.visibility = View.VISIBLE
+                binding.checkNotify.visibility = View.VISIBLE
+            } else
+                binding.layoutPeriodic.visibility = View.GONE
+        }
+    }
+
+    private fun updateVisibilityOfCheckNotify() {
+        if (binding.checkPeriodic.isChecked) {
+            binding.checkNotify.isEnabled = true
+            binding.inputNotifyRow.visibility = View.VISIBLE
+        } else {
+            val date = LocalDate.parse(binding.editTextMovementDate.text)
+            if (date.isAfter(LocalDate.now())) {
+                // Can't notify if date is not after today
+                binding.checkNotify.isEnabled = true
+                binding.inputNotifyRow.visibility = View.VISIBLE
+            } else {
+                binding.checkNotify.isEnabled = false
+                binding.inputNotifyRow.visibility = View.GONE
+            }
         }
     }
 

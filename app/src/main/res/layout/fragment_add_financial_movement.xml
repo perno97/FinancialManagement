@@ -67,7 +67,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
-                android:id="@+id/linLayIncomeOutcome"
+                android:id="@+id/linLayIncomeExpense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
@@ -89,7 +89,7 @@
                     style="?android:attr/buttonBarButtonStyle" />
 
                 <Button
-                    android:id="@+id/btnOutcome"
+                    android:id="@+id/btnExpense"
                     android:layout_width="110dp"
                     android:layout_height="48dp"
                     android:padding="0dp"
@@ -97,7 +97,7 @@
                     app:backgroundTint="@color/dark"
                     android:textSize="12sp"
                     android:textColor="@drawable/btn_dark_colors"
-                    android:text="@string/outcome"
+                    android:text="@string/expense"
                     style="?android:attr/buttonBarButtonStyle" />
 
             </LinearLayout>
@@ -111,7 +111,7 @@
                 android:paddingStart="25dp"
                 android:paddingEnd="25dp"
                 android:paddingBottom="30dp"
-                app:layout_constraintTop_toBottomOf="@id/linLayIncomeOutcome"
+                app:layout_constraintTop_toBottomOf="@id/linLayIncomeExpense"
                 app:layout_constraintStart_toStartOf="parent"
                 android:background="@drawable/all_rounded_15_style"
                 android:backgroundTint="@color/dark_10"

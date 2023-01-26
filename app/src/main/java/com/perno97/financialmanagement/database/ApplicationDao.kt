@@ -86,14 +86,14 @@ interface ApplicationDao {
     /*
     Basic getters
      */
-    @Query("SELECT * FROM category")
+    @Query("SELECT * FROM category ORDER BY name ASC")
     fun getAllCategories(): Flow<List<Category>>
 
     @Query("SELECT * FROM periodic_movement")
     suspend fun getAllPeriodicMovements(): List<PeriodicMovement>
 
     @Query("SELECT SUM(daily_budget) as budget FROM category")
-    fun getAvailableDailyBudget(): Flow<Float>
+    fun getAvailableDailyBudget(): Flow<Float> // TODO REMOVE
 
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
     fun getProfile(profileId: Long): Flow<Profile>

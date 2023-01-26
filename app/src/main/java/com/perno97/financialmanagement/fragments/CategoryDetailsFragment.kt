@@ -169,31 +169,58 @@ class CategoryDetailsFragment(private val categoryId: Long) :
         Log.i(logTag, "Called updateHorizontalGraphs()")
         binding.expensesProgressList.removeAllViews()
         binding.incomesProgressList.removeAllViews()
-        val budgetMultiplier: Int = when (state) {
-            PeriodState.DAY -> {
-                Log.e(logTag, "Period day not defined in this screen")
-                1
-            }
-            PeriodState.WEEK -> 7
-            PeriodState.MONTH -> LocalDate.now().lengthOfMonth()
-            PeriodState.PERIOD -> ChronoUnit.DAYS.between(dateFrom, dateTo)
-                .toInt() + 1 // Add 1 because between is exclusive
-        } // Budget is defined as daily budget
         if (categoriesExpenses == null || categoriesExpenses!!.isEmpty()) {
             Log.e(logTag, "No category movements to show in horizontal graphs")
         } else {
             var maxGain = 0f
-            var expFound = false
+            var maxExpense = 0f
             for (c in categoriesExpenses!!.keys) {
                 if (categoriesExpenses!![c] != null && maxGain < categoriesExpenses!![c]!!.positive) {
                     maxGain = categoriesExpenses!![c]!!.positive
                 }
-                if (!expFound && categoriesExpenses!![c] != null && categoriesExpenses!![c]!!.negative < 0f)
-                    expFound = true
+                if (categoriesExpenses!![c] != null && categoriesExpenses!![c]!!.negative < maxExpense)
+                    maxExpense = categoriesExpenses!![c]!!.negative
             }
-            if (maxGain != 0f || expFound) {
+            maxExpense = maxExpense.absoluteValue
+            if (maxGain != 0f) {
                 for (c in categoriesExpenses!!.keys) {
-                    val multipliedBudget = c.budget * budgetMultiplier
+                    if (categoriesExpenses!![c] == null) {
+                        Log.e(
+                            logTag,
+                            "No expense progress data found for category ${category.name}"
+                        )
+                        break
+                    }
+                    val currentCatGain = categoriesExpenses!![c]!!.positive
+                    // Load layout
+                    val viewCatProgressLayoutGain =
+                        layoutInflater.inflate(
+                            R.layout.category_progress_minimal,
+                            binding.incomesProgressList,
+                            false
+                        )
+                    // Add progress layout to container
+                    binding.incomesProgressList.addView(viewCatProgressLayoutGain)
+                    // Load progress bar
+                    val progressBarGain =
+                        viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+
+                    // Set category name for progress bar
+                    viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
+                        c.name
+                    // Set progress bar progress and color
+                    progressBarGain.progress = (currentCatGain * 100 / maxGain).roundToInt()
+                    progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
+                    // Set category budget of category line
+                    viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtCategoryBudget).text =
+                        getString(
+                            R.string.euro_value,
+                            currentCatGain
+                        )
+                }
+            }
+            if (maxExpense != 0f) {
+                for (c in categoriesExpenses!!.keys) {
                     if (categoriesExpenses!![c] == null) {
                         Log.e(
                             logTag,
@@ -203,67 +230,34 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                     }
                     val currentCatExpenseAsPositive =
                         categoriesExpenses!![c]!!.negative.absoluteValue
-                    val currentCatGain = categoriesExpenses!![c]!!.positive
 
-                    if (expFound) {
-                        // Load layout
-                        val viewCatProgressLayoutExp =
-                            layoutInflater.inflate(
-                                R.layout.category_progress_minimal,
-                                binding.expensesProgressList,
-                                false
-                            )
-                        // Add progress layout to container
-                        binding.expensesProgressList.addView(viewCatProgressLayoutExp)
-                        // Load progress bar
-                        val progressBarExp =
-                            viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
-                        // Set category name for progress bar
-                        viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
-                            c.name
-                        // Set progress bar progress and color
-                        //If multiplied budget is 0 and there's no expense then empty the progress bar
-                        //If multiplied budget is 0 and there's some expense then fill the progress bar
-                        progressBarExp.progress =
-                            if (multipliedBudget == 0f && currentCatExpenseAsPositive == 0f) 0
-                            else if (multipliedBudget == 0f) 100 else
-                                (currentCatExpenseAsPositive * 100 / multipliedBudget).roundToInt()
-                        progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
-                        // Set category budget of category line
-                        viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
-                            getString(
-                                R.string.current_on_max_budget,
-                                currentCatExpenseAsPositive,
-                                multipliedBudget
-                            )
-                    }
-                    if (maxGain != 0f) {
-                        // Load layout
-                        val viewCatProgressLayoutGain =
-                            layoutInflater.inflate(
-                                R.layout.category_progress_minimal,
-                                binding.incomesProgressList,
-                                false
-                            )
-                        // Add progress layout to container
-                        binding.incomesProgressList.addView(viewCatProgressLayoutGain)
-                        // Load progress bar
-                        val progressBarGain =
-                            viewCatProgressLayoutGain.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
-
-                        // Set category name for progress bar
-                        viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
-                            c.name
-                        // Set progress bar progress and color
-                        progressBarGain.progress = (currentCatGain * 100 / maxGain).roundToInt()
-                        progressBarGain.indicatorColor[0] = Color.parseColor(c.color)
-                        // Set category budget of category line
-                        viewCatProgressLayoutGain.findViewById<TextView>(R.id.txtCategoryBudget).text =
-                            getString(
-                                R.string.euro_value,
-                                currentCatGain
-                            )
-                    }
+                    // Load layout
+                    val viewCatProgressLayoutExp =
+                        layoutInflater.inflate(
+                            R.layout.category_progress_minimal,
+                            binding.expensesProgressList,
+                            false
+                        )
+                    // Add progress layout to container
+                    binding.expensesProgressList.addView(viewCatProgressLayoutExp)
+                    // Load progress bar
+                    val progressBarExp =
+                        viewCatProgressLayoutExp.findViewById<LinearProgressIndicator>(R.id.progressBarCategoryBudget)
+                    // Set category name for progress bar
+                    viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtProgressMinimalCategoryName).text =
+                        c.name
+                    // Set progress bar progress and color
+                    //If multiplied budget is 0 and there's no expense then empty the progress bar
+                    //If multiplied budget is 0 and there's some expense then fill the progress bar
+                    progressBarExp.progress =
+                        (currentCatExpenseAsPositive * 100 / maxExpense).roundToInt()
+                    progressBarExp.indicatorColor[0] = Color.parseColor(c.color)
+                    // Set category budget of category line
+                    viewCatProgressLayoutExp.findViewById<TextView>(R.id.txtCategoryBudget).text =
+                        getString(
+                            R.string.euro_value,
+                            currentCatExpenseAsPositive
+                        )
                 }
             }
         }
@@ -758,8 +752,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
         binding.btnWeek.isEnabled = false
         binding.btnMonth.isEnabled = true
         dateTo = LocalDate.now()
-        dateFrom = LocalDate.now()
-            .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+        dateFrom = LocalDate.now().minusDays(7 * numberOfColumnsInGraphs.toLong())
         state = PeriodState.WEEK
         setTitle(
             "${dateFrom.dayOfMonth}/${dateFrom.monthValue}/${dateFrom.year} " +
@@ -773,7 +766,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
         binding.btnWeek.isEnabled = true
         binding.btnMonth.isEnabled = false
         dateTo = LocalDate.now()
-        dateFrom = LocalDate.of(dateTo.year, dateTo.month, 1)
+        dateFrom = LocalDate.now().minusMonths(numberOfColumnsInGraphs.toLong())
         state = PeriodState.MONTH
         val month = dateTo.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
         setTitle("$month ${dateTo.year}")

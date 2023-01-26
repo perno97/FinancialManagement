@@ -44,7 +44,6 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.absoluteValue
-import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class MainFragment : Fragment() {
@@ -535,6 +534,8 @@ class MainFragment : Fragment() {
         binding.categoryList.removeAllViews()
         val pieChartEntries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
+        var currentSum = 0f
+        var budgetsSum = 0f
         val budgetMultiplier: Int = when (state) {
             PeriodState.DAY -> 1
             PeriodState.WEEK -> 7
@@ -546,8 +547,6 @@ class MainFragment : Fragment() {
             pieChartEntries.add(PieEntry(1f, "No data"))
             colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
         } else {
-            var currentSum = 0f
-            var budgetsSum = 0f
             for (c in categories.keys) {
                 val multipliedBudget = c.budget * budgetMultiplier
                 val currentCatExpenseAsPositive = categories[c]?.expense?.absoluteValue ?: 0f
@@ -602,16 +601,26 @@ class MainFragment : Fragment() {
         chart.data = pieData
         val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
         val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
-        val s1 = SpannableString("AVAILABLE \n BUDGET")
+        //val s1 = SpannableString("AVAILABLE \n BUDGET") TODO REMOVE
+        val availableBudget =
+            if (currentSum > budgetsSum) 0 else (budgetsSum - currentSum).roundToInt()
+        val s1 = SpannableString(getString(R.string.pie_chart_center_first_text))
         val s2 = SpannableString(
-            String.format(
-                "%d€",
-                ceil((dailyBudget ?: 0f) * budgetMultiplier).toInt() // If null show 0
+            getString(
+                R.string.pie_chart_center_second_text,
+                availableBudget
+            )
+        )
+        val s3 = SpannableString(
+            getString(
+                R.string.pie_chart_center_third_text,
+                budgetsSum.roundToInt()
             )
         )
         s1.setSpan(AbsoluteSizeSpan(textSize1), 0, s1.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         s2.setSpan(AbsoluteSizeSpan(textSize2), 0, s2.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-        chart.centerText = TextUtils.concat(s1, "\n", s2)
+        s3.setSpan(AbsoluteSizeSpan(textSize1), 0, s3.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        chart.centerText = TextUtils.concat(s1, "\n", s2, "\n", s3)
         chart.setCenterTextColor(R.color.dark)
         chart.invalidate()
     }

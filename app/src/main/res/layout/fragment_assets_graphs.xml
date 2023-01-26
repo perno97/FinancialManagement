@@ -162,7 +162,7 @@
                     android:weightSum="1">
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/progressBarAssetsOutcomes"
+                        android:id="@+id/progressBarAssetsExpenses"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:max="100"
@@ -174,7 +174,7 @@
                         android:layout_weight=".7" />
 
                     <TextView
-                        android:id="@+id/txtAssetsOutcomes"
+                        android:id="@+id/txtAssetsExpenses"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight=".3"
@@ -223,7 +223,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/outcome"
+                        android:text="@string/expense"
                         android:layout_marginStart="15dp" />
                 </LinearLayout>
             </LinearLayout>

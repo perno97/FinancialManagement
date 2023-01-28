@@ -1,93 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="45dp"
-    android:paddingEnd="45dp"
-    android:paddingTop="35dp"
-    android:paddingBottom="40dp"
-    android:background="@drawable/all_rounded_20_style"
-    android:backgroundTint="@color/white"
-    tools:context=".fragments.EditCurrentAssetsDialog">
-
-    <TextView
-        android:id="@+id/txtEditCurrentAssets"
-        android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/edit_current_assets_capital"
-        android:textSize="15sp"
-        android:labelFor="@id/editTextCurrentAssets"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="45dp"
+            android:paddingEnd="45dp"
+            android:paddingTop="35dp"
+            android:paddingBottom="40dp"
+            android:background="@drawable/all_rounded_20_style"
+            android:backgroundTint="@color/white"
+            tools:context=".fragments.EditCurrentAssetsDialog">
 
-    <EditText
-        android:id="@+id/editTextCurrentAssets"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
-        android:ems="6"
-        android:textSize="28sp"
-        android:textAlignment="center"
-        android:background="@drawable/all_rounded_30_style"
-        android:backgroundTint="@color/dark_10"
-        android:inputType="numberDecimal"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEditCurrentAssets"
-        android:importantForAutofill="no" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/euro_symbol"
-        android:textColor="@color/dark"
-        android:textSize="28sp"
-        android:layout_marginTop="65dp"
-        android:layout_marginBottom="72dp"
-        app:layout_constraintStart_toEndOf="@id/editTextCurrentAssets"
-        app:layout_constraintTop_toBottomOf="@id/txtEditCurrentAssets"
-        app:layout_constraintBottom_toTopOf="@id/rowCancelConfirm"/>
+            <TextView
+                android:id="@+id/txtEditCurrentAssets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_current_assets_capital"
+                android:textSize="15sp"
+                android:labelFor="@id/editTextCurrentAssets"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/rowCancelConfirm"
-        android:layout_marginTop="72dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextCurrentAssets">
-        <Button
-            android:id="@+id/btnCancelEditAssets"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:padding="0dp"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:layout_marginEnd="3dp"
-            android:background="@drawable/all_rounded_10_style"
-            app:backgroundTint="@color/dark"
-            android:text="@string/cancel_capital"
-            app:layout_constraintEnd_toStartOf="@+id/btnConfirmEditAssets"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <EditText
+                android:id="@+id/editTextCurrentAssets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="65dp"
+                android:ems="6"
+                android:textSize="28sp"
+                android:textAlignment="center"
+                android:background="@drawable/all_rounded_30_style"
+                android:backgroundTint="@color/dark_10"
+                android:inputType="numberDecimal"
+                android:minHeight="48dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtEditCurrentAssets"
+                android:importantForAutofill="no" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/euro_symbol"
+                android:textColor="@color/dark"
+                android:textSize="28sp"
+                android:layout_marginTop="65dp"
+                android:layout_marginBottom="72dp"
+                app:layout_constraintStart_toEndOf="@id/editTextCurrentAssets"
+                app:layout_constraintTop_toBottomOf="@id/txtEditCurrentAssets"
+                app:layout_constraintBottom_toTopOf="@id/rowCancelConfirm"/>
 
-        <Button
-            android:id="@+id/btnConfirmEditAssets"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:padding="0dp"
-            android:textSize="12sp"
-            android:layout_marginStart="3dp"
-            android:textColor="@color/white"
-            android:background="@drawable/all_rounded_10_style"
-            app:backgroundTint="@color/primary"
-            android:text="@string/confirm_capital"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btnCancelEditAssets"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rowCancelConfirm"
+                android:layout_marginTop="72dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/editTextCurrentAssets">
+                <Button
+                    android:id="@+id/btnCancelEditAssets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:padding="0dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/all_rounded_10_style"
+                    app:backgroundTint="@color/dark"
+                    android:text="@string/cancel_capital"
+                    app:layout_constraintEnd_toStartOf="@+id/btnConfirmEditAssets"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <Button
+                    android:id="@+id/btnConfirmEditAssets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:padding="0dp"
+                    android:textSize="12sp"
+                    android:layout_marginStart="3dp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/all_rounded_10_style"
+                    app:backgroundTint="@color/primary"
+                    android:text="@string/confirm_capital"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnCancelEditAssets"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,139 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="45dp"
-    android:paddingEnd="45dp"
-    android:paddingTop="35dp"
-    android:paddingBottom="40dp"
-    android:background="@drawable/all_rounded_20_style"
-    android:backgroundTint="@color/white"
-    tools:context=".fragments.AddNewCategoryDialog">
-
-    <TextView
-        android:id="@+id/txtAddNewCat"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="@string/edit_category_capital"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    android:layout_height="match_parent">
     <LinearLayout
-        android:id="@+id/inputNameNewCatRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        app:layout_constraintTop_toBottomOf="@id/txtAddNewCat">
-        <TextView
-            android:id="@+id/txtCatName"
-            android:layout_width="0dp"
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/name_capital"
-            android:labelFor="@id/editTextNewCatName"
-            android:gravity="center_vertical"
-            android:layout_weight=".5" />
+            android:paddingStart="45dp"
+            android:paddingEnd="45dp"
+            android:paddingTop="35dp"
+            android:paddingBottom="40dp"
+            android:background="@drawable/all_rounded_20_style"
+            android:backgroundTint="@color/white"
+            tools:context=".fragments.AddNewCategoryDialog">
 
-        <EditText
-            android:id="@+id/editTextNewCatName"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:ems="10"
-            android:textAlignment="textEnd"
-            android:layout_weight=".5"
-            android:maxLength="15"
-            android:inputType="text"
-            android:importantForAutofill="no" />
+            <TextView
+                android:id="@+id/txtAddNewCat"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_category_capital"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/inputNameNewCatRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                app:layout_constraintTop_toBottomOf="@id/txtAddNewCat">
+                <TextView
+                    android:id="@+id/txtCatName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/name_capital"
+                    android:labelFor="@id/editTextNewCatName"
+                    android:gravity="center_vertical"
+                    android:layout_weight=".5" />
+
+                <EditText
+                    android:id="@+id/editTextNewCatName"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:ems="10"
+                    android:textAlignment="textEnd"
+                    android:layout_weight=".5"
+                    android:maxLength="15"
+                    android:inputType="text"
+                    android:importantForAutofill="no" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="@string/color_capital"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"/>
+
+            <Spinner
+                android:id="@+id/spinnerColor"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginTop="23dp"
+                app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <LinearLayout
+                android:id="@+id/inputBudgetNewCatRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                app:layout_constraintTop_toBottomOf="@id/txtColor">
+                <TextView
+                    android:id="@+id/txtNewCatBudget"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:gravity="center_vertical"
+                    android:text="@string/daily_budget_capital"
+                    android:labelFor="@id/editTextNewCatBudget"/>
+
+                <EditText
+                    android:id="@+id/editTextNewCatBudget"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight=".4"
+                    android:textAlignment="textEnd"
+                    android:ems="10"
+                    android:inputType="numberDecimal"
+                    android:importantForAutofill="no" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".1"
+                    android:text="@string/euro_symbol" />
+            </LinearLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="72dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/inputBudgetNewCatRow">
+                <Button
+                    android:id="@+id/btnCancelEditCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:padding="0dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/all_rounded_10_style"
+                    app:backgroundTint="@color/dark"
+                    android:text="@string/cancel_capital"
+                    app:layout_constraintEnd_toStartOf="@id/btnConfirmEditCategory"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/btnConfirmEditCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:padding="0dp"
+                    android:textSize="12sp"
+                    android:layout_marginStart="3dp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/all_rounded_10_style"
+                    app:backgroundTint="@color/primary"
+                    android:text="@string/confirm_capital"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btnCancelEditCategory"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/txtColor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="@string/color_capital"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"/>
-
-    <Spinner
-        android:id="@+id/spinnerColor"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginTop="23dp"
-        app:layout_constraintTop_toBottomOf="@id/inputNameNewCatRow"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <LinearLayout
-        android:id="@+id/inputBudgetNewCatRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        app:layout_constraintTop_toBottomOf="@id/txtColor">
-        <TextView
-            android:id="@+id/txtNewCatBudget"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".5"
-            android:gravity="center_vertical"
-            android:text="@string/daily_budget_capital"
-            android:labelFor="@id/editTextNewCatBudget"/>
-
-        <EditText
-            android:id="@+id/editTextNewCatBudget"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight=".4"
-            android:textAlignment="textEnd"
-            android:ems="10"
-            android:inputType="numberDecimal"
-            android:importantForAutofill="no" />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".1"
-            android:text="@string/euro_symbol" />
-    </LinearLayout>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputBudgetNewCatRow">
-        <Button
-            android:id="@+id/btnCancelEditCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:padding="0dp"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:layout_marginEnd="3dp"
-            android:background="@drawable/all_rounded_10_style"
-            app:backgroundTint="@color/dark"
-            android:text="@string/cancel_capital"
-            app:layout_constraintEnd_toStartOf="@id/btnConfirmEditCategory"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btnConfirmEditCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:padding="0dp"
-            android:textSize="12sp"
-            android:layout_marginStart="3dp"
-            android:textColor="@color/white"
-            android:background="@drawable/all_rounded_10_style"
-            app:backgroundTint="@color/primary"
-            android:text="@string/confirm_capital"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnCancelEditCategory"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

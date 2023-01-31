@@ -452,7 +452,7 @@ class AddFinancialMovementFragment : Fragment() {
                 requireContext(),
                 appViewModel,
                 appViewModel.viewModelScope,
-                null,
+                null, // Generate all movements starting from the periodic movement date
                 appViewModel.getPeriodicMovement(periodicMovementId)
             )
             Snackbar.make(

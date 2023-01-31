@@ -23,15 +23,6 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     }
 
     @WorkerThread
-    suspend fun getLatestPeriodicMovement(
-        periodicMovementId: Long,
-        dateFrom: LocalDate,
-        dateTo: LocalDate
-    ): Movement? {
-        return applicationDao.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
-    }
-
-    @WorkerThread
     suspend fun getLatestIncomingPeriodic(
         periodicMovementId: Long,
         dateFrom: LocalDate,
@@ -308,6 +299,11 @@ class AppRepository(private val applicationDao: ApplicationDao) {
     @WorkerThread
     suspend fun updateCategoryNameInMovements(oldName: String, newName: String) {
         applicationDao.updateCategoryNameInMovements(oldName, newName)
+    }
+
+    @WorkerThread
+    suspend fun updateLastAccess(profileId: Long, lastAccess: LocalDate) {
+        applicationDao.updateLastAccess(profileId, lastAccess)
     }
 
 

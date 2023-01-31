@@ -50,14 +50,6 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
         return repository.getAllPeriodicMovements()
     }
 
-    suspend fun getLatestPeriodicMovement(
-        periodicMovementId: Long,
-        dateFrom: LocalDate,
-        dateTo: LocalDate
-    ): Movement? {
-        return repository.getLatestPeriodicMovement(periodicMovementId, dateFrom, dateTo)
-    }
-
     suspend fun getLatestIncomingPeriodic(
         periodicMovementId: Long,
         dateFrom: LocalDate,
@@ -352,6 +344,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel() {
 
     fun updateCategoryNameInMovements(oldName: String, newName: String) = viewModelScope.launch {
         repository.updateCategoryNameInMovements(oldName, newName)
+    }
+
+    fun updateLastAccess(lastAccess: LocalDate) = viewModelScope.launch {
+        repository.updateLastAccess(defaultProfileId, lastAccess)
     }
 
 

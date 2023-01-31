@@ -55,6 +55,11 @@ interface ApplicationDao {
     )
     suspend fun updateCategoryNameInMovements(oldName: String, newName: String)
 
+    @Query(
+        "UPDATE profile SET last_access = :lastAccess WHERE profileId = :profileId"
+    )
+    suspend fun updateLastAccess(profileId: Long, lastAccess: LocalDate)
+
 
     /*
     Delete
@@ -392,15 +397,6 @@ interface ApplicationDao {
                 " FROM movement WHERE :dateTo >= movement.date AND movement.date >= :dateFrom"
     )
     fun getGainsAndExpensesInPeriod(dateFrom: LocalDate, dateTo: LocalDate): Flow<GroupInfo>
-
-    @Query(
-        "SELECT * FROM movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date >= :dateFrom ORDER BY date DESC LIMIT 1"
-    )
-    suspend fun getLatestPeriodicMovement(
-        periodicMovementId: Long,
-        dateFrom: LocalDate,
-        dateTo: LocalDate
-    ): Movement?
 
     @Query(
         "SELECT * FROM incoming_movement WHERE periodic_movement_id = :periodicMovementId AND :dateTo >= date AND date >= :dateFrom ORDER BY date DESC LIMIT 1"

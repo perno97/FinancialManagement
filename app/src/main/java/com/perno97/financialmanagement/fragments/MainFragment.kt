@@ -77,13 +77,16 @@ class MainFragment : Fragment() {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
         lifecycleScope.launch {
+            val lastAccess = appViewModel.getLastAccess()
+            Log.e(logTag, "Last access --> ${lastAccess.toString()}")
             PeriodicMovementsChecker.check(
                 requireContext(),
                 appViewModel,
                 appViewModel.viewModelScope,
-                appViewModel.getLastAccess(),
+                lastAccess,
                 null
             )
+            appViewModel.updateLastAccess(LocalDate.now())
         }
 
         // Setup chart styling

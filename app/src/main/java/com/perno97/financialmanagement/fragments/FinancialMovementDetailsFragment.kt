@@ -687,7 +687,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                 requireContext(),
                 appViewModel,
                 appViewModel.viewModelScope,
-                null,
+                null, // Generate all movements starting from the periodic movement date
                 appViewModel.getPeriodicMovement(periodicMovementId)
             )
             if (movementDetailsData.incomingMovementId != null) {
@@ -774,7 +774,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
             requireContext(),
             appViewModel,
             appViewModel.viewModelScope,
-            LocalDate.now(),
+            LocalDate.now(), // Update only incoming movements
             periodicMovement
         )
         Snackbar.make(

@@ -23,21 +23,14 @@ object PeriodicMovementsChecker {
         Log.i(logTag, "Called check")
         scope.launch {
             val list =
-                if (periodicMovement == null) {
+                if (periodicMovement == null) { // Update all periodic movements
                     appViewModel.getAllPeriodicMovements()
-                } else {
+                } else { // Update a single periodic movement
                     listOf(periodicMovement)
                 }
             for (periodicMov in list) {
-                var movement: Movement? = null
                 var incomingMovement: IncomingMovement? = null
                 if (lastAccess != null) {
-                    // Search for last added movement of this periodic
-                    movement = appViewModel.getLatestPeriodicMovement(
-                        periodicMovementId = periodicMov.periodicMovementId,
-                        dateTo = LocalDate.now(),
-                        dateFrom = lastAccess
-                    )
                     // Search for last added incoming movement of this periodic
                     incomingMovement = appViewModel.getLatestIncomingPeriodic(
                         periodicMovementId = periodicMov.periodicMovementId,
@@ -46,23 +39,22 @@ object PeriodicMovementsChecker {
                     )
                 }
 
-                val calculatedMovements =
-                    if (movement != null) {
-                        // Generate movements starting the day after the found one
-                        getMovementsFromPeriodicMovement(
-                            periodicMov,
-                            movement.date.plusDays(1),
-                            LocalDate.now()
-                                .plusMonths(5) // Generating incoming movements up to 5 months
-                        )
-                    } else {
-                        // No movements found before today and after last access or periodic movement's date
-                        getMovementsFromPeriodicMovement(
-                            periodicMov,
-                            lastAccess ?: periodicMov.date,
-                            LocalDate.now().plusMonths(5)
-                        )
-                    }
+                val calculatedMovements = if (lastAccess != null) {
+                    // Called for generating only incoming movements and not all the past movements
+                    getMovementsFromPeriodicMovement(
+                        periodicMov,
+                        LocalDate.now().plusDays(1),
+                        LocalDate.now().plusMonths(5)
+                    )
+                } else {
+                    // Just created a periodic movement, so this method is called for generating
+                    // all movements starting from the periodic movement's date
+                    getMovementsFromPeriodicMovement(
+                        periodicMov,
+                        periodicMov.date,
+                        LocalDate.now().plusMonths(5)
+                    )
+                }
                 var amountsSum = 0f
                 for (date in calculatedMovements.keys) {
                     val movDate = LocalDate.parse(date)

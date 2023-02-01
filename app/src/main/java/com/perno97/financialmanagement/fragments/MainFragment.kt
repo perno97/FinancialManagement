@@ -580,7 +580,7 @@ class MainFragment : Fragment() {
             val diff = budgetsSum - currentSum
             if (diff > 0) {
                 pieChartEntries.add(PieEntry(diff, "Available"))
-                colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
+                colors.add(ContextCompat.getColor(requireContext(), R.color.light_1))
             }
         }
         val dataSet = PieDataSet(pieChartEntries, "Budgets")
@@ -610,7 +610,7 @@ class MainFragment : Fragment() {
         s2.setSpan(AbsoluteSizeSpan(textSize2), 0, s2.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         s3.setSpan(AbsoluteSizeSpan(textSize1), 0, s3.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
         chart.centerText = TextUtils.concat(s1, "\n", s2, "\n", s3)
-        chart.setCenterTextColor(R.color.dark)
+        chart.setCenterTextColor(R.color.light_1)
         chart.invalidate()
     }
 }

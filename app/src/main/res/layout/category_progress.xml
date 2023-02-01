@@ -32,7 +32,7 @@
         android:progress="0"
         app:trackThickness="8dp"
         app:trackCornerRadius="4dp"
-        app:trackColor="@color/dark_30"
+        app:trackColor="@color/light_1"
         app:layout_constraintBottom_toTopOf="@+id/txtCurrentCategoryProgress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

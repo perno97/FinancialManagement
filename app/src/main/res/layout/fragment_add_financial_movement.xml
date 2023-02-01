@@ -42,9 +42,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="55dp"
                     android:hint="@string/zero"
-                    android:textColorHint="@color/dark_10"
+                    android:textColorHint="@color/light_2"
                     android:textSize="64sp"
-                    android:textColor="@color/dark_10"
+                    android:textColor="@color/light_2"
                     android:textAlignment="textEnd"
                     android:inputType="numberDecimal"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="55dp"
                     android:text="@string/euro_symbol"
-                    android:textColor="@color/dark_10"
+                    android:textColor="@color/light_2"
                     android:textSize="24sp"
                     android:layout_marginBottom="11dp"
                     android:layout_marginStart="5dp"
@@ -114,7 +114,7 @@
                 app:layout_constraintTop_toBottomOf="@id/linLayIncomeExpense"
                 app:layout_constraintStart_toStartOf="parent"
                 android:background="@drawable/all_rounded_15_style"
-                android:backgroundTint="@color/dark_10"
+                android:backgroundTint="@color/light_2"
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -231,7 +231,7 @@
                         android:inputType="textShortMessage"
                         android:textAlignment="textEnd"
                         android:background="@drawable/all_rounded_10_style"
-                        android:backgroundTint="@color/dark_30"
+                        android:backgroundTint="@color/light_1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/txtTitleInput"
                         android:importantForAutofill="no" />
@@ -267,7 +267,7 @@
                         android:padding="10dp"
                         android:textAlignment="textEnd"
                         android:background="@drawable/all_rounded_10_style"
-                        android:backgroundTint="@color/dark_30"
+                        android:backgroundTint="@color/light_1"
                         android:inputType="textLongMessage|textMultiLine|textNoSuggestions"
                         android:maxLength="200"
                         app:layout_constraintStart_toStartOf="parent"

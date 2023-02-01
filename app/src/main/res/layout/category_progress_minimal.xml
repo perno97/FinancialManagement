@@ -27,7 +27,7 @@
             android:progress="0"
             app:trackThickness="20dp"
             app:trackCornerRadius="30dp"
-            app:trackColor="@color/dark_30"
+            app:trackColor="@color/light_1"
             android:layout_weight=".7" />
 
         <TextView

@@ -39,7 +39,7 @@
                 android:textSize="28sp"
                 android:textAlignment="center"
                 android:background="@drawable/all_rounded_30_style"
-                android:backgroundTint="@color/dark_10"
+                android:backgroundTint="@color/light_2"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"

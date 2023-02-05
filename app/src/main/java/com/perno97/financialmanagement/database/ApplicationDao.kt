@@ -94,7 +94,7 @@ interface ApplicationDao {
     @Query("SELECT * FROM category ORDER BY name ASC")
     fun getAllCategories(): Flow<List<Category>>
 
-    @Query("SELECT * FROM periodic_movement")
+    @Query("SELECT * FROM periodic_movement ORDER BY date DESC, periodic_movement_id DESC")
     suspend fun getAllPeriodicMovements(): List<PeriodicMovement>
 
     @Query("SELECT * FROM profile WHERE profileId = :profileId")
@@ -140,7 +140,7 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m', a.date,'unixepoch') = STRFTIME('%Y-%m', b.date,'unixepoch')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC, b.movement_id DESC"
     )
     fun getMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>>
 
@@ -160,7 +160,7 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch') = STRFTIME('%Y-%m-%d', b.date,'unixepoch')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC, b.movement_id DESC"
     )
     fun getMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<MovementAndCategory>>>
 
@@ -182,7 +182,7 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM periodic_movement a" +
                 " JOIN periodic_movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch') = STRFTIME('%Y-%m-%d', b.date,'unixepoch')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.periodic_movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.periodic_movement_id ORDER BY groupDate DESC, b.date DESC, b.periodic_movement_id DESC"
     )
     fun getPeriodicMovementsGroupByDay(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<PeriodicMovementAndCategory>>>
 
@@ -195,7 +195,7 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM periodic_movement a" +
                 " JOIN periodic_movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.periodic_movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.periodic_movement_id ORDER BY groupDate DESC, b.date DESC, b.periodic_movement_id DESC"
     )
     fun getPeriodicMovementsGroupByWeek(
         weekStartOffset: Int,
@@ -209,7 +209,7 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount > 0 THEN a.amount else 0 END) AS positive," +
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.*FROM periodic_movement a" +
                 " JOIN periodic_movement b ON STRFTIME('%Y-%m', a.date,'unixepoch') = STRFTIME('%Y-%m', b.date,'unixepoch')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.periodic_movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.periodic_movement_id ORDER BY groupDate DESC, b.date DESC, b.periodic_movement_id DESC"
     )
     fun getPeriodicMovementsGroupByMonth(beforeDateInclusive: LocalDate): Flow<Map<GroupInfo, List<PeriodicMovementAndCategory>>>
 
@@ -237,7 +237,7 @@ interface ApplicationDao {
                 " SUM(CASE WHEN a.amount < 0 THEN a.amount else 0 END) AS negative, b.* FROM movement a" +
                 " JOIN movement b ON STRFTIME('%Y-%m-%d', a.date,'unixepoch', 'weekday 0', '-' || :weekStartOffset ||' days')" +
                 " = STRFTIME('%Y-%m-%d', b.date,'unixepoch',  'weekday 0', '-' || :weekStartOffset ||' days')" +
-                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC"
+                " JOIN category ON b.category = category.name WHERE :beforeDateInclusive >= b.date AND :beforeDateInclusive >= a.date GROUP BY b.movement_id ORDER BY groupDate DESC, b.date DESC, b.movement_id DESC"
     )
     fun getMovementsGroupByWeek(
         weekStartOffset: Int,

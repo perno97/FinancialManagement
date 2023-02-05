@@ -85,7 +85,9 @@ class EditCategoryDialog(private val category: Category, private val viewForSnac
                 )
             } else {
                 appViewModel.update(newCategoryData)
-                appViewModel.updateCategoryNameInMovements(category.name, newCategoryData.name)
+                if (category.name != newCategoryData.name) {
+                    appViewModel.updateCategoryNameInMovements(category.name, newCategoryData.name)
+                }
             }
             Snackbar.make(
                 viewForSnack,

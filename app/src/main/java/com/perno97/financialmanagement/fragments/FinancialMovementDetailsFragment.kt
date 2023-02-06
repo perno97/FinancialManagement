@@ -800,6 +800,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
     private fun cancelEdit() {
         disableEditing()
         loadMovementData()
+        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
     }
 
     override fun onDestroyView() {

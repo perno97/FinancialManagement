@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -101,8 +102,12 @@ class CategoryDetailsFragment(private val categoryId: Long) :
         val gainsChart = binding.incomesLineChart
         expChart.setExtraOffsets(10f, 0f, 10f, 10f)
         expChart.description.isEnabled = false
+        expChart.setNoDataText(getString(R.string.loading_data))
+        expChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.dark))
         gainsChart.setExtraOffsets(10f, 0f, 10f, 10f)
         gainsChart.description.isEnabled = false
+        gainsChart.setNoDataText(getString(R.string.loading_data))
+        gainsChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.dark))
 
         val xAxisExp = expChart.xAxis
         xAxisExp.setDrawGridLines(false)

@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.perno97.financialmanagement.FinancialManagementApplication
 import com.perno97.financialmanagement.R
+import com.perno97.financialmanagement.database.UnusedCategoriesChecker
 import com.perno97.financialmanagement.databinding.FragmentConfirmMovementDeleteDialogBinding
 import com.perno97.financialmanagement.notifications.NotifyManager
 import com.perno97.financialmanagement.utils.MovementDeletionData
@@ -129,6 +130,7 @@ class ConfirmMovementDeleteDialog(
         } else {
             Log.e(logTag, "Error deleting movement $movementDeletionData")
         }
+        UnusedCategoriesChecker.check(appViewModel, appViewModel.viewModelScope)
         dismiss()
         parentFragmentManager.popBackStack()
     }

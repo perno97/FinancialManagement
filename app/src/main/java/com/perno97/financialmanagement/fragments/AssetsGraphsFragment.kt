@@ -117,9 +117,13 @@ class AssetsGraphsFragment : Fragment() {
         lineChart.setExtraOffsets(10f, 0f, 10f, 10f)
         lineChart.description.isEnabled = false
         lineChart.legend.isEnabled = false
+        lineChart.setNoDataText(getString(R.string.loading_data))
+        lineChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.dark))
         barChart.setExtraOffsets(10f, 0f, 10f, 10f)
         barChart.description.isEnabled = false
         barChart.legend.isEnabled = false
+        barChart.setNoDataText(getString(R.string.loading_data))
+        barChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.dark))
 
         val xAxisLine = lineChart.xAxis
         xAxisLine.setDrawGridLines(false)
@@ -292,7 +296,7 @@ class AssetsGraphsFragment : Fragment() {
                         lineEntries.add(
                             Entry(
                                 columnCount.toFloat() + 1, // +1 because the first column is current assets
-                                columnValue
+                                columnValue.roundToInt().toFloat()
                             )
                         )
                         lineLabels.add(l)
@@ -333,7 +337,7 @@ class AssetsGraphsFragment : Fragment() {
                         lineEntries.add(
                             Entry(
                                 columnCount.toFloat() + 1, // +1 because the first column is current assets
-                                columnValue
+                                columnValue.roundToInt().toFloat()
                             )
                         )
                         lineLabels.add(l)
@@ -371,7 +375,7 @@ class AssetsGraphsFragment : Fragment() {
                     lineEntries.add(
                         Entry(
                             columnCount.toFloat(),
-                            columnValue
+                            columnValue.roundToInt().toFloat()
                         )
                     )
                     lineLabels.add(l)

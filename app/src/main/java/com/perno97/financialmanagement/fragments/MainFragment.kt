@@ -89,6 +89,11 @@ class MainFragment : Fragment() {
             appViewModel.updateLastAccess(LocalDate.now())
         }
 
+        initGraph()
+        return binding.root
+    }
+
+    private fun initGraph() {
         // Setup chart styling
         val chart = binding.pieChartMain
         chart.setNoDataText(getString(R.string.loading_data))
@@ -97,7 +102,35 @@ class MainFragment : Fragment() {
         chart.setDrawEntryLabels(false)
         chart.setDrawCenterText(true)
         chart.setTouchEnabled(false)
-        return binding.root
+
+        val pieChartEntries = ArrayList<PieEntry>()
+        pieChartEntries.add(PieEntry(1f, "Available"))
+        val dataSet = PieDataSet(pieChartEntries, "Expenses")
+        dataSet.colors = listOf(ContextCompat.getColor(requireContext(), R.color.light_1))
+        val pieData = PieData(dataSet)
+        pieData.setDrawValues(false)
+        chart.data = pieData
+        val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
+        val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
+        val s1 = SpannableString(getString(R.string.pie_chart_center_first_text))
+        val s2 = SpannableString(
+            getString(
+                R.string.pie_chart_center_second_text,
+                0
+            )
+        )
+        val s3 = SpannableString(
+            getString(
+                R.string.pie_chart_center_third_text,
+                0
+            )
+        )
+        s1.setSpan(AbsoluteSizeSpan(textSize1), 0, s1.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        s2.setSpan(AbsoluteSizeSpan(textSize2), 0, s2.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        s3.setSpan(AbsoluteSizeSpan(textSize1), 0, s3.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        chart.centerText = TextUtils.concat(s1, "\n", s2, "\n", s3)
+        chart.setCenterTextColor(R.color.light_1)
+        chart.invalidate()
     }
 
     private fun loadCountIncoming() {
@@ -535,8 +568,10 @@ class MainFragment : Fragment() {
         } // Budget is defined as daily budget
         if (categories.isEmpty()) {
             pieChartEntries.add(PieEntry(1f, "No data"))
-            colors.add(ContextCompat.getColor(requireContext(), R.color.dark))
+            colors.add(ContextCompat.getColor(requireContext(), R.color.light_1))
+            binding.txtBudgetExpense.visibility = View.GONE
         } else {
+            binding.txtBudgetExpense.visibility = View.VISIBLE
             for (c in categories.keys) {
                 val multipliedBudget = c.budget * budgetMultiplier
                 val currentCatExpenseAsPositive = categories[c]?.expense?.absoluteValue ?: 0f
@@ -583,7 +618,7 @@ class MainFragment : Fragment() {
                 colors.add(ContextCompat.getColor(requireContext(), R.color.light_1))
             }
         }
-        val dataSet = PieDataSet(pieChartEntries, "Budgets")
+        val dataSet = PieDataSet(pieChartEntries, "Expenses")
         dataSet.colors = colors
         val pieData = PieData(dataSet)
         pieData.setDrawValues(false)
@@ -592,12 +627,12 @@ class MainFragment : Fragment() {
         val textSize1 = resources.getDimensionPixelSize(R.dimen.text_size_1)
         val textSize2 = resources.getDimensionPixelSize(R.dimen.text_size_2)
         val availableBudget =
-            if (currentSum > budgetsSum) 0 else (budgetsSum - currentSum).roundToInt()
+            if (currentSum > budgetsSum) 0f else (budgetsSum - currentSum)
         val s1 = SpannableString(getString(R.string.pie_chart_center_first_text))
         val s2 = SpannableString(
             getString(
                 R.string.pie_chart_center_second_text,
-                availableBudget
+                availableBudget.roundToInt()
             )
         )
         val s3 = SpannableString(

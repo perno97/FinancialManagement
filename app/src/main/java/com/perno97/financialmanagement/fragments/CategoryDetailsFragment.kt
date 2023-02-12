@@ -22,6 +22,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.utils.EntryXComparator
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.perno97.financialmanagement.FinancialManagementApplication
@@ -334,13 +335,13 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                     }
                     expEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            numberOfColumnsInGraphs - 1 - columnCount.toFloat(),
                             exp
                         )
                     )
                     gainEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            numberOfColumnsInGraphs - 1 - columnCount.toFloat(),
                             gain
                         )
                     )
@@ -354,6 +355,8 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                         )
                     columnCount++
                 }
+                expEntries.sortWith(EntryXComparator())
+                gainEntries.sortWith(EntryXComparator())
                 val expensesDataSet = LineDataSet(expEntries, category.name)
                 val incomesDataSet = LineDataSet(gainEntries, category.name)
                 expensesDataSet.color = Color.parseColor(category.color)
@@ -362,7 +365,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                 lineChartGainData.addDataSet(incomesDataSet)
                 labelsLoaded = true
             }
-            val valueFormatter = IndexAxisValueFormatter(labels)
+            val valueFormatter = IndexAxisValueFormatter(labels.reversed())
             if (!expensesFound)
                 binding.expensesSectionCatDetails.visibility = View.GONE
             else {
@@ -425,11 +428,11 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                 while (columnCount < numberOfColumnsInGraphs) {
                     // x value must be between these dates to be in this column
                     dateToCheckAfter =
-                        LocalDate.now()
+                        LocalDate.now().minusWeeks(columnCount.toLong())
                             .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
                     dateToCheckBefore =
                         if (columnCount == 0) LocalDate.now()
-                        else LocalDate.now()
+                        else LocalDate.now().minusWeeks(columnCount.toLong())
                             .with(TemporalAdjusters.nextOrSame(firstDayOfWeek.minus(1)))
                     val amountWithDateFound = data[category]!!.filter { amountWithDate ->
                         !amountWithDate.amountDate.isBefore(
@@ -463,13 +466,13 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                     }
                     expEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            numberOfColumnsInGraphs - 1 - columnCount.toFloat(),
                             exp
                         )
                     )
                     gainEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            numberOfColumnsInGraphs - 1 - columnCount.toFloat(),
                             gain
                         )
                     )
@@ -483,6 +486,8 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                     }
                     columnCount++
                 }
+                expEntries.sortWith(EntryXComparator())
+                gainEntries.sortWith(EntryXComparator())
                 val expensesDataSet = LineDataSet(expEntries, category.name)
                 val incomesDataSet = LineDataSet(gainEntries, category.name)
                 expensesDataSet.color = Color.parseColor(category.color)
@@ -492,7 +497,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                 labelsLoaded = true
             }
 
-            val valueFormatter = IndexAxisValueFormatter(labels)
+            val valueFormatter = IndexAxisValueFormatter(labels.reversed())
             if (!expensesFound)
                 binding.expensesSectionCatDetails.visibility = View.GONE
             else {
@@ -542,6 +547,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
             var labelsLoaded = false
             var expensesFound = false
             var gainsFound = false
+            val numberOfColumns = ChronoUnit.DAYS.between(dateFrom, dateTo) + 1
             for (category in data.keys) {
                 val expEntries = arrayListOf<Entry>()
                 val gainEntries = arrayListOf<Entry>()
@@ -582,13 +588,13 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                     }
                     expEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            numberOfColumns - 1 - columnCount.toFloat(),
                             exp
                         )
                     )
                     gainEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            numberOfColumns - 1 - columnCount.toFloat(),
                             gain
                         )
                     )
@@ -598,6 +604,8 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                     columnCount++
                     currentColumnDate = currentColumnDate.minusDays(1)
                 }
+                expEntries.sortWith(EntryXComparator())
+                gainEntries.sortWith(EntryXComparator())
                 val expensesDataSet = LineDataSet(expEntries, category.name)
                 val incomesDataSet = LineDataSet(gainEntries, category.name)
                 expensesDataSet.color = Color.parseColor(category.color)
@@ -607,7 +615,7 @@ class CategoryDetailsFragment(private val categoryId: Long) :
                 labelsLoaded = true
             }
 
-            val valueFormatter = IndexAxisValueFormatter(labels)
+            val valueFormatter = IndexAxisValueFormatter(labels.reversed())
             val numberOfDays = ChronoUnit.DAYS.between(dateFrom, dateTo).toInt() + 1
             if (!expensesFound)
                 binding.expensesSectionCatDetails.visibility = View.GONE

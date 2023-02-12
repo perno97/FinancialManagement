@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.utils.EntryXComparator
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -234,8 +235,8 @@ class AssetsGraphsFragment : Fragment() {
         if (state != PeriodState.PERIOD) {
             lineEntries.add(
                 Entry(
-                    0f,
-                    columnValue
+                    (numberOfColumnsInGraphs - 1).toFloat(),
+                    columnValue.roundToInt().toFloat()
                 )
             )
             lineLabels.add(getString(R.string.graph_label_now))
@@ -295,7 +296,7 @@ class AssetsGraphsFragment : Fragment() {
                     if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
                         lineEntries.add(
                             Entry(
-                                columnCount.toFloat() + 1, // +1 because the first column is current assets
+                                columnsToShow - 2 - columnCount.toFloat(), // +1 because the first column is current assets, but -1 because of inversion
                                 columnValue.roundToInt().toFloat()
                             )
                         )
@@ -303,13 +304,13 @@ class AssetsGraphsFragment : Fragment() {
                     }
                     barEntriesGain.add(
                         BarEntry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             item?.positive ?: 0f
                         )
                     )
                     barEntriesExp.add(
                         BarEntry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             item?.negative?.absoluteValue ?: 0f
                         )
                     )
@@ -336,7 +337,7 @@ class AssetsGraphsFragment : Fragment() {
                     if (columnCount + 1 < columnsToShow) { // Due to +1, need to check out of bound
                         lineEntries.add(
                             Entry(
-                                columnCount.toFloat() + 1, // +1 because the first column is current assets
+                                columnsToShow - 2 - columnCount.toFloat(), // +1 because the first column is current assets, but -1 because of inversion
                                 columnValue.roundToInt().toFloat()
                             )
                         )
@@ -345,13 +346,13 @@ class AssetsGraphsFragment : Fragment() {
 
                     barEntriesGain.add(
                         BarEntry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             item?.positive ?: 0f
                         )
                     )
                     barEntriesExp.add(
                         BarEntry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             item?.negative?.absoluteValue ?: 0f
                         )
                     )
@@ -374,7 +375,7 @@ class AssetsGraphsFragment : Fragment() {
 
                     lineEntries.add(
                         Entry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             columnValue.roundToInt().toFloat()
                         )
                     )
@@ -382,13 +383,13 @@ class AssetsGraphsFragment : Fragment() {
 
                     barEntriesGain.add(
                         BarEntry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             item?.positive ?: 0f
                         )
                     )
                     barEntriesExp.add(
                         BarEntry(
-                            columnCount.toFloat(),
+                            columnsToShow - 1 - columnCount.toFloat(),
                             item?.negative?.absoluteValue ?: 0f
                         )
                     )
@@ -402,21 +403,24 @@ class AssetsGraphsFragment : Fragment() {
             columnCount++
         }
 
+        lineEntries.sortWith(EntryXComparator())
         val lineDataSet = LineDataSet(lineEntries, getString(R.string.assets))
         lineDataSet.color = ContextCompat.getColor(requireContext(), R.color.dark)
         val lineChartData = LineData(lineDataSet)
         val xAxisLine = lineChart.xAxis
         xAxisLine.labelCount = columnsToShow
         xAxisLine.granularity = 1f
-        xAxisLine.valueFormatter = IndexAxisValueFormatter(lineLabels)
+        xAxisLine.valueFormatter = IndexAxisValueFormatter(lineLabels.reversed())
         lineChart.data = lineChartData
         lineChart.invalidate()
 
+        barEntriesExp.sortWith(EntryXComparator())
         val barDataSetExp = BarDataSet(barEntriesExp, getString(R.string.expenses))
         barDataSetExp.color = ContextCompat.getColor(
             requireContext(),
             R.color.warning
         )
+        barEntriesGain.sortWith(EntryXComparator())
         val barDataSetGain = BarDataSet(barEntriesGain, getString(R.string.incomes))
         barDataSetGain.color = ContextCompat.getColor(
             requireContext(),
@@ -428,7 +432,7 @@ class AssetsGraphsFragment : Fragment() {
         xAxisBar.labelCount = columnsToShow
         xAxisBar.granularity = 1f
         xAxisBar.axisMaximum = columnsToShow.toFloat()
-        xAxisBar.valueFormatter = IndexAxisValueFormatter(labels)
+        xAxisBar.valueFormatter = IndexAxisValueFormatter(labels.reversed())
         barChart.data = barChartData
         barChart.groupBars(0f, 0.1f, 0.05f)
         barChart.invalidate()

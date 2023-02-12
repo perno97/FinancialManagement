@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="30dp"
     android:orientation="horizontal"
+    android:id="@+id/categoryLine"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 

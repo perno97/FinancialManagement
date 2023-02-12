@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
@@ -68,7 +68,7 @@ class CategoriesListFragment : Fragment() {
                     Color.parseColor(category.color)
                 )
             itemView.findViewById<TextView>(R.id.txtCategoryFilterName).text = category.name
-            itemView.findViewById<ImageButton>(R.id.imgBtnEditCat).setOnClickListener {
+            itemView.findViewById<ConstraintLayout>(R.id.categoryLine).setOnClickListener {
                 parentFragmentManager.commit {
                     setCustomAnimations(
                         R.anim.slide_in_left,

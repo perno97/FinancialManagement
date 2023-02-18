@@ -173,7 +173,7 @@ class FinancialMovementDetailsFragment(private val movementDetailsData: Movement
                     MaterialDatePicker.Builder.datePicker()
                         .setTitleText(getString(R.string.select_date))
                         .setSelection(
-                            MaterialDatePicker.todayInUtcMilliseconds()
+                            MaterialDatePicker.todayInUtcMilliseconds() // TODO mettere data presente nell'edittext
                         )
                         .build()
                 datePicker.addOnPositiveButtonClickListener { value ->
